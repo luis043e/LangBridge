@@ -1,7 +1,9 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -20,7 +22,13 @@ export default function HomeScreen() {
         Connect with native speakers, exchange languages and grow together.
       </Text>
 
-      <TouchableOpacity style={styles.primaryButton}>
+      <TouchableOpacity
+  style={styles.primaryButton}
+  onPress={() => {
+  console.log('GET STARTED PRESSED');
+  router.navigate('/register');
+}}
+>
         <Text style={styles.primaryButtonText}>Get Started</Text>
       </TouchableOpacity>
 
