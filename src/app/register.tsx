@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -16,6 +17,8 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 
 export default function RegisterScreen() {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -118,7 +121,10 @@ export default function RegisterScreen() {
           Privacy Policy.
         </Text>
 
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity
+  style={styles.loginButton}
+  onPress={() => router.push('./login')}
+>
           <Text style={styles.loginText}>
             Already have an account?{' '}
             <Text style={styles.loginLink}>Log in</Text>

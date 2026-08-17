@@ -32,11 +32,14 @@ export default function HomeScreen() {
         <Text style={styles.primaryButtonText}>Get Started</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.secondaryButton}>
-        <Text style={styles.secondaryButtonText}>
-          I already have an account
-        </Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.secondaryButton}
+  onPress={() => router.push('./login')}
+>
+  <Text style={styles.secondaryButtonText}>
+    I already have an account
+  </Text>
+</TouchableOpacity>
 
       <Text style={styles.footer}>
         Build real connections through language
