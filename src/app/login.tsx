@@ -32,6 +32,8 @@ export default function LoginScreen() {
       'Login successful',
       'Welcome back to LangBridge.'
     );
+    
+    router.replace('./home');
   } catch (error) {
     Alert.alert(
       'Login error',
