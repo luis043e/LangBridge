@@ -21,6 +21,13 @@ export const translations = {
       footer: 'Build real connections through language',
     },
 
+    homeScreen: {
+  welcome: 'Welcome to LangBridge',
+  subtitle: 'Your language journey starts here.',
+  weeklyGoal: 'YOUR WEEKLY GOAL',
+  startPracticing: 'Start practicing today',
+},
+
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -74,6 +81,12 @@ registerScreen: {
       login: 'Ya tengo una cuenta',
       footer: 'Crea conexiones reales a través del idioma',
     },
+    homeScreen: {
+  welcome: 'Bienvenido a LangBridge',
+  subtitle: 'Tu viaje de aprendizaje de idiomas comienza aquí.',
+  weeklyGoal: 'TU META SEMANAL',
+  startPracticing: 'Comienza a practicar hoy',
+},
     loginScreen: {
   title: 'Bienvenido de nuevo',
   subtitle:

@@ -33,11 +33,21 @@ export default function LoginScreen() {
     await signInWithEmailAndPassword(auth, email.trim(), password);
 
     Alert.alert(
-      'Login successful',
-      'Welcome back to LangBridge.'
-    );
-
-    router.replace('./home');
+  language === 'es' ? 'Inicio de sesión exitoso' : 'Login successful',
+  language === 'es'
+    ? 'Bienvenido de nuevo a LangBridge.'
+    : 'Welcome back to LangBridge.',
+  [
+    {
+      text: 'OK',
+      onPress: () =>
+        router.replace({
+          pathname: './home',
+          params: { lang: language },
+        }),
+    },
+  ]
+);
   } catch (error) {
     Alert.alert(
       'Login error',
