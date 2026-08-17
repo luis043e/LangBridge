@@ -12,6 +12,7 @@ export default function RootLayout() {
       <Stack.Screen name="login" />
       <Stack.Screen name="home" />
       <Stack.Screen name="language-profile" />
+      <Stack.Screen name="choose-language" />
     </Stack>
   );
 }
