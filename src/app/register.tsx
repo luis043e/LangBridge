@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -21,15 +22,24 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
   if (password !== confirmPassword) {
-    console.log('PASSWORDS DO NOT MATCH');
+    Alert.alert(
+  'Passwords do not match',
+  'Please enter the same password in both fields.'
+);
     return;
   }
 
   try {
     await createUserWithEmailAndPassword(auth, email.trim(), password);
-    console.log('ACCOUNT CREATED SUCCESSFULLY');
+    Alert.alert(
+  'Account created',
+  'Your LangBridge account was created successfully.'
+);
   } catch (error) {
-    console.log('REGISTRATION ERROR:', error);
+    Alert.alert(
+  'Registration error',
+  'The account could not be created. The email may already be registered.'
+);
   }
 };
 
