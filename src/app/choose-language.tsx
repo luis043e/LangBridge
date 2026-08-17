@@ -8,12 +8,20 @@ import {
     View,
 } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translations } from '../translations';
-
 export default function ChooseLanguageScreen() {
   const router = useRouter();
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'es'>('en');
   const text = translations[selectedLanguage];
+  const handleContinue = async () => {
+  await AsyncStorage.setItem('appLanguage', selectedLanguage);
+
+  router.replace({
+    pathname: './welcome',
+    params: { lang: selectedLanguage },
+  });
+};
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -40,7 +48,7 @@ export default function ChooseLanguageScreen() {
   {text.chooseLanguage.english}
 </Text>
   <Text style={styles.languageDescription}>
-  {text.chooseLanguage.spanishDescription}
+  {text.chooseLanguage.englishDescription}
 </Text>
         </View>
 
@@ -62,7 +70,7 @@ export default function ChooseLanguageScreen() {
         <View>
           <Text style={styles.languageName}>Español</Text>
           <Text style={styles.languageName}>
-  {text.chooseLanguage.spanish}
+ {text.chooseLanguage.spanishDescription}
 </Text>
         </View>
 
@@ -80,12 +88,7 @@ export default function ChooseLanguageScreen() {
 
       <TouchableOpacity
   style={styles.primaryButton}
-  onPress={() =>
-  router.replace({
-    pathname: './welcome',
-    params: { lang: selectedLanguage },
-  })
-}
+  onPress={handleContinue}
 >
 
         <Text style={styles.primaryButtonText}>
