@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
     ScrollView,
@@ -8,6 +9,8 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
+    const router = useRouter();
+    
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -47,7 +50,10 @@ export default function HomeScreen() {
 
         <Text style={styles.sectionTitle}>Quick actions</Text>
 
-        <TouchableOpacity style={styles.actionCard}>
+        <TouchableOpacity
+  style={styles.actionCard}
+  onPress={() => router.push('./language-profile')}
+>
           <View style={styles.actionIcon}>
             <Text style={styles.actionIconText}>🌍</Text>
           </View>
