@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+
 import {
     ScrollView,
     StyleSheet,

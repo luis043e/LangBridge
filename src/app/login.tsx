@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -18,7 +18,11 @@ import {
     signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import { translations, type AppLanguage } from '../translations';
 export default function LoginScreen() {
+    const params = useLocalSearchParams<{ lang?: string }>();
+    const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+    const text = translations[language];
     const router = useRouter();
 
     const [email, setEmail] = useState('');
@@ -32,7 +36,7 @@ export default function LoginScreen() {
       'Login successful',
       'Welcome back to LangBridge.'
     );
-    
+
     router.replace('./home');
   } catch (error) {
     Alert.alert(
@@ -80,30 +84,36 @@ const handleForgotPassword = async () => {
           <Text style={styles.logoText}>LB</Text>
         </View>
 
-        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.title}>
+  {text.loginScreen.title}
+</Text>
 
         <Text style={styles.subtitle}>
-          Log in to continue practicing and connecting through languages.
-        </Text>
+  {text.loginScreen.subtitle}
+</Text>
 
-        <Text style={styles.label}>Email address</Text>
+        <Text style={styles.label}>
+  {text.loginScreen.emailLabel}
+</Text>
 
         <TextInput
         value={email}
 onChangeText={setEmail}
           style={styles.input}
-          placeholder="Enter your email"
+          placeholder={text.loginScreen.emailPlaceholder}
           placeholderTextColor="#64748B"
           keyboardType="email-address"
           autoCapitalize="none"
           
         />
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>
+  {text.loginScreen.passwordLabel}
+</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Enter your password"
+          placeholder={text.loginScreen.passwordPlaceholder}
           placeholderTextColor="#64748B"
           secureTextEntry
           value={password}
@@ -114,14 +124,18 @@ onChangeText={setEmail}
   style={styles.forgotButton}
   onPress={handleForgotPassword}
 >
-          <Text style={styles.forgotText}>Forgot password?</Text>
+          <Text style={styles.forgotText}>
+  {text.loginScreen.forgotPassword}
+</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
   style={styles.primaryButton}
   onPress={handleLogin}
 >
-  <Text style={styles.primaryButtonText}>Log In</Text>
+  <Text style={styles.primaryButtonText}>
+  {text.loginScreen.loginButton}
+</Text>
 </TouchableOpacity>
 
         <TouchableOpacity
@@ -129,9 +143,11 @@ onChangeText={setEmail}
   onPress={() => router.push('./register')}
 >
           <Text style={styles.registerText}>
-            Don't have an account?{' '}
-            <Text style={styles.registerLink}>Create one</Text>
-          </Text>
+  {text.loginScreen.noAccount}{' '}
+  <Text style={styles.registerLink}>
+    {text.loginScreen.createOne}
+  </Text>
+</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

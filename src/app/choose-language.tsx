@@ -8,10 +8,12 @@ import {
     View,
 } from 'react-native';
 
+import { translations } from '../translations';
+
 export default function ChooseLanguageScreen() {
   const router = useRouter();
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-
+  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'es'>('en');
+  const text = translations[selectedLanguage];
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -23,8 +25,8 @@ export default function ChooseLanguageScreen() {
       <Text style={styles.title}>Choose your language</Text>
 
       <Text style={styles.subtitle}>
-        Select the language you want to use in LangBridge.
-      </Text>
+  {text.chooseLanguage.subtitle}
+</Text>
 
       <TouchableOpacity
         style={[
@@ -34,10 +36,12 @@ export default function ChooseLanguageScreen() {
         onPress={() => setSelectedLanguage('en')}
       >
         <View>
-          <Text style={styles.languageName}>English</Text>
-          <Text style={styles.languageDescription}>
-            Use LangBridge in English
-          </Text>
+          <Text style={styles.languageName}>
+  {text.chooseLanguage.english}
+</Text>
+  <Text style={styles.languageDescription}>
+  {text.chooseLanguage.spanishDescription}
+</Text>
         </View>
 
         <View
@@ -57,9 +61,9 @@ export default function ChooseLanguageScreen() {
       >
         <View>
           <Text style={styles.languageName}>Español</Text>
-          <Text style={styles.languageDescription}>
-            Usar LangBridge en español
-          </Text>
+          <Text style={styles.languageName}>
+  {text.chooseLanguage.spanish}
+</Text>
         </View>
 
         <View
@@ -71,15 +75,22 @@ export default function ChooseLanguageScreen() {
       </TouchableOpacity>
 
       <Text style={styles.note}>
-        You can change the interface language later in Settings.
-      </Text>
+  {text.chooseLanguage.note}
+</Text>
 
       <TouchableOpacity
   style={styles.primaryButton}
-  onPress={() => router.replace('./welcome')}
+  onPress={() =>
+  router.replace({
+    pathname: './welcome',
+    params: { lang: selectedLanguage },
+  })
+}
 >
 
-        <Text style={styles.primaryButtonText}>Continue</Text>
+        <Text style={styles.primaryButtonText}>
+  {text.chooseLanguage.continue}
+</Text>
       </TouchableOpacity>
     </View>
   );

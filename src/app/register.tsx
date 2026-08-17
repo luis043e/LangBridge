@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -15,9 +15,13 @@ import {
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import { translations, type AppLanguage } from '../translations';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ lang?: string }>();
+  const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+  const text = translations[language];
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,28 +64,48 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        <TouchableOpacity
+  style={styles.backButton}
+  onPress={() =>
+    router.replace({
+      pathname: './welcome',
+      params: { lang: language },
+    })
+  }
+>
+  <Text style={styles.backButtonText}>
+    {language === 'es' ? '‹ Atrás' : '‹ Back'}
+  </Text>
+</TouchableOpacity>
         <View style={styles.logo}>
           <Text style={styles.logoText}>LB</Text>
         </View>
 
-        <Text style={styles.title}>Create your account</Text>
+        <Text style={styles.title}>
+  {text.registerScreen.title}
+</Text>
+
 
         <Text style={styles.subtitle}>
-          Join LangBridge and start connecting through languages.
-        </Text>
+  {text.registerScreen.subtitle}
+</Text>
 
-        <Text style={styles.label}>Full name</Text>
+        <Text style={styles.label}>
+  {text.registerScreen.fullNameLabel}
+</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your full name"
+          placeholder={text.registerScreen.fullNamePlaceholder}
           placeholderTextColor="#64748B"
           autoCapitalize="words"
         />
 
-        <Text style={styles.label}>Email address</Text>
+        <Text style={styles.label}>
+  {text.registerScreen.emailLabel}
+</Text>
         <TextInput
   style={styles.input}
-  placeholder="Enter your email"
+  placeholder={text.registerScreen.emailPlaceholder}
   placeholderTextColor="#64748B"
   keyboardType="email-address"
   autoCapitalize="none"
@@ -89,20 +113,24 @@ export default function RegisterScreen() {
   onChangeText={setEmail}
 />
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>
+  {text.registerScreen.passwordLabel}
+</Text>
         <TextInput
   style={styles.input}
-  placeholder="Create a password"
+  placeholder={text.registerScreen.passwordPlaceholder}
   placeholderTextColor="#64748B"
   secureTextEntry
   value={password}
   onChangeText={setPassword}
 />
 
-        <Text style={styles.label}>Confirm password</Text>
+        <Text style={styles.label}>
+  {text.registerScreen.confirmPasswordLabel}
+</Text>
         <TextInput
           style={styles.input}
-          placeholder="Confirm your password"
+          placeholder={text.registerScreen.confirmPasswordPlaceholder}
           placeholderTextColor="#64748B"
           secureTextEntry
           value={confirmPassword}
@@ -113,22 +141,25 @@ export default function RegisterScreen() {
   style={styles.primaryButton}
   onPress={handleRegister}
 >
-          <Text style={styles.primaryButtonText}>Create Account</Text>
+          <Text style={styles.primaryButtonText}>
+  {text.registerScreen.createAccount}
+</Text>
         </TouchableOpacity>
 
         <Text style={styles.terms}>
-          By creating an account, you agree to the Terms of Service and
-          Privacy Policy.
-        </Text>
+  {text.registerScreen.terms}
+</Text>
 
         <TouchableOpacity
   style={styles.loginButton}
   onPress={() => router.push('./login')}
 >
           <Text style={styles.loginText}>
-            Already have an account?{' '}
-            <Text style={styles.loginLink}>Log in</Text>
-          </Text>
+  {text.registerScreen.hasAccount}{' '}
+  <Text style={styles.loginLink}>
+    {text.registerScreen.login}
+  </Text>
+</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -136,6 +167,17 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+  alignSelf: 'flex-start',
+  paddingVertical: 8,
+  paddingRight: 16,
+  marginBottom: 18,
+},
+backButtonText: {
+  color: '#A7F3D0',
+  fontSize: 16,
+  fontWeight: '600',
+},
   container: {
     flex: 1,
     backgroundColor: '#0F172A',

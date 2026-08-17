@@ -1,13 +1,25 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import { translations, type AppLanguage } from '../translations';
 export default function HomeScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ lang?: string }>();
+  const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+  const text = translations[language];
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
+<TouchableOpacity
+  style={styles.languageButton}
+  onPress={() => router.replace('./choose-language')}
+>
+  <Text style={styles.languageButtonText}>
+    {language === 'es' ? 'Idioma' : 'Language'}
+  </Text>
+</TouchableOpacity>
       <View style={styles.logo}>
         <Text style={styles.logoText}>LB</Text>
       </View>
@@ -15,40 +27,67 @@ export default function HomeScreen() {
       <Text style={styles.title}>LangBridge</Text>
 
       <Text style={styles.slogan}>
-        Practice. Connect. Grow.
-      </Text>
+  {text.welcome.slogan}
+</Text>
 
       <Text style={styles.description}>
-        Connect with native speakers, exchange languages and grow together.
-      </Text>
+  {text.welcome.description}
+</Text>
 
       <TouchableOpacity
   style={styles.primaryButton}
   onPress={() => {
   console.log('GET STARTED PRESSED');
-  router.navigate('/register');
+  router.push({
+  pathname: './register',
+  params: { lang: language },
+});
 }}
 >
-        <Text style={styles.primaryButtonText}>Get Started</Text>
+        <Text style={styles.primaryButtonText}>
+  {text.welcome.getStarted}
+</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
   style={styles.secondaryButton}
-  onPress={() => router.push('./login')}
+  onPress={() =>
+  router.push({
+    pathname: './login',
+    params: { lang: language },
+  })
+}
 >
   <Text style={styles.secondaryButtonText}>
-    I already have an account
-  </Text>
+  {text.welcome.login}
+</Text>
 </TouchableOpacity>
 
       <Text style={styles.footer}>
-        Build real connections through language
-      </Text>
+  {text.welcome.footer}
+</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  languageButton: {
+  position: 'absolute',
+  top: 54,
+  right: 24,
+  paddingHorizontal: 14,
+  paddingVertical: 9,
+  borderRadius: 14,
+  backgroundColor: '#1E293B',
+  borderWidth: 1,
+  borderColor: '#475569',
+  zIndex: 10,
+},
+languageButtonText: {
+  color: '#A7F3D0',
+  fontSize: 14,
+  fontWeight: '600',
+},
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
