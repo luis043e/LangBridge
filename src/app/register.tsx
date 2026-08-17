@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,8 +11,31 @@ import {
   View,
 } from 'react-native';
 
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+
 export default function RegisterScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegister = async () => {
+  if (password !== confirmPassword) {
+    console.log('PASSWORDS DO NOT MATCH');
+    return;
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, email.trim(), password);
+    console.log('ACCOUNT CREATED SUCCESSFULLY');
+  } catch (error) {
+    console.log('REGISTRATION ERROR:', error);
+  }
+};
+
   return (
+
+    
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -43,20 +67,24 @@ export default function RegisterScreen() {
 
         <Text style={styles.label}>Email address</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Enter your email"
-          placeholderTextColor="#64748B"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+  style={styles.input}
+  placeholder="Enter your email"
+  placeholderTextColor="#64748B"
+  keyboardType="email-address"
+  autoCapitalize="none"
+  value={email}
+  onChangeText={setEmail}
+/>
 
         <Text style={styles.label}>Password</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Create a password"
-          placeholderTextColor="#64748B"
-          secureTextEntry
-        />
+  style={styles.input}
+  placeholder="Create a password"
+  placeholderTextColor="#64748B"
+  secureTextEntry
+  value={password}
+  onChangeText={setPassword}
+/>
 
         <Text style={styles.label}>Confirm password</Text>
         <TextInput
@@ -64,11 +92,13 @@ export default function RegisterScreen() {
           placeholder="Confirm your password"
           placeholderTextColor="#64748B"
           secureTextEntry
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
         />
 
         <TouchableOpacity
   style={styles.primaryButton}
-  onPress={() => console.log('CREATE ACCOUNT PRESSED')}
+  onPress={handleRegister}
 >
           <Text style={styles.primaryButtonText}>Create Account</Text>
         </TouchableOpacity>
