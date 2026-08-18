@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -54,8 +55,10 @@ export default function WelcomeScreen() {
         <View style={styles.logo}>
           <Text style={styles.logoText}>LB</Text>
         </View>
-
-        <Text style={styles.title}>LangBridge</Text>
+<View style={styles.brandName}>
+  <Text style={styles.titleWhite}>Lang</Text>
+  <Text style={styles.titleBlue}>Bridge</Text>
+</View>
 
         <Text style={styles.slogan}>
           {text.welcome.slogan}
@@ -66,14 +69,21 @@ export default function WelcomeScreen() {
         </Text>
 
         <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={goToRegister}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.primaryButtonText}>
-            {text.welcome.getStarted}
-          </Text>
-        </TouchableOpacity>
+  style={styles.primaryButton}
+  onPress={goToRegister}
+  activeOpacity={0.85}
+>
+  <LinearGradient
+    colors={['#8B5CF6', '#4F46E5', '#22D3EE']}
+    start={{ x: 0, y: 0.5 }}
+    end={{ x: 1, y: 0.5 }}
+    style={styles.primaryButtonGradient}
+  >
+    <Text style={styles.primaryButtonText}>
+      {text.welcome.getStarted}
+    </Text>
+  </LinearGradient>
+</TouchableOpacity>
 
         <TouchableOpacity
           style={styles.secondaryButton}
@@ -95,55 +105,62 @@ export default function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 30,
-  },
+  flex: 1,
+  backgroundColor: '#050B24',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: 24,
+},
 
   content: {
-    width: '100%',
-    maxWidth: 420,
-    alignItems: 'center',
-  },
+  width: '100%',
+  maxWidth: 420,
+  alignItems: 'center',
+  paddingHorizontal: 6,
+},
 
   languageButton: {
-    position: 'absolute',
-    top: 54,
-    right: 24,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 14,
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#475569',
-    zIndex: 10,
-  },
+  position: 'absolute',
+  top: 18,
+  right: 0,
+  minHeight: 42,
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  borderRadius: 21,
+  backgroundColor: 'rgba(17, 28, 58, 0.92)',
+  borderWidth: 1,
+  borderColor: '#22D3EE',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 10,
+},
 
   languageButtonText: {
-    color: '#A7F3D0',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  color: '#A7F3D0',
+  fontSize: 14,
+  fontWeight: '700',
+  letterSpacing: 0.2,
+},
 
   logo: {
-    width: 96,
-    height: 96,
-    borderRadius: 30,
-    backgroundColor: '#6366F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    shadowColor: '#6366F1',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.35,
-    shadowRadius: 14,
-    elevation: 10,
+  width: 104,
+  height: 104,
+  borderRadius: 32,
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#22D3EE',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 24,
+  shadowColor: '#22D3EE',
+  shadowOffset: {
+    width: 0,
+    height: 8,
   },
+  shadowOpacity: 0.35,
+  shadowRadius: 16,
+  elevation: 10,
+},
 
   logoText: {
     color: '#FFFFFF',
@@ -151,39 +168,70 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  title: {
-    color: '#FFFFFF',
-    fontSize: 42,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-    textAlign: 'center',
-  },
+  brandName: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+titleWhite: {
+  color: '#FFFFFF',
+  fontSize: 42,
+  lineHeight: 52,
+  fontWeight: 'bold',
+  letterSpacing: 0.3,
+},
+
+titleBlue: {
+  color: '#22D3EE',
+  fontSize: 42,
+  lineHeight: 52,
+  fontWeight: 'bold',
+  letterSpacing: 0.3,
+},
 
   slogan: {
-    color: '#A7F3D0',
-    fontSize: 19,
-    fontWeight: '600',
-    marginTop: 8,
-    textAlign: 'center',
-  },
+  color: '#A7F3D0',
+  fontSize: 19,
+  lineHeight: 27,
+  fontWeight: '700',
+  marginTop: 10,
+  textAlign: 'center',
+  letterSpacing: 0.2,
+},
 
   description: {
-    color: '#CBD5E1',
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'center',
-    marginTop: 22,
-    marginBottom: 38,
-    maxWidth: 340,
-  },
+  color: '#A8B3CF',
+  fontSize: 15,
+  lineHeight: 23,
+  textAlign: 'center',
+  marginTop: 18,
+  marginBottom: 32,
+  maxWidth: 350,
+},
 
   primaryButton: {
-    width: '100%',
-    backgroundColor: '#6366F1',
-    paddingVertical: 17,
-    borderRadius: 16,
-    alignItems: 'center',
+  width: '100%',
+  borderRadius: 16,
+  overflow: 'hidden',
+  shadowColor: '#6366F1',
+  shadowOffset: {
+    width: 0,
+    height: 8,
   },
+  shadowOpacity: 0.35,
+  shadowRadius: 14,
+  elevation: 8,
+},
+
+primaryButtonGradient: {
+  width: '100%',
+  minHeight: 56,
+  paddingVertical: 17,
+  paddingHorizontal: 20,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
 
   primaryButtonText: {
     color: '#FFFFFF',
@@ -192,20 +240,25 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#475569',
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginTop: 14,
-  },
+  width: '100%',
+  minHeight: 54,
+  borderWidth: 1.5,
+  borderColor: '#22D3EE',
+  backgroundColor: 'rgba(15, 23, 42, 0.75)',
+  paddingVertical: 16,
+  paddingHorizontal: 20,
+  borderRadius: 16,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: 14,
+},
 
   secondaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  color: '#A7F3D0',
+  fontSize: 16,
+  fontWeight: '700',
+  letterSpacing: 0.2,
+},
 
   footer: {
     position: 'absolute',
