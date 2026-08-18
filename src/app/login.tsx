@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
     Platform,
@@ -12,169 +13,390 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
 } from 'firebase/auth';
+
 import { auth } from '../firebaseConfig';
 import { translations, type AppLanguage } from '../translations';
+
 export default function LoginScreen() {
-    const params = useLocalSearchParams<{ lang?: string }>();
-    const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
-    const text = translations[language];
-    const router = useRouter();
+  const router = useRouter();
+  const params = useLocalSearchParams<{ lang?: string }>();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
- 
- const handleLogin = async () => {
-  try {
-    await signInWithEmailAndPassword(auth, email.trim(), password);
+  const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+  const text = translations[language];
 
-    Alert.alert(
-  language === 'es' ? 'Inicio de sesión exitoso' : 'Login successful',
-  language === 'es'
-    ? 'Bienvenido de nuevo a LangBridge.'
-    : 'Welcome back to LangBridge.',
-  [
-    {
-      text: 'OK',
-      onPress: () =>
-        router.replace({
-          pathname: './home',
-          params: { lang: language },
-        }),
-    },
-  ]
-);
-  } catch (error) {
-    Alert.alert(
-      'Login error',
-      'The email or password is incorrect.'
-    );
-  }
-};   
-const handleForgotPassword = async () => {
-  if (!email.trim()) {
-    Alert.alert(
-      'Email required',
-      'Please enter your email address first.'
-    );
-    return;
-  }
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
-  try {
-    await sendPasswordResetEmail(auth, email.trim());
+  const showAlert = (
+    spanishTitle: string,
+    englishTitle: string,
+    spanishMessage: string,
+    englishMessage: string
+  ) => {
+    Alert.alert(
+      language === 'es' ? spanishTitle : englishTitle,
+      language === 'es' ? spanishMessage : englishMessage
+    );
+  };
 
-    Alert.alert(
-      'Email sent',
-      'Check your inbox for instructions to reset your password.'
-    );
-  } catch (error) {
-    Alert.alert(
-      'Reset error',
-      'We could not send the password reset email. Check the email address and try again.'
-    );
-  }
-};
+  const handleLogin = async () => {
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !password) {
+      showAlert(
+        'Campos incompletos',
+        'Incomplete fields',
+        'Escribe tu correo electrónico y contraseña.',
+        'Enter your email address and password.'
+      );
+      return;
+    }
+
+    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      showAlert(
+        'Correo no válido',
+        'Invalid email',
+        'Escribe una dirección de correo electrónico válida.',
+        'Enter a valid email address.'
+      );
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
+
+      Alert.alert(
+        language === 'es'
+          ? 'Inicio de sesión exitoso'
+          : 'Login successful',
+        language === 'es'
+          ? 'Bienvenido de nuevo a LangBridge.'
+          : 'Welcome back to LangBridge.',
+        [
+          {
+            text: language === 'es' ? 'Continuar' : 'Continue',
+            onPress: () =>
+              router.replace({
+                pathname: '/home',
+                params: { lang: language },
+              }),
+          },
+        ]
+      );
+    } catch (error: any) {
+      let messageEs =
+        'No fue posible iniciar sesión. Verifica tus datos e inténtalo nuevamente.';
+
+      let messageEn =
+        'Unable to log in. Check your information and try again.';
+
+      if (
+        error?.code === 'auth/invalid-credential' ||
+        error?.code === 'auth/wrong-password' ||
+        error?.code === 'auth/user-not-found'
+      ) {
+        messageEs =
+          'El correo electrónico o la contraseña son incorrectos.';
+        messageEn =
+          'The email address or password is incorrect.';
+      } else if (error?.code === 'auth/invalid-email') {
+        messageEs =
+          'La dirección de correo electrónico no es válida.';
+        messageEn =
+          'The email address is not valid.';
+      } else if (error?.code === 'auth/too-many-requests') {
+        messageEs =
+          'Se realizaron demasiados intentos. Espera unos minutos e inténtalo nuevamente.';
+        messageEn =
+          'Too many attempts were made. Wait a few minutes and try again.';
+      } else if (error?.code === 'auth/user-disabled') {
+        messageEs =
+          'Esta cuenta ha sido deshabilitada.';
+        messageEn =
+          'This account has been disabled.';
+      } else if (error?.code === 'auth/network-request-failed') {
+        messageEs =
+          'Revisa tu conexión a Internet e inténtalo nuevamente.';
+        messageEn =
+          'Check your Internet connection and try again.';
+      }
+
+      showAlert(
+        'Error al iniciar sesión',
+        'Login error',
+        messageEs,
+        messageEn
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail) {
+      showAlert(
+        'Correo requerido',
+        'Email required',
+        'Escribe primero tu dirección de correo electrónico.',
+        'Enter your email address first.'
+      );
+      return;
+    }
+
+    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      showAlert(
+        'Correo no válido',
+        'Invalid email',
+        'Escribe una dirección de correo electrónico válida.',
+        'Enter a valid email address.'
+      );
+      return;
+    }
+
+    try {
+      setIsResettingPassword(true);
+
+      await sendPasswordResetEmail(auth, cleanEmail);
+
+      showAlert(
+        'Correo enviado',
+        'Email sent',
+        'Revisa tu bandeja de entrada para restablecer tu contraseña.',
+        'Check your inbox for instructions to reset your password.'
+      );
+    } catch (error: any) {
+      let messageEs =
+        'No se pudo enviar el correo de recuperación. Verifica la dirección e inténtalo nuevamente.';
+
+      let messageEn =
+        'The password reset email could not be sent. Check the address and try again.';
+
+      if (error?.code === 'auth/invalid-email') {
+        messageEs =
+          'La dirección de correo electrónico no es válida.';
+        messageEn =
+          'The email address is not valid.';
+      } else if (error?.code === 'auth/too-many-requests') {
+        messageEs =
+          'Se realizaron demasiadas solicitudes. Espera unos minutos e inténtalo nuevamente.';
+        messageEn =
+          'Too many requests were made. Wait a few minutes and try again.';
+      } else if (error?.code === 'auth/network-request-failed') {
+  messageEs =
+    'Revisa tu conexión a Internet e inténtalo nuevamente.';
+  messageEn =
+    'Check your Internet connection and try again.';
+}
+      showAlert(
+        'Error de recuperación',
+        'Reset error',
+        messageEs,
+        messageEn
+      );
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  const goBack = () => {
+    router.replace({
+      pathname: '/welcome',
+      params: { lang: language },
+    });
+  };
+
+  const goToRegister = () => {
+    router.push({
+      pathname: '/register',
+      params: { lang: language },
+    });
+  };
+
+  const isBusy = isLoading || isResettingPassword;
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <StatusBar style="light" />
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.logo}>
-          <Text style={styles.logoText}>LB</Text>
-        </View>
+        <StatusBar style="light" />
 
-        <Text style={styles.title}>
-  {text.loginScreen.title}
-</Text>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.formContainer}>
+  <TouchableOpacity
+    style={styles.backButton}
+    onPress={goBack}
+    activeOpacity={0.8}
+    disabled={isBusy}
+  >
+    <Text style={styles.backButtonText}>
+      {language === 'es' ? '‹ Atrás' : '‹ Back'}
+    </Text>
+  </TouchableOpacity>
 
-        <Text style={styles.subtitle}>
-  {text.loginScreen.subtitle}
-</Text>
+            <View style={styles.logo}>
+              <Text style={styles.logoText}>LB</Text>
+            </View>
 
-        <Text style={styles.label}>
-  {text.loginScreen.emailLabel}
-</Text>
+            <Text style={styles.title}>
+              {text.loginScreen.title}
+            </Text>
 
-        <TextInput
-        value={email}
-onChangeText={setEmail}
-          style={styles.input}
-          placeholder={text.loginScreen.emailPlaceholder}
-          placeholderTextColor="#64748B"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          
-        />
+            <Text style={styles.subtitle}>
+              {text.loginScreen.subtitle}
+            </Text>
 
-        <Text style={styles.label}>
-  {text.loginScreen.passwordLabel}
-</Text>
+            <Text style={styles.label}>
+              {text.loginScreen.emailLabel}
+            </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder={text.loginScreen.passwordPlaceholder}
-          placeholderTextColor="#64748B"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+            <TextInput
+              style={styles.input}
+              placeholder={text.loginScreen.emailPlaceholder}
+              placeholderTextColor="#64748B"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              value={email}
+              onChangeText={setEmail}
+              editable={!isBusy}
+              returnKeyType="next"
+            />
 
-        <TouchableOpacity
-  style={styles.forgotButton}
-  onPress={handleForgotPassword}
->
-          <Text style={styles.forgotText}>
-  {text.loginScreen.forgotPassword}
-</Text>
-        </TouchableOpacity>
+            <Text style={styles.label}>
+              {text.loginScreen.passwordLabel}
+            </Text>
 
-        <TouchableOpacity
-  style={styles.primaryButton}
-  onPress={handleLogin}
->
-  <Text style={styles.primaryButtonText}>
-  {text.loginScreen.loginButton}
-</Text>
-</TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              placeholder={text.loginScreen.passwordPlaceholder}
+              placeholderTextColor="#64748B"
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="current-password"
+              value={password}
+              onChangeText={setPassword}
+              editable={!isBusy}
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+            />
 
-        <TouchableOpacity
-  style={styles.registerButton}
-  onPress={() => router.push('./register')}
->
-          <Text style={styles.registerText}>
-  {text.loginScreen.noAccount}{' '}
-  <Text style={styles.registerLink}>
-    {text.loginScreen.createOne}
-  </Text>
-</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <TouchableOpacity
+              style={styles.forgotButton}
+              onPress={handleForgotPassword}
+              activeOpacity={0.8}
+              disabled={isBusy}
+            >
+              {isResettingPassword ? (
+                <ActivityIndicator
+                  color="#A7F3D0"
+                  size="small"
+                />
+              ) : (
+                <Text style={styles.forgotText}>
+                  {text.loginScreen.forgotPassword}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.primaryButton,
+                isBusy && styles.disabledButton,
+              ]}
+              onPress={handleLogin}
+              activeOpacity={0.85}
+              disabled={isBusy}
+            >
+              {isLoading ? (
+                <ActivityIndicator
+                  color="#FFFFFF"
+                  size="small"
+                />
+              ) : (
+                <Text style={styles.primaryButtonText}>
+                  {text.loginScreen.loginButton}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={goToRegister}
+              activeOpacity={0.8}
+              disabled={isBusy}
+            >
+              <Text style={styles.registerText}>
+                {text.loginScreen.noAccount}{' '}
+                <Text style={styles.registerLink}>
+                  {text.loginScreen.createOne}
+                </Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#0F172A',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
   },
+
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: 26,
-    paddingVertical: 50,
+    paddingTop: 18,
+    paddingBottom: 36,
   },
+
+  formContainer: {
+    width: '100%',
+    maxWidth: 420,
+    alignSelf: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 50,
+  },
+
+  backButton: {
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingRight: 16,
+  },
+
+  backButtonText: {
+    color: '#A7F3D0',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
   logo: {
     width: 72,
     height: 72,
@@ -183,17 +405,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,
+    shadowColor: '#6366F1',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 7,
   },
+
   logoText: {
     color: '#FFFFFF',
     fontSize: 26,
     fontWeight: 'bold',
   },
+
   title: {
     color: '#FFFFFF',
     fontSize: 34,
     fontWeight: 'bold',
   },
+
   subtitle: {
     color: '#94A3B8',
     fontSize: 15,
@@ -201,12 +434,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 34,
   },
+
   label: {
     color: '#E2E8F0',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
   },
+
   input: {
     width: '100%',
     height: 54,
@@ -219,36 +454,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 18,
   },
+
   forgotButton: {
     alignSelf: 'flex-end',
+    minHeight: 34,
+    justifyContent: 'center',
     marginTop: -4,
     marginBottom: 26,
   },
+
   forgotText: {
     color: '#A7F3D0',
     fontSize: 14,
     fontWeight: '600',
   },
+
   primaryButton: {
     width: '100%',
+    minHeight: 56,
     backgroundColor: '#6366F1',
     paddingVertical: 17,
     borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
+
+  disabledButton: {
+    opacity: 0.65,
+  },
+
   primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 17,
     fontWeight: 'bold',
   },
+
   registerButton: {
     alignItems: 'center',
     marginTop: 26,
+    paddingVertical: 8,
   },
+
   registerText: {
     color: '#94A3B8',
     fontSize: 14,
+    textAlign: 'center',
   },
+
   registerLink: {
     color: '#A7F3D0',
     fontWeight: 'bold',

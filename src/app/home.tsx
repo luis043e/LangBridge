@@ -1,15 +1,18 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
-
+import { translations, type AppLanguage } from '../translations';
 export default function HomeScreen() {
     const router = useRouter();
+    const params = useLocalSearchParams<{ lang?: string }>();
+    const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+    const text = translations[language];
     
   return (
     <View style={styles.container}>
@@ -21,10 +24,13 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Welcome to LangBridge</Text>
-            <Text style={styles.subtitle}>
-              Your language journey starts here.
-            </Text>
+            <Text style={styles.greeting}>
+  {text.homeScreen.welcome}
+</Text>
+
+<Text style={styles.subtitle}>
+  {text.homeScreen.subtitle}
+</Text>
           </View>
 
           <View style={styles.avatar}>
@@ -33,77 +39,98 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.progressCard}>
-          <Text style={styles.cardLabel}>YOUR WEEKLY GOAL</Text>
-          <Text style={styles.progressTitle}>Start practicing today</Text>
+          <Text style={styles.cardLabel}>
+  {text.homeScreen.weeklyGoal}
+</Text>
+        <Text style={styles.progressTitle}>
+  {text.homeScreen.startPracticing}
+</Text>
 
           <Text style={styles.progressDescription}>
-            Complete your language profile to find compatible learning
-            partners.
-          </Text>
+  {text.homeScreen.profileDescription}
+</Text>
 
           <View style={styles.progressBar}>
             <View style={styles.progressValue} />
           </View>
 
-          <Text style={styles.progressText}>Profile progress: 20%</Text>
+          <Text style={styles.progressText}>
+  {text.homeScreen.profileProgress}: 20%
+</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Quick actions</Text>
+       <Text style={styles.sectionTitle}>
+  {text.homeScreen.quickActions}
+</Text>
 
         <TouchableOpacity
   style={styles.actionCard}
-  onPress={() => router.push('./language-profile')}
+  onPress={() =>
+    router.push({
+      pathname: '/language-profile',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
 >
           <View style={styles.actionIcon}>
             <Text style={styles.actionIconText}>🌍</Text>
           </View>
 
           <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>Complete your profile</Text>
+            <Text style={styles.actionTitle}>
+  {text.homeScreen.completeProfile}
+  </Text>
             <Text style={styles.actionDescription}>
-              Add your native language, learning language and interests.
-            </Text>
+  {text.homeScreen.conversationsDescription}
+</Text>
           </View>
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionCard}>
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionIconText}>🤝</Text>
-          </View>
+        <TouchableOpacity
+  style={styles.actionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/explore',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
+>
 
-          <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>Find language partners</Text>
-            <Text style={styles.actionDescription}>
-              Discover people who want to exchange languages with you.
-            </Text>
-          </View>
+    <View style={styles.actionContent}>
+  <Text style={styles.actionTitle}>
+    {text.homeScreen.findPartners}
+  </Text>
+
+  <Text style={styles.actionDescription}>
+  {text.homeScreen.findPartnersDescription}
+</Text>
+</View>
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionCard}>
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionIconText}>💬</Text>
-          </View>
 
           <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>Your conversations</Text>
-            <Text style={styles.actionDescription}>
-              Continue practicing with your language partners.
-            </Text>
+           <Text style={styles.actionTitle}>
+  {text.homeScreen.conversations}
+</Text>
           </View>
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
 
         <View style={styles.tipCard}>
-          <Text style={styles.tipLabel}>LANGBRIDGE TIP</Text>
+          <Text style={styles.tipLabel}>
+  {text.homeScreen.tipLabel}
+</Text>
           <Text style={styles.tipText}>
-            A complete profile helps you find more reliable and compatible
-            language partners.
-          </Text>
+  {text.homeScreen.tipText}
+</Text>
         </View>
       </ScrollView>
     </View>
