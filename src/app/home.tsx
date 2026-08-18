@@ -1,11 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { translations, type AppLanguage } from '../translations';
 export default function HomeScreen() {
@@ -62,7 +63,46 @@ export default function HomeScreen() {
        <Text style={styles.sectionTitle}>
   {text.homeScreen.quickActions}
 </Text>
+<TouchableOpacity
+  style={[styles.actionCard, styles.learnCard]}
+  onPress={() =>
+    Alert.alert(
+      language === 'es'
+        ? 'Espacio de aprendizaje'
+        : 'Learning space',
+      language === 'es'
+        ? 'Muy pronto podrás completar lecciones, ganar puntos, mantener tu racha y avanzar por niveles.'
+        : 'Soon you will be able to complete lessons, earn points, maintain your streak, and advance through levels.'
+    )
+  }
+  activeOpacity={0.85}
+>
+  <View style={[styles.actionIcon, styles.learnIcon]}>
+    <Text style={styles.actionIconText}>📚</Text>
+  </View>
 
+  <View style={styles.actionContent}>
+    <View style={styles.learnTitleRow}>
+      <Text style={styles.actionTitle}>
+        {language === 'es' ? 'Aprender' : 'Learn'}
+      </Text>
+
+      <View style={styles.newBadge}>
+        <Text style={styles.newBadgeText}>
+          {language === 'es' ? 'NUEVO' : 'NEW'}
+        </Text>
+      </View>
+    </View>
+
+    <Text style={styles.actionDescription}>
+      {language === 'es'
+        ? 'Lecciones, niveles, puntos y práctica diaria.'
+        : 'Lessons, levels, points, and daily practice.'}
+    </Text>
+  </View>
+
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
         <TouchableOpacity
   style={styles.actionCard}
   onPress={() =>
@@ -139,14 +179,17 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-  },
+  flex: 1,
+  backgroundColor: '#050B24',
+},
   content: {
-    paddingHorizontal: 22,
-    paddingTop: 58,
-    paddingBottom: 40,
-  },
+  width: '100%',
+  maxWidth: 520,
+  alignSelf: 'center',
+  paddingHorizontal: 22,
+  paddingTop: 58,
+  paddingBottom: 40,
+},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -154,36 +197,58 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   greeting: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
+  color: '#FFFFFF',
+  fontSize: 26,
+  lineHeight: 33,
+  fontWeight: 'bold',
+  letterSpacing: -0.3,
+},
   subtitle: {
-    color: '#94A3B8',
-    fontSize: 14,
-    marginTop: 6,
+  color: '#A8B3CF',
+  fontSize: 14,
+  lineHeight: 21,
+  marginTop: 6,
+},
+ avatar: {
+  width: 52,
+  height: 52,
+  borderRadius: 18,
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#22D3EE',
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowColor: '#22D3EE',
+  shadowOffset: {
+    width: 0,
+    height: 5,
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: '#6366F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  shadowOpacity: 0.3,
+  shadowRadius: 10,
+  elevation: 7,
+},
   avatarText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  color: '#22D3EE',
+  fontSize: 17,
+  fontWeight: 'bold',
+  letterSpacing: 0.5,
+},
   progressCard: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 22,
-    padding: 22,
-    marginBottom: 32,
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 24,
+  padding: 22,
+  marginBottom: 32,
+  shadowColor: '#4F46E5',
+  shadowOffset: {
+    width: 0,
+    height: 8,
   },
+  shadowOpacity: 0.22,
+  shadowRadius: 16,
+  elevation: 7,
+},
   cardLabel: {
     color: '#A7F3D0',
     fontSize: 11,
@@ -211,41 +276,83 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressValue: {
-    width: '20%',
-    height: '100%',
-    backgroundColor: '#6366F1',
-    borderRadius: 8,
-  },
+  width: '20%',
+  height: '100%',
+  backgroundColor: '#22D3EE',
+  borderRadius: 8,
+},
   progressText: {
-    color: '#CBD5E1',
-    fontSize: 12,
-    marginTop: 10,
-  },
+  color: '#A8B3CF',
+  fontSize: 12,
+  fontWeight: '600',
+  marginTop: 10,
+},
   sectionTitle: {
     color: '#FFFFFF',
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
   },
+  learnCard: {
+  borderColor: '#4F46E5',
+  backgroundColor: '#141A3D',
+  shadowColor: '#4F46E5',
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 12,
+  elevation: 6,
+},
+
+learnIcon: {
+  backgroundColor: '#252052',
+  borderWidth: 1,
+  borderColor: '#8B5CF6',
+},
+
+learnTitleRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+},
+
+newBadge: {
+  backgroundColor: '#22D3EE',
+  borderRadius: 9,
+  paddingHorizontal: 8,
+  paddingVertical: 3,
+  marginLeft: 8,
+},
+
+newBadgeText: {
+  color: '#050B24',
+  fontSize: 9,
+  fontWeight: 'bold',
+  letterSpacing: 0.6,
+},
   actionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 14,
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 20,
+  padding: 16,
+  marginBottom: 14,
+},
   actionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 15,
-    backgroundColor: '#293548',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-  },
+  width: 50,
+  height: 50,
+  borderRadius: 16,
+  backgroundColor: '#19284A',
+  borderWidth: 1,
+  borderColor: '#334C7D',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: 14,
+},
   actionIconText: {
     fontSize: 23,
   },
