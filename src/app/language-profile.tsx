@@ -1,18 +1,19 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
-
 type LanguageOption = {
   code: string;
   es: string;
@@ -94,6 +95,7 @@ export default function LanguageProfileScreen() {
 
   const [selectedLevel, setSelectedLevel] =
     useState<LevelOption['id'] | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
   const getLanguageName = (option: LanguageOption) => {
     return language === 'es' ? option.es : option.en;
@@ -144,68 +146,110 @@ export default function LanguageProfileScreen() {
       ]
     );
   };
+  const handleContinue = async () => {
+  if (isSaving) {
+    return;
+  }
 
-  const handleContinue = () => {
-    if (!nativeLanguage) {
-      Alert.alert(
-        language === 'es'
-          ? 'Idioma nativo requerido'
-          : 'Native language required',
-        language === 'es'
-          ? 'Selecciona tu idioma nativo para continuar.'
-          : 'Select your native language to continue.'
-      );
-      return;
-    }
+  if (!nativeLanguage) {
+    Alert.alert(
+      language === 'es'
+        ? 'Idioma nativo requerido'
+        : 'Native language required',
+      language === 'es'
+        ? 'Selecciona tu idioma nativo para continuar.'
+        : 'Select your native language to continue.'
+    );
+    return;
+  }
 
-    if (!learningLanguage) {
-      Alert.alert(
-        language === 'es'
-          ? 'Idioma de aprendizaje requerido'
-          : 'Learning language required',
-        language === 'es'
-          ? 'Selecciona el idioma que quieres aprender.'
-          : 'Select the language you want to learn.'
-      );
-      return;
-    }
+  if (!learningLanguage) {
+    Alert.alert(
+      language === 'es'
+        ? 'Idioma de aprendizaje requerido'
+        : 'Learning language required',
+      language === 'es'
+        ? 'Selecciona el idioma que quieres aprender.'
+        : 'Select the language you want to learn.'
+    );
+    return;
+  }
 
-    if (nativeLanguage.code === learningLanguage.code) {
-      Alert.alert(
-        language === 'es'
-          ? 'Selecciona idiomas diferentes'
-          : 'Select different languages',
-        language === 'es'
-          ? 'El idioma nativo y el idioma que quieres aprender deben ser diferentes.'
-          : 'Your native language and learning language must be different.'
-      );
-      return;
-    }
+  if (nativeLanguage.code === learningLanguage.code) {
+    Alert.alert(
+      language === 'es'
+        ? 'Selecciona idiomas diferentes'
+        : 'Select different languages',
+      language === 'es'
+        ? 'El idioma nativo y el idioma que quieres aprender deben ser diferentes.'
+        : 'Your native language and learning language must be different.'
+    );
+    return;
+  }
 
-    if (!selectedLevel) {
-      Alert.alert(
-        language === 'es'
-          ? 'Nivel requerido'
-          : 'Level required',
-        language === 'es'
-          ? 'Selecciona tu nivel actual para continuar.'
-          : 'Select your current level to continue.'
-      );
-      return;
-    }
+  if (!selectedLevel) {
+    Alert.alert(
+      language === 'es'
+        ? 'Nivel requerido'
+        : 'Level required',
+      language === 'es'
+        ? 'Selecciona tu nivel actual para continuar.'
+        : 'Select your current level to continue.'
+    );
+    return;
+  }
+
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    Alert.alert(
+      language === 'es'
+        ? 'Sesión requerida'
+        : 'Login required',
+      language === 'es'
+        ? 'Debes iniciar sesión nuevamente para guardar tu perfil.'
+        : 'You must log in again to save your profile.'
+    );
+    return;
+  }
+
+  try {
+    setIsSaving(true);
+
+    await setDoc(
+      doc(db, 'users', currentUser.uid),
+      {
+        uid: currentUser.uid,
+        fullName: currentUser.displayName ?? '',
+        email: currentUser.email ?? '',
+        interfaceLanguage: language,
+        nativeLanguage: nativeLanguage.code,
+        learningLanguage: learningLanguage.code,
+        level: selectedLevel,
+        profileCompleted: true,
+        online: false,
+        accountCreatedAt:
+          currentUser.metadata.creationTime ?? null,
+        updatedAt: serverTimestamp(),
+      },
+      {
+        merge: true,
+      }
+    );
 
     Alert.alert(
       language === 'es'
-        ? 'Perfil completado'
-        : 'Profile completed',
+        ? 'Perfil guardado'
+        : 'Profile saved',
       language === 'es'
-        ? 'Tu perfil lingüístico fue configurado correctamente.'
-        : 'Your language profile was configured successfully.',
+        ? 'Tu perfil lingüístico fue guardado correctamente.'
+        : 'Your language profile was saved successfully.',
       [
         {
-          text: language === 'es'
-            ? 'Continuar'
-            : 'Continue',
+          text:
+            language === 'es'
+              ? 'Continuar'
+              : 'Continue',
           onPress: () =>
             router.replace({
               pathname: '/home',
@@ -219,12 +263,27 @@ export default function LanguageProfileScreen() {
         },
       ]
     );
-  };
+  } catch (error) {
+    console.error(
+      'Error saving language profile:',
+      error
+    );
 
-  const goBack = () => {
-    router.back();
-  };
-
+    Alert.alert(
+      language === 'es'
+        ? 'Error al guardar'
+        : 'Save error',
+      language === 'es'
+        ? 'No se pudo guardar tu perfil. Revisa tu conexión e inténtalo nuevamente.'
+        : 'Your profile could not be saved. Check your connection and try again.'
+    );
+  } finally {
+    setIsSaving(false);
+  }
+};
+const goBack = () => {
+  router.back();
+};
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -400,16 +459,35 @@ export default function LanguageProfileScreen() {
             </View>
 
             <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleContinue}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.primaryButtonText}>
-                {language === 'es'
-                  ? 'Continuar'
-                  : 'Continue'}
-              </Text>
-            </TouchableOpacity>
+  style={[
+    styles.primaryButton,
+    isSaving && styles.disabledButton,
+  ]}
+  onPress={handleContinue}
+  activeOpacity={0.85}
+  disabled={isSaving}
+>
+  {isSaving ? (
+    <View style={styles.savingContent}>
+      <ActivityIndicator
+        color="#FFFFFF"
+        size="small"
+      />
+
+      <Text style={styles.savingText}>
+        {language === 'es'
+          ? 'Guardando...'
+          : 'Saving...'}
+      </Text>
+    </View>
+  ) : (
+    <Text style={styles.primaryButtonText}>
+      {language === 'es'
+        ? 'Continuar'
+        : 'Continue'}
+    </Text>
+  )}
+</TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -628,4 +706,20 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
   },
+  disabledButton: {
+  opacity: 0.65,
+},
+
+savingContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+savingText: {
+  color: '#FFFFFF',
+  fontSize: 16,
+  fontWeight: '600',
+  marginLeft: 10,
+},
 });

@@ -2,22 +2,22 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
-    sendPasswordResetEmail,
-    signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
 
 import { auth } from '../firebaseConfig';
@@ -94,6 +94,11 @@ export default function LoginScreen() {
         ]
       );
     } catch (error: any) {
+      console.error(
+  'FIREBASE LOGIN ERROR:',
+  error?.code,
+  error?.message
+);
       let messageEs =
         'No fue posible iniciar sesión. Verifica tus datos e inténtalo nuevamente.';
 
