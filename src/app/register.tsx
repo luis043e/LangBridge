@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -289,6 +290,12 @@ export default function RegisterScreen() {
               activeOpacity={0.85}
               disabled={isLoading}
             >
+              <LinearGradient
+  colors={['#8B5CF6', '#4F46E5', '#22D3EE']}
+  start={{ x: 0, y: 0.5 }}
+  end={{ x: 1, y: 0.5 }}
+  style={styles.primaryButtonGradient}
+>
               {isLoading ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
@@ -296,6 +303,7 @@ export default function RegisterScreen() {
                   {text.registerScreen.createAccount}
                 </Text>
               )}
+              </LinearGradient>
             </TouchableOpacity>
 
             <Text style={styles.terms}>
@@ -324,14 +332,14 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-  },
+  flex: 1,
+  backgroundColor: '#050B24',
+},
 
   container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-  },
+  flex: 1,
+  backgroundColor: '#050B24',
+},
 
   content: {
     flexGrow: 1,
@@ -354,83 +362,101 @@ const styles = StyleSheet.create({
   },
 
   backButtonText: {
-    color: '#A7F3D0',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  color: '#22D3EE',
+  fontSize: 16,
+  fontWeight: '700',
+  letterSpacing: 0.2,
+},
 
   logo: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: '#6366F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 26,
-    shadowColor: '#6366F1',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 7,
+  width: 76,
+  height: 76,
+  borderRadius: 24,
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#22D3EE',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 26,
+  shadowColor: '#22D3EE',
+  shadowOffset: {
+    width: 0,
+    height: 8,
   },
+  shadowOpacity: 0.35,
+  shadowRadius: 16,
+  elevation: 10,
+},
 
   logoText: {
-    color: '#FFFFFF',
-    fontSize: 23,
-    fontWeight: 'bold',
-  },
+  color: '#22D3EE',
+  fontSize: 26,
+  fontWeight: 'bold',
+  letterSpacing: 1,
+},
 
   title: {
-    color: '#FFFFFF',
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
+  color: '#FFFFFF',
+  fontSize: 36,
+  lineHeight: 43,
+  fontWeight: 'bold',
+  letterSpacing: -0.4,
+},
 
   subtitle: {
-    color: '#94A3B8',
-    fontSize: 15,
-    lineHeight: 22,
-    marginTop: 10,
-    marginBottom: 30,
-  },
+  color: '#A8B3CF',
+  fontSize: 15,
+  lineHeight: 23,
+  marginTop: 10,
+  marginBottom: 30,
+},
+
 
   label: {
-    color: '#E2E8F0',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
+  color: '#E8EEFF',
+  fontSize: 14,
+  fontWeight: '700',
+  marginBottom: 9,
+},
 
   input: {
-    width: '100%',
-    height: 54,
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 14,
-    color: '#FFFFFF',
-    fontSize: 16,
-    paddingHorizontal: 16,
-    marginBottom: 18,
-  },
+  width: '100%',
+  height: 56,
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334155',
+  borderRadius: 16,
+  color: '#FFFFFF',
+  fontSize: 16,
+  paddingHorizontal: 18,
+  marginBottom: 18,
+},
 
   primaryButton: {
-    width: '100%',
-    minHeight: 56,
-    backgroundColor: '#6366F1',
-    paddingVertical: 17,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
+  width: '100%',
+  borderRadius: 16,
+  overflow: 'hidden',
+  marginTop: 8,
+  shadowColor: '#6366F1',
+  shadowOffset: {
+    width: 0,
+    height: 8,
   },
-
-  disabledButton: {
-    opacity: 0.65,
-  },
+  shadowOpacity: 0.35,
+  shadowRadius: 14,
+  elevation: 8,
+},
+disabledButton: {
+  opacity: 0.65,
+},
+  primaryButtonGradient: {
+  width: '100%',
+  minHeight: 56,
+  paddingVertical: 17,
+  paddingHorizontal: 20,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
 
   primaryButtonText: {
     color: '#FFFFFF',
@@ -459,7 +485,7 @@ const styles = StyleSheet.create({
   },
 
   loginLink: {
-    color: '#A7F3D0',
-    fontWeight: 'bold',
-  },
+  color: '#22D3EE',
+  fontWeight: 'bold',
+},
 });
