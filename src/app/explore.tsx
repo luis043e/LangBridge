@@ -1,6 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { useEffect, useMemo, useState } from 'react';
+
 import {
   Alert,
   ScrollView,
@@ -11,11 +13,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth, db } from '../firebaseConfig';
 
 import { type AppLanguage } from '../translations';
 
 type Partner = {
-  id: number;
+  id: string;
   name: string;
   initials: string;
   city: string;
@@ -25,48 +28,7 @@ type Partner = {
   online: boolean;
 };
 
-const partners: Partner[] = [
-  {
-    id: 1,
-    name: 'Emily Carter',
-    initials: 'EC',
-    city: 'New York',
-    nativeLanguage: 'English',
-    learningLanguage: 'Spanish',
-    level: 'Intermediate',
-    online: true,
-  },
-  {
-    id: 2,
-    name: 'Daniel Brooks',
-    initials: 'DB',
-    city: 'Toronto',
-    nativeLanguage: 'English',
-    learningLanguage: 'Spanish',
-    level: 'Beginner',
-    online: true,
-  },
-  {
-    id: 3,
-    name: 'Sophie Martin',
-    initials: 'SM',
-    city: 'Paris',
-    nativeLanguage: 'French',
-    learningLanguage: 'Spanish',
-    level: 'Intermediate',
-    online: false,
-  },
-  {
-    id: 4,
-    name: 'Lucas Ferreira',
-    initials: 'LF',
-    city: 'São Paulo',
-    nativeLanguage: 'Portuguese',
-    learningLanguage: 'Spanish',
-    level: 'Advanced',
-    online: true,
-  },
-];
+
 
 export default function ExploreScreen() {
   const router = useRouter();
@@ -78,10 +40,89 @@ export default function ExploreScreen() {
   const [searchText, setSearchText] = useState('');
   const [onlineOnly, setOnlineOnly] = useState(false);
 
+  const [realPartners, setRealPartners] = useState<Partner[]>([]);
+const [isLoading, setIsLoading] = useState(true);
+const [loadError, setLoadError] = useState<string | null>(null);
+useEffect(() => {
+  const loadPartners = async () => {
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+
+      const usersSnapshot = await getDocs(
+        collection(db, 'users')
+      );
+
+      const currentUserId = auth.currentUser?.uid;
+
+      const loadedPartners: Partner[] =
+        usersSnapshot.docs
+          .filter((userDocument) => {
+            return userDocument.id !== currentUserId;
+          })
+          .map((userDocument) => {
+            const data = userDocument.data();
+
+            const displayName =
+              data.fullName?.trim() ||
+              data.email?.split('@')[0] ||
+              (language === 'es'
+                ? 'Usuario de LangBridge'
+                : 'LangBridge user');
+
+            const nameParts = displayName
+              .split(' ')
+              .filter(Boolean);
+
+            const initials = nameParts
+              .slice(0, 2)
+              .map((part: string) =>
+                part.charAt(0).toUpperCase()
+              )
+              .join('');
+
+            return {
+              id: userDocument.id,
+              name: displayName,
+              initials: initials || 'LB',
+              city:
+                data.city ||
+                (language === 'es'
+                  ? 'Ubicación no indicada'
+                  : 'Location not provided'),
+              nativeLanguage:
+                data.nativeLanguage || '',
+              learningLanguage:
+                data.learningLanguage || '',
+              level: data.level || 'beginner',
+              online: data.online === true,
+            };
+          });
+
+      setRealPartners(loadedPartners);
+    } catch (error) {
+      console.error(
+        'Error loading partners:',
+        error
+      );
+
+      setLoadError(
+        language === 'es'
+          ? 'No se pudieron cargar los compañeros.'
+          : 'Partners could not be loaded.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadPartners();
+}, [language]);
+
   const filteredPartners = useMemo(() => {
     const search = searchText.trim().toLowerCase();
 
-    return partners.filter((partner) => {
+    return realPartners.filter((partner) => {
       const matchesSearch =
         !search ||
         partner.name.toLowerCase().includes(search) ||
@@ -93,7 +134,7 @@ export default function ExploreScreen() {
 
       return matchesSearch && matchesOnline;
     });
-  }, [searchText, onlineOnly]);
+  }, [searchText, onlineOnly, realPartners]);
 
   const handleConnect = (partner: Partner) => {
     Alert.alert(
@@ -216,10 +257,22 @@ export default function ExploreScreen() {
               <Text style={styles.emptyIcon}>🔎</Text>
 
               <Text style={styles.emptyTitle}>
-                {language === 'es'
-                  ? 'No encontramos resultados'
-                  : 'No results found'}
-              </Text>
+  {isLoading
+    ? language === 'es'
+      ? 'Buscando compañeros...'
+      : 'Finding partners...'
+    : loadError
+      ? language === 'es'
+        ? 'No pudimos cargar los perfiles'
+        : 'Profiles could not be loaded'
+      : searchText.trim()
+        ? language === 'es'
+          ? 'No encontramos resultados'
+          : 'No results found'
+        : language === 'es'
+          ? 'Aún no hay otros compañeros'
+          : 'No other partners yet'}
+</Text>
 
               <Text style={styles.emptyText}>
                 {language === 'es'
