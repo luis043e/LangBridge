@@ -222,10 +222,22 @@ const [loadError, setLoadError] =
             </View>
           ) : (
             connections.map((connection) => (
-              <View
-                key={connection.id}
-                style={styles.connectionCard}
-              >
+              <TouchableOpacity
+  key={connection.id}
+  style={styles.connectionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/chat',
+      params: {
+        lang: language,
+        connectionId: connection.id,
+        partnerId: connection.partnerId,
+        partnerName: connection.partnerName,
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>
                     {connection.partnerName
@@ -252,7 +264,7 @@ const [loadError, setLoadError] =
                 </View>
 
                 <Text style={styles.arrow}>›</Text>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </ScrollView>
