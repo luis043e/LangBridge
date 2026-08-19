@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,7 +24,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View>
+          <View style={styles.headerText}>
             <Text style={styles.greeting}>
   {text.homeScreen.welcome}
 </Text>
@@ -34,7 +35,11 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>LE</Text>
+            <Image
+  source={require('../../assets/images/langbridge-logo.png')}
+  style={styles.avatarImage}
+  resizeMode="contain"
+/>
           </View>
         </View>
 
@@ -177,6 +182,38 @@ export default function HomeScreen() {
 
   <Text style={styles.arrow}>›</Text>
 </TouchableOpacity>
+
+  <TouchableOpacity
+  style={styles.actionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/connections',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.actionIcon}>
+    <Text style={styles.actionIconText}>🤝</Text>
+  </View>
+
+  <View style={styles.actionContent}>
+    <Text style={styles.actionTitle}>
+      {language === 'es'
+        ? 'Mis conexiones'
+        : 'My connections'}
+    </Text>
+
+    <Text style={styles.actionDescription}>
+      {language === 'es'
+        ? 'Consulta las personas con quienes ya puedes practicar.'
+        : 'View the people you can already practice with.'}
+    </Text>
+  </View>
+
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
+
         <TouchableOpacity style={styles.actionCard}>
 
           <View style={styles.actionContent}>
@@ -220,18 +257,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 30,
   },
+  headerText: {
+  flex: 1,
+  minWidth: 0,
+  paddingRight: 14,
+},
   greeting: {
   color: '#FFFFFF',
-  fontSize: 26,
-  lineHeight: 33,
+  fontSize: 24,
+  lineHeight: 31,
   fontWeight: 'bold',
   letterSpacing: -0.3,
+  flexShrink: 1,
 },
   subtitle: {
   color: '#A8B3CF',
   fontSize: 14,
   lineHeight: 21,
   marginTop: 6,
+  flexShrink: 1,
 },
  avatar: {
   width: 52,
@@ -242,6 +286,8 @@ const styles = StyleSheet.create({
   borderColor: '#22D3EE',
   alignItems: 'center',
   justifyContent: 'center',
+  flexShrink: 0,
+  marginRight: 8,
   shadowColor: '#22D3EE',
   shadowOffset: {
     width: 0,
@@ -250,6 +296,11 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.3,
   shadowRadius: 10,
   elevation: 7,
+},
+avatarImage: {
+  width: '200%',
+  height: '200%',
+  borderRadius: 16,
 },
   avatarText: {
   color: '#22D3EE',
