@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -66,15 +65,11 @@ export default function HomeScreen() {
 <TouchableOpacity
   style={[styles.actionCard, styles.learnCard]}
   onPress={() =>
-    Alert.alert(
-      language === 'es'
-        ? 'Espacio de aprendizaje'
-        : 'Learning space',
-      language === 'es'
-        ? 'Muy pronto podrás completar lecciones, ganar puntos, mantener tu racha y avanzar por niveles.'
-        : 'Soon you will be able to complete lessons, earn points, maintain your streak, and advance through levels.'
-    )
-  }
+  router.push({
+    pathname: '/learn',
+    params: { lang: language },
+  })
+}
   activeOpacity={0.85}
 >
   <View style={[styles.actionIcon, styles.learnIcon]}>
