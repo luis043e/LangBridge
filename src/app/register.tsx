@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -201,8 +202,12 @@ export default function RegisterScreen() {
 
           <View style={styles.formContainer}>
             <View style={styles.logo}>
-              <Text style={styles.logoText}>LB</Text>
-            </View>
+  <Image
+    source={require('../../assets/images/langbridge-logo.png')}
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+</View>
 
             <Text style={styles.title}>
               {text.registerScreen.title}
@@ -369,15 +374,17 @@ const styles = StyleSheet.create({
 },
 
   logo: {
-  width: 76,
-  height: 76,
-  borderRadius: 24,
-  backgroundColor: '#111C3A',
+  width: 82,
+  height: 82,
+  borderRadius: 26,
+  backgroundColor: '#050B24',
   borderWidth: 1.5,
   borderColor: '#22D3EE',
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: 26,
+  padding: 5,
+  overflow: 'hidden',
   shadowColor: '#22D3EE',
   shadowOffset: {
     width: 0,
@@ -388,11 +395,10 @@ const styles = StyleSheet.create({
   elevation: 10,
 },
 
-  logoText: {
-  color: '#22D3EE',
-  fontSize: 26,
-  fontWeight: 'bold',
-  letterSpacing: 1,
+  logoImage: {
+  width: '138%',
+  height: '138%',
+  borderRadius: 22,
 },
 
   title: {

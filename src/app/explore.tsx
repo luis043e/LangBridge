@@ -36,6 +36,65 @@ export default function ExploreScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+    const getLanguageName = (code: string) => {
+  const languageNames: Record<string, { es: string; en: string }> = {
+    es: {
+      es: 'Español',
+      en: 'Spanish',
+    },
+    en: {
+      es: 'Inglés',
+      en: 'English',
+    },
+    fr: {
+      es: 'Francés',
+      en: 'French',
+    },
+    pt: {
+      es: 'Portugués',
+      en: 'Portuguese',
+    },
+    de: {
+      es: 'Alemán',
+      en: 'German',
+    },
+    it: {
+      es: 'Italiano',
+      en: 'Italian',
+    },
+  };
+
+  return (
+    languageNames[code]?.[language] ||
+    (language === 'es'
+      ? 'No especificado'
+      : 'Not specified')
+  );
+};
+
+const getLevelName = (level: string) => {
+  const levelNames: Record<string, { es: string; en: string }> = {
+    beginner: {
+      es: 'Principiante',
+      en: 'Beginner',
+    },
+    intermediate: {
+      es: 'Intermedio',
+      en: 'Intermediate',
+    },
+    advanced: {
+      es: 'Avanzado',
+      en: 'Advanced',
+    },
+  };
+
+  return (
+    levelNames[level]?.[language] ||
+    (language === 'es'
+      ? 'Nivel no especificado'
+      : 'Level not specified')
+  );
+};
 
   const [searchText, setSearchText] = useState('');
   const [onlineOnly, setOnlineOnly] = useState(false);
@@ -148,27 +207,25 @@ useEffect(() => {
   };
 
   const handleViewProfile = (partner: Partner) => {
-    Alert.alert(
-      partner.name,
-      language === 'es'
-        ? `${partner.name} habla ${partner.nativeLanguage} y está aprendiendo ${partner.learningLanguage}.`
-        : `${partner.name} speaks ${partner.nativeLanguage} and is learning ${partner.learningLanguage}.`,
-      [
-        {
-          text: language === 'es'
-            ? 'Cerrar'
-            : 'Close',
-          style: 'cancel',
-        },
-        {
-          text: language === 'es'
-            ? 'Conectar'
-            : 'Connect',
-          onPress: () => handleConnect(partner),
-        },
-      ]
-    );
-  };
+  router.push({
+    pathname: '/partner-profile',
+    params: {
+      lang: language,
+      partnerId: partner.id,
+      name: partner.name,
+      initials: partner.initials,
+      city: partner.city,
+      nativeLanguage: getLanguageName(
+        partner.nativeLanguage
+      ),
+      learningLanguage: getLanguageName(
+        partner.learningLanguage
+      ),
+      level: getLevelName(partner.level),
+      online: String(partner.online),
+    },
+  });
+};
 
   const goBack = () => {
     router.back();
@@ -313,19 +370,19 @@ useEffect(() => {
 
                   <Text style={styles.languageInformation}>
                     {language === 'es'
-                      ? `Habla: ${partner.nativeLanguage}`
-                      : `Speaks: ${partner.nativeLanguage}`}
+  ? `Habla: ${getLanguageName(partner.nativeLanguage)}`
+  : `Speaks: ${getLanguageName(partner.nativeLanguage)}`}
                   </Text>
 
                   <Text style={styles.languageInformation}>
                     {language === 'es'
-                      ? `Aprende: ${partner.learningLanguage}`
-                      : `Learning: ${partner.learningLanguage}`}
+  ? `Aprende: ${getLanguageName(partner.learningLanguage)}`
+  : `Learning: ${getLanguageName(partner.learningLanguage)}`}
                   </Text>
 
                   <View style={styles.levelBadge}>
                     <Text style={styles.levelBadgeText}>
-                      {partner.level}
+                      {getLevelName(partner.level)}
                     </Text>
                   </View>
                 </View>

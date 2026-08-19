@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -53,8 +54,12 @@ export default function WelcomeScreen() {
 
       <View style={styles.content}>
         <View style={styles.logo}>
-          <Text style={styles.logoText}>LB</Text>
-        </View>
+  <Image
+    source={require('../../assets/images/langbridge-logo.png')}
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+</View>
 <View style={styles.brandName}>
   <Text style={styles.titleWhite}>Lang</Text>
   <Text style={styles.titleBlue}>Bridge</Text>
@@ -143,15 +148,17 @@ const styles = StyleSheet.create({
 },
 
   logo: {
-  width: 104,
-  height: 104,
-  borderRadius: 32,
-  backgroundColor: '#111C3A',
+  width: 112,
+  height: 112,
+  borderRadius: 34,
+  backgroundColor: '#050B24',
   borderWidth: 1.5,
   borderColor: '#22D3EE',
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: 24,
+  padding: 6,
+  overflow: 'hidden',
   shadowColor: '#22D3EE',
   shadowOffset: {
     width: 0,
@@ -162,11 +169,11 @@ const styles = StyleSheet.create({
   elevation: 10,
 },
 
-  logoText: {
-    color: '#FFFFFF',
-    fontSize: 34,
-    fontWeight: 'bold',
-  },
+  logoImage: {
+  width: '180%',
+  height: '150%',
+  borderRadius: 30,
+},
 
   brandName: {
   flexDirection: 'row',
