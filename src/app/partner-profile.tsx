@@ -1,20 +1,19 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc,
+  doc,
+  serverTimestamp,
+  setDoc,
 } from 'firebase/firestore';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -118,7 +117,9 @@ export default function PartnerProfileScreen() {
     return;
   }
 
-  const requestId = `${currentUser.uid}_${partnerId}`;
+  const requestId =
+    `${currentUser.uid}_${partnerId}`;
+
   const requestReference = doc(
     db,
     'connectionRequests',
@@ -127,49 +128,6 @@ export default function PartnerProfileScreen() {
 
   try {
     setIsSending(true);
-
-    const existingRequest = await getDoc(
-      requestReference
-    );
-
-    if (existingRequest.exists()) {
-      const requestData = existingRequest.data();
-      const status = requestData.status;
-
-      let messageEs =
-        'Ya existe una solicitud de conexión con este usuario.';
-
-      let messageEn =
-        'A connection request already exists with this user.';
-
-      if (status === 'pending') {
-        messageEs =
-          'Ya enviaste una solicitud y todavía está pendiente.';
-        messageEn =
-          'You already sent a request and it is still pending.';
-      } else if (status === 'accepted') {
-        messageEs =
-          'Esta persona ya forma parte de tus conexiones.';
-        messageEn =
-          'This person is already one of your connections.';
-      } else if (status === 'rejected') {
-        messageEs =
-          'Esta solicitud ya fue respondida anteriormente.';
-        messageEn =
-          'This request was previously answered.';
-      }
-
-      Alert.alert(
-        language === 'es'
-          ? 'Solicitud existente'
-          : 'Existing request',
-        language === 'es'
-          ? messageEs
-          : messageEn
-      );
-
-      return;
-    }
 
     await setDoc(requestReference, {
       senderId: currentUser.uid,
@@ -210,7 +168,7 @@ export default function PartnerProfileScreen() {
     setIsSending(false);
   }
 };
-  return (
+    return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <StatusBar style="light" />
