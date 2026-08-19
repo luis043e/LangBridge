@@ -147,7 +147,36 @@ export default function HomeScreen() {
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
+<TouchableOpacity
+  style={styles.actionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/requests',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.actionIcon}>
+    <Text style={styles.actionIconText}>🔔</Text>
+  </View>
 
+  <View style={styles.actionContent}>
+    <Text style={styles.actionTitle}>
+      {language === 'es'
+        ? 'Solicitudes'
+        : 'Requests'}
+    </Text>
+
+    <Text style={styles.actionDescription}>
+      {language === 'es'
+        ? 'Revisa y responde tus solicitudes de conexión.'
+        : 'Review and respond to your connection requests.'}
+    </Text>
+  </View>
+
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
         <TouchableOpacity style={styles.actionCard}>
 
           <View style={styles.actionContent}>
