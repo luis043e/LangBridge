@@ -76,25 +76,11 @@ export default function LoginScreen() {
       setIsLoading(true);
 
       await signInWithEmailAndPassword(auth, cleanEmail, password);
+      router.replace({
+  pathname: '/home',
+  params: { lang: language },
+});
 
-      Alert.alert(
-        language === 'es'
-          ? 'Inicio de sesión exitoso'
-          : 'Login successful',
-        language === 'es'
-          ? 'Bienvenido de nuevo a LangBridge.'
-          : 'Welcome back to LangBridge.',
-        [
-          {
-            text: language === 'es' ? 'Continuar' : 'Continue',
-            onPress: () =>
-              router.replace({
-                pathname: '/home',
-                params: { lang: language },
-              }),
-          },
-        ]
-      );
     } catch (error: any) {
       console.error(
   'FIREBASE LOGIN ERROR:',

@@ -233,6 +233,36 @@ export default function HomeScreen() {
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+  style={styles.actionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/settings',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.actionIcon}>
+    <Text style={styles.actionIconText}>⚙️</Text>
+  </View>
+
+  <View style={styles.actionContent}>
+    <Text style={styles.actionTitle}>
+      {language === 'es'
+        ? 'Perfil y configuración'
+        : 'Profile and settings'}
+    </Text>
+
+    <Text style={styles.actionDescription}>
+      {language === 'es'
+        ? 'Administra tu cuenta, preferencias y sesión.'
+        : 'Manage your account, preferences, and session.'}
+    </Text>
+  </View>
+
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
 
         <View style={styles.tipCard}>
           <Text style={styles.tipLabel}>
