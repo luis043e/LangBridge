@@ -1,21 +1,26 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc,
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -53,8 +58,10 @@ export default function ChatScreen() {
 const [chatError, setChatError] =
   useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
-  const [messages] = useState<Message[]>([]);
+  const [messages, setMessages] =
+  useState<Message[]>([]);
 useEffect(() => {
   const prepareConversation = async () => {
     const currentUser = auth.currentUser;
@@ -118,22 +125,125 @@ useEffect(() => {
   params.partnerId,
 ]);
   const initials = partnerName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join('');
+  useEffect(() => {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser || !connectionId) {
+    return;
+  }
+
+  const messagesQuery = query(
+    collection(
+      db,
+      'conversations',
+      connectionId,
+      'messages'
+    ),
+    orderBy('createdAt', 'asc')
+  );
+
+  const unsubscribe = onSnapshot(
+    messagesQuery,
+    (messagesSnapshot) => {
+      const loadedMessages: Message[] =
+        messagesSnapshot.docs.map(
+          (messageDocument) => {
+            const data = messageDocument.data();
+
+            return {
+              id: messageDocument.id,
+              text: data.text || '',
+              isOwn:
+                data.senderId === currentUser.uid,
+            };
+          }
+        );
+
+      setMessages(loadedMessages);
+    },
+    (error) => {
+      console.error(
+        'Error loading chat messages:',
+        error
+      );
+
+      setChatError(
+        language === 'es'
+          ? 'No se pudieron cargar los mensajes.'
+          : 'Messages could not be loaded.'
+      );
+    }
+  );
+
+  return unsubscribe;
+}, [connectionId, language]);
+  const handleSendMessage = async () => {
+  const cleanMessage = messageText.trim();
+  const currentUser = auth.currentUser;
+
+  if (
+    !cleanMessage ||
+    isSending ||
+    isPreparingChat
+  ) {
+    return;
+  }
+
+  if (!currentUser || !connectionId) {
+    setChatError(
+      language === 'es'
+        ? 'No se pudo identificar esta conversación.'
+        : 'This conversation could not be identified.'
+    );
+    return;
+  }
+
+  try {
+    setIsSending(true);
+    setChatError(null);
+
+    await addDoc(
+      collection(
+        db,
+        'conversations',
+        connectionId,
+        'messages'
+      ),
+      {
+        senderId: currentUser.uid,
+        text: cleanMessage,
+        createdAt: serverTimestamp(),
+      }
+    );
+
+    setMessageText('');
+  } catch (error) {
+    console.error(
+      'Error sending chat message:',
+      error
+    );
+
+    setChatError(
+      language === 'es'
+        ? 'No se pudo enviar el mensaje. Revisa tu conexión e inténtalo nuevamente.'
+        : 'The message could not be sent. Check your connection and try again.'
+    );
+  } finally {
+    setIsSending(false);
+  }
+};
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={
-          Platform.OS === 'ios'
-            ? 'padding'
-            : undefined
-        }
-      >
+  <SafeAreaView style={styles.safeArea}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={
+        Platform.OS === 'ios'
+          ? 'padding'
+          : 'height'
+      }
+      keyboardVerticalOffset={0}
+    >
         <StatusBar style="light" />
 
         <View style={styles.header}>
@@ -213,34 +323,42 @@ useEffect(() => {
         </ScrollView>
 
         <View style={styles.composer}>
-          <TextInput
-            style={styles.messageInput}
-            placeholder={
-              language === 'es'
-                ? 'Escribe un mensaje...'
-                : 'Write a message...'
-            }
-            placeholderTextColor="#64748B"
-            value={messageText}
-            onChangeText={setMessageText}
-            multiline
-            maxLength={1000}
-          />
+  <TextInput
+    style={styles.messageInput}
+    placeholder={
+      language === 'es'
+        ? 'Escribe un mensaje...'
+        : 'Write a message...'
+    }
+    placeholderTextColor="#64748B"
+    value={messageText}
+    onChangeText={setMessageText}
+    multiline
+    maxLength={1000}
+    editable={!isSending}
+  />
 
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              !messageText.trim() &&
-                styles.disabledSendButton,
-            ]}
-            activeOpacity={0.85}
-            disabled={!messageText.trim()}
-          >
-            <Text style={styles.sendButtonText}>
-              ➤
-            </Text>
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity
+    style={[
+      styles.sendButton,
+      (!messageText.trim() ||
+        isSending ||
+        isPreparingChat) &&
+        styles.disabledSendButton,
+    ]}
+    onPress={handleSendMessage}
+    activeOpacity={0.85}
+    disabled={
+      !messageText.trim() ||
+      isSending ||
+      isPreparingChat
+    }
+  >
+    <Text style={styles.sendButtonText}>
+      {isSending ? '…' : '➤'}
+    </Text>
+  </TouchableOpacity>
+</View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
