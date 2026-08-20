@@ -11,7 +11,7 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -31,6 +31,7 @@ type Message = {
   id: string;
   text: string;
   isOwn: boolean;
+  time: string;
 };
 
 export default function ChatScreen() {
@@ -62,6 +63,9 @@ const [chatError, setChatError] =
 
   const [messages, setMessages] =
   useState<Message[]>([]);
+
+  const messagesScrollRef =
+  useRef<ScrollView>(null);
 useEffect(() => {
   const prepareConversation = async () => {
     const currentUser = auth.currentUser;
@@ -150,12 +154,26 @@ useEffect(() => {
           (messageDocument) => {
             const data = messageDocument.data();
 
-            return {
-              id: messageDocument.id,
-              text: data.text || '',
-              isOwn:
-                data.senderId === currentUser.uid,
-            };
+            const messageDate =
+  data.createdAt?.toDate?.();
+
+const formattedTime = messageDate
+  ? messageDate.toLocaleTimeString(
+      language === 'es' ? 'es-DO' : 'en-US',
+      {
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    )
+  : '';
+
+return {
+  id: messageDocument.id,
+  text: data.text || '',
+  isOwn:
+    data.senderId === currentUser.uid,
+  time: formattedTime,
+};
           }
         );
 
@@ -280,11 +298,17 @@ useEffect(() => {
         </View>
 
         <ScrollView
-          style={styles.messagesArea}
-          contentContainerStyle={styles.messagesContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+  ref={messagesScrollRef}
+  style={styles.messagesArea}
+  contentContainerStyle={styles.messagesContent}
+  showsVerticalScrollIndicator={false}
+  keyboardShouldPersistTaps="handled"
+  onContentSizeChange={() =>
+    messagesScrollRef.current?.scrollToEnd({
+      animated: true,
+    })
+  }
+>
           {messages.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>
@@ -315,8 +339,21 @@ useEffect(() => {
                 ]}
               >
                 <Text style={styles.messageText}>
-                  {message.text}
-                </Text>
+  {message.text}
+</Text>
+
+{message.time ? (
+  <Text
+    style={[
+      styles.messageTime,
+      message.isOwn
+        ? styles.ownMessageTime
+        : styles.partnerMessageTime,
+    ]}
+  >
+    {message.time}
+  </Text>
+) : null}
               </View>
             ))
           )}
@@ -502,6 +539,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 21,
   },
+
+  messageTime: {
+  fontSize: 10,
+  marginTop: 5,
+  alignSelf: 'flex-end',
+},
+
+ownMessageTime: {
+  color: '#C7D2FE',
+},
+
+partnerMessageTime: {
+  color: '#94A3B8',
+},
 
   composer: {
     flexDirection: 'row',

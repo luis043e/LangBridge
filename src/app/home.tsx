@@ -214,7 +214,16 @@ export default function HomeScreen() {
   <Text style={styles.arrow}>›</Text>
 </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionCard}>
+        <TouchableOpacity
+  style={styles.actionCard}
+  onPress={() =>
+    router.push({
+      pathname: '/conversations',
+      params: { lang: language },
+    })
+  }
+  activeOpacity={0.85}
+>
 
           <View style={styles.actionContent}>
            <Text style={styles.actionTitle}>
