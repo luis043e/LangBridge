@@ -2,10 +2,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   doc,
+  getDoc,
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -26,9 +27,11 @@ export default function PartnerProfileScreen() {
   const params = useLocalSearchParams<{
     lang?: string;
     partnerId?: string;
+    preview?: string;
     name?: string;
     initials?: string;
     city?: string;
+    bio?: string;
     nativeLanguage?: string;
     learningLanguage?: string;
     level?: string;
@@ -37,7 +40,79 @@ export default function PartnerProfileScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+    const getLanguageName = (code: string) => {
+  const languageNames: Record<
+    string,
+    { es: string; en: string }
+  > = {
+    es: {
+      es: 'Español',
+      en: 'Spanish',
+    },
+    en: {
+      es: 'Inglés',
+      en: 'English',
+    },
+    fr: {
+      es: 'Francés',
+      en: 'French',
+    },
+    pt: {
+      es: 'Portugués',
+      en: 'Portuguese',
+    },
+    de: {
+      es: 'Alemán',
+      en: 'German',
+    },
+    it: {
+      es: 'Italiano',
+      en: 'Italian',
+    },
+  };
 
+  return (
+    languageNames[code]?.[language] ||
+    code ||
+    (language === 'es'
+      ? 'No especificado'
+      : 'Not specified')
+  );
+};
+
+const getLevelName = (levelCode: string) => {
+  const levelNames: Record<
+    string,
+    { es: string; en: string }
+  > = {
+    beginner: {
+      es: 'Principiante',
+      en: 'Beginner',
+    },
+    intermediate: {
+      es: 'Intermedio',
+      en: 'Intermediate',
+    },
+    advanced: {
+      es: 'Avanzado',
+      en: 'Advanced',
+    },
+  };
+
+  return (
+    levelNames[levelCode]?.[language] ||
+    levelCode ||
+    (language === 'es'
+      ? 'Nivel no especificado'
+      : 'Level not specified')
+  );
+};
+
+    const isOwnProfile = params.preview === 'true';
+
+    const profileUserId = isOwnProfile
+  ? auth.currentUser?.uid
+  : params.partnerId;
   const name =
     params.name ||
     (language === 'es'
@@ -51,6 +126,8 @@ export default function PartnerProfileScreen() {
     (language === 'es'
       ? 'Ubicación no indicada'
       : 'Location not provided');
+
+  const bio = params.bio?.trim() || '';
 
   const nativeLanguage =
     params.nativeLanguage ||
@@ -71,8 +148,113 @@ export default function PartnerProfileScreen() {
       : 'Level not specified');
 
   const isOnline = params.online === 'true';
-  const [isSending, setIsSending] = useState(false);
 
+const [loadedProfile, setLoadedProfile] = useState<{
+
+  fullName: string;
+  city: string;
+  bio: string;
+  nativeLanguage: string;
+  learningLanguage: string;
+  level: string;
+  online: boolean;
+} | null>(null);
+
+useEffect(() => {
+  const loadOwnPublicProfile = async () => {
+    if (!isOwnProfile || !profileUserId) {
+      return;
+    }
+
+    try {
+      const profileReference = doc(
+        db,
+        'users',
+        profileUserId
+      );
+
+      const profileSnapshot = await getDoc(
+        profileReference
+      );
+
+      if (!profileSnapshot.exists()) {
+        return;
+      }
+
+      const profileData = profileSnapshot.data();
+
+      setLoadedProfile({
+        fullName:
+          profileData.fullName?.trim() ||
+          auth.currentUser?.displayName?.trim() ||
+          auth.currentUser?.email?.split('@')[0] ||
+          (language === 'es'
+            ? 'Usuario de LangBridge'
+            : 'LangBridge user'),
+        city:
+          profileData.city?.trim() ||
+          (language === 'es'
+            ? 'Ubicación no indicada'
+            : 'Location not provided'),
+        bio: profileData.bio?.trim() || '',
+        nativeLanguage:
+          profileData.nativeLanguage || '',
+        learningLanguage:
+          profileData.learningLanguage || '',
+        level: profileData.level || 'beginner',
+        online: profileData.online === true,
+      });
+    } catch (error) {
+      console.error(
+        'Error loading public profile:',
+        error
+      );
+    }
+  };
+
+  loadOwnPublicProfile();
+}, [
+  isOwnProfile,
+  language,
+  profileUserId,
+]);
+
+const displayedName =
+  loadedProfile?.fullName || name;
+
+const displayedInitials =
+  displayedName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) =>
+      part.charAt(0).toUpperCase()
+    )
+    .join('') ||
+  initials;
+
+const displayedCity =
+  loadedProfile?.city || city;
+
+  const displayedNativeLanguage =
+  loadedProfile?.nativeLanguage ||
+  nativeLanguage;
+
+const displayedLearningLanguage =
+  loadedProfile?.learningLanguage ||
+  learningLanguage;
+
+const displayedLevel =
+  loadedProfile?.level || level;
+
+const displayedBio =
+  loadedProfile?.bio || bio;
+
+const displayedOnline =
+  loadedProfile?.online ?? isOnline;
+
+const [isSending, setIsSending] = useState(false);
+  
   const handleConnect = async () => {
   if (isSending) {
     return;
@@ -191,27 +373,27 @@ export default function PartnerProfileScreen() {
             <View style={styles.avatarWrapper}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
-                  {initials}
+                  {displayedInitials}
                 </Text>
               </View>
 
-              {isOnline && (
+              {displayedOnline && (
                 <View style={styles.onlineIndicator} />
               )}
             </View>
 
             <Text style={styles.name}>
-              {name}
+              {displayedName}
             </Text>
 
             <Text style={styles.location}>
-              📍 {city}
+              📍 {displayedCity}
             </Text>
 
             <View
               style={[
                 styles.statusBadge,
-                isOnline
+                displayedOnline
                   ? styles.onlineBadge
                   : styles.offlineBadge,
               ]}
@@ -219,12 +401,12 @@ export default function PartnerProfileScreen() {
               <Text
                 style={[
                   styles.statusText,
-                  isOnline
+                  displayedOnline
                     ? styles.onlineText
                     : styles.offlineText,
                 ]}
               >
-                {isOnline
+                {displayedOnline
                   ? language === 'es'
                     ? 'En línea'
                     : 'Online'
@@ -234,6 +416,21 @@ export default function PartnerProfileScreen() {
               </Text>
             </View>
           </View>
+{bio ? (
+  <>
+    <Text style={styles.aboutTitle}>
+      {language === 'es'
+        ? 'Acerca de mí'
+        : 'About me'}
+    </Text>
+
+    <View style={styles.aboutCard}>
+      <Text style={styles.aboutText}>
+        {bio}
+      </Text>
+    </View>
+  </>
+) : null}
 
           <Text style={styles.sectionTitle}>
             {language === 'es'
@@ -257,7 +454,7 @@ export default function PartnerProfileScreen() {
                 </Text>
 
                 <Text style={styles.informationValue}>
-                  {nativeLanguage}
+                  {getLanguageName(displayedNativeLanguage)}
                 </Text>
               </View>
             </View>
@@ -279,7 +476,7 @@ export default function PartnerProfileScreen() {
                 </Text>
 
                 <Text style={styles.informationValue}>
-                  {learningLanguage}
+                  {getLanguageName(displayedLearningLanguage)}
                 </Text>
               </View>
             </View>
@@ -301,7 +498,7 @@ export default function PartnerProfileScreen() {
                 </Text>
 
                 <Text style={styles.informationValue}>
-                  {level}
+                  {getLevelName(displayedLevel)}
                 </Text>
               </View>
             </View>
@@ -320,37 +517,39 @@ export default function PartnerProfileScreen() {
                 : 'Send a request to start a language exchange connection.'}
             </Text>
           </View>
+          
+         {!isOwnProfile ? (
+  <TouchableOpacity
+    style={[
+      styles.connectButton,
+      isSending && styles.disabledConnectButton,
+    ]}
+    onPress={handleConnect}
+    activeOpacity={0.85}
+    disabled={isSending}
+  >
+    {isSending ? (
+      <View style={styles.sendingContent}>
+        <ActivityIndicator
+          color="#050B24"
+          size="small"
+        />
 
-          <TouchableOpacity
-  style={[
-    styles.connectButton,
-    isSending && styles.disabledConnectButton,
-  ]}
-  onPress={handleConnect}
-  activeOpacity={0.85}
-  disabled={isSending}
->
-  {isSending ? (
-    <View style={styles.sendingContent}>
-      <ActivityIndicator
-        color="#050B24"
-        size="small"
-      />
-
-      <Text style={styles.sendingText}>
+        <Text style={styles.sendingText}>
+          {language === 'es'
+            ? 'Enviando...'
+            : 'Sending...'}
+        </Text>
+      </View>
+    ) : (
+      <Text style={styles.connectButtonText}>
         {language === 'es'
-          ? 'Enviando...'
-          : 'Sending...'}
+          ? 'Enviar solicitud'
+          : 'Send request'}
       </Text>
-    </View>
-  ) : (
-    <Text style={styles.connectButtonText}>
-      {language === 'es'
-        ? 'Enviar solicitud'
-        : 'Send request'}
-    </Text>
-  )}
-</TouchableOpacity>
+    )}
+  </TouchableOpacity>
+) : null}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -478,7 +677,28 @@ onlineText: {
 offlineText: {
   color: '#94A3B8',
 },
+aboutTitle: {
+  color: '#FFFFFF',
+  fontSize: 20,
+  fontWeight: 'bold',
+  marginTop: 34,
+  marginBottom: 14,
+},
 
+aboutCard: {
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 20,
+  paddingHorizontal: 18,
+  paddingVertical: 17,
+},
+
+aboutText: {
+  color: '#D7E0F5',
+  fontSize: 14,
+  lineHeight: 22,
+},
 sectionTitle: {
   color: '#FFFFFF',
   fontSize: 20,

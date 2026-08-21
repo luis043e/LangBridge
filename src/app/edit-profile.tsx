@@ -1,18 +1,28 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { auth } from '../firebaseConfig';
+import { updateProfile } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
+
+import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
 
 export default function EditProfileScreen() {
@@ -33,7 +43,135 @@ export default function EditProfileScreen() {
 
   const [city, setCity] = useState('');
   const [bio, setBio] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+  const loadProfile = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const profileReference = doc(
+        db,
+        'users',
+        user.uid
+      );
+
+      const profileSnapshot = await getDoc(
+        profileReference
+      );
+
+      if (profileSnapshot.exists()) {
+        const profileData =
+          profileSnapshot.data();
+
+        setFullName(
+          profileData.fullName ||
+          user.displayName ||
+          ''
+        );
+
+        setCity(profileData.city || '');
+        setBio(profileData.bio || '');
+      }
+    } catch (error) {
+      console.error(
+        'Error loading profile:',
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadProfile();
+}, []);
+const handleSaveProfile = async () => {
+  if (isSaving) {
+    return;
+  }
+
+  const user = auth.currentUser;
+  const cleanName = fullName.trim();
+  const cleanCity = city.trim();
+  const cleanBio = bio.trim();
+
+  if (!user) {
+    Alert.alert(
+      language === 'es'
+        ? 'Sesión requerida'
+        : 'Login required',
+      language === 'es'
+        ? 'Debes iniciar sesión nuevamente para actualizar tu perfil.'
+        : 'You must log in again to update your profile.'
+    );
+    return;
+  }
+
+  if (!cleanName) {
+    Alert.alert(
+      language === 'es'
+        ? 'Nombre requerido'
+        : 'Name required',
+      language === 'es'
+        ? 'Escribe tu nombre completo para continuar.'
+        : 'Enter your full name to continue.'
+    );
+    return;
+  }
+
+  try {
+    setIsSaving(true);
+
+    await updateProfile(user, {
+      displayName: cleanName,
+    });
+
+    await setDoc(
+      doc(db, 'users', user.uid),
+      {
+        fullName: cleanName,
+        city: cleanCity,
+        bio: cleanBio,
+        updatedAt: serverTimestamp(),
+      },
+      {
+        merge: true,
+      }
+    );
+
+    Alert.alert(
+      language === 'es'
+        ? 'Perfil actualizado'
+        : 'Profile updated',
+      language === 'es'
+        ? 'Tus cambios fueron guardados correctamente.'
+        : 'Your changes were saved successfully.'
+    );
+  } catch (error) {
+    console.error(
+      'Error saving profile:',
+      error
+    );
+
+    Alert.alert(
+      language === 'es'
+        ? 'No se pudo guardar'
+        : 'Save failed',
+      language === 'es'
+        ? 'Revisa tu conexión e inténtalo nuevamente.'
+        : 'Check your connection and try again.'
+    );
+  } finally {
+    setIsSaving(false);
+  }
+};
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -62,6 +200,12 @@ export default function EditProfileScreen() {
                 : '‹ Back'}
             </Text>
           </TouchableOpacity>
+          {isLoading ? (
+  <ActivityIndicator
+    color="#22D3EE"
+    size="large"
+  />
+) : null}
 
           <Text style={styles.title}>
             {language === 'es'
@@ -144,21 +288,25 @@ export default function EditProfileScreen() {
           </Text>
 
           <TouchableOpacity
-            style={styles.saveButton}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.saveButtonText}>
-              {language === 'es'
-                ? 'Guardar cambios'
-                : 'Save changes'}
-            </Text>
-          </TouchableOpacity>
+  style={[
+    styles.saveButton,
+    isSaving && styles.disabledSaveButton,
+  ]}
+  onPress={handleSaveProfile}
+  activeOpacity={0.85}
+  disabled={isSaving || isLoading}
+>
+  <Text style={styles.saveButtonText}>
+    {isSaving
+      ? language === 'es'
+        ? 'Guardando...'
+        : 'Saving...'
+      : language === 'es'
+        ? 'Guardar cambios'
+        : 'Save changes'}
+  </Text>
+</TouchableOpacity>
 
-          <Text style={styles.helperText}>
-            {language === 'es'
-              ? 'En el próximo paso conectaremos este formulario con Firestore.'
-              : 'Next, this form will be connected to Firestore.'}
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -267,18 +415,12 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 8,
   },
-
+disabledSaveButton: {
+  opacity: 0.65,
+},
   saveButtonText: {
     color: '#050B24',
     fontSize: 17,
     fontWeight: 'bold',
-  },
-
-  helperText: {
-    color: '#64748B',
-    fontSize: 12,
-    lineHeight: 18,
-    textAlign: 'center',
-    marginTop: 16,
   },
 });

@@ -1,19 +1,23 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter
+} from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { signOut } from 'firebase/auth';
+import { useCallback, useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
-
 export default function SettingsScreen() {
   const router = useRouter();
 
@@ -26,12 +30,21 @@ export default function SettingsScreen() {
 
   const currentUser = auth.currentUser;
 
-  const displayName =
-    currentUser?.displayName?.trim() ||
-    currentUser?.email?.split('@')[0] ||
-    (language === 'es'
-      ? 'Usuario de LangBridge'
-      : 'LangBridge user');
+const getCurrentDisplayName = () =>
+  auth.currentUser?.displayName?.trim() ||
+  auth.currentUser?.email?.split('@')[0] ||
+  (language === 'es'
+    ? 'Usuario de LangBridge'
+    : 'LangBridge user');
+
+const [displayName, setDisplayName] =
+  useState(getCurrentDisplayName);
+
+useFocusEffect(
+  useCallback(() => {
+    setDisplayName(getCurrentDisplayName());
+  }, [language])
+);
 
   const email =
     currentUser?.email ||
@@ -182,15 +195,49 @@ export default function SettingsScreen() {
                     : 'Name, location, and personal information.'}
                 </Text>
               </View>
-
-              <Text style={styles.comingSoon}>
-                {language === 'es'
-                  ? 'PRONTO'
-                  : 'SOON'}
-              </Text>
+              
             </TouchableOpacity>
-            <View style={styles.divider} />
 
+            <View style={styles.divider} />
+<TouchableOpacity
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/partner-profile',
+      params: {
+        lang: language,
+        preview: 'true',
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.settingIcon}>
+    <Text style={styles.settingIconText}>
+      👁️
+    </Text>
+  </View>
+
+  <View style={styles.settingInformation}>
+    <Text style={styles.settingTitle}>
+      {language === 'es'
+        ? 'Ver mi perfil público'
+        : 'View my public profile'}
+    </Text>
+
+    <Text style={styles.settingDescription}>
+      {language === 'es'
+        ? 'Comprueba cómo otras personas ven tu perfil.'
+        : 'Preview how other people see your profile.'}
+    </Text>
+  </View>
+
+  <Text style={styles.settingArrow}>
+    ›
+  </Text>
+</TouchableOpacity>
+
+<View style={styles.divider} />
             <View style={styles.settingRow}>
               <View style={styles.settingIcon}>
                 <Text style={styles.settingIconText}>
@@ -424,6 +471,11 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 4,
   },
+settingArrow: {
+  color: '#64748B',
+  fontSize: 26,
+  marginLeft: 8,
+},
 
   comingSoon: {
     color: '#C4B5FD',

@@ -22,6 +22,7 @@ type Partner = {
   name: string;
   initials: string;
   city: string;
+  bio: string;
   nativeLanguage: string;
   learningLanguage: string;
   level: string;
@@ -149,6 +150,7 @@ useEffect(() => {
                 (language === 'es'
                   ? 'Ubicación no indicada'
                   : 'Location not provided'),
+              bio: data.bio || '',    
               nativeLanguage:
                 data.nativeLanguage || '',
               learningLanguage:
@@ -215,6 +217,7 @@ useEffect(() => {
       name: partner.name,
       initials: partner.initials,
       city: partner.city,
+      bio: partner.bio,
       nativeLanguage: getLanguageName(
         partner.nativeLanguage
       ),
