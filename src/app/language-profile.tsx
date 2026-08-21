@@ -89,7 +89,8 @@ export default function LanguageProfileScreen() {
 
   const [nativeLanguage, setNativeLanguage] =
     useState<LanguageOption | null>(null);
-
+const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
+  useState(false);
   const [learningLanguage, setLearningLanguage] =
     useState<LanguageOption | null>(null);
 
@@ -106,25 +107,8 @@ export default function LanguageProfileScreen() {
   };
 
   const showNativeLanguageSelector = () => {
-    Alert.alert(
-      language === 'es'
-        ? 'Idioma nativo'
-        : 'Native language',
-      language === 'es'
-        ? 'Selecciona tu idioma nativo.'
-        : 'Select your native language.',
-      [
-        ...languageOptions.map((option) => ({
-          text: getLanguageName(option),
-          onPress: () => setNativeLanguage(option),
-        })),
-        {
-          text: language === 'es' ? 'Cancelar' : 'Cancel',
-          style: 'cancel' as const,
-        },
-      ]
-    );
-  };
+  setIsNativeLanguageOpen((currentValue) => !currentValue);
+};
 
   const showLearningLanguageSelector = () => {
     Alert.alert(
@@ -381,7 +365,89 @@ const goBack = () => {
 
               <Text style={styles.arrow}>⌄</Text>
             </TouchableOpacity>
+{isNativeLanguageOpen && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 20,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {languageOptions.map((option) => {
+        const isSelected =
+          option === nativeLanguage;
 
+        const isDisabled =
+          option === learningLanguage;
+
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+              opacity: isDisabled ? 0.4 : 1,
+            }}
+            onPress={() => {
+              setNativeLanguage(option);
+              setIsNativeLanguageOpen(false);
+            }}
+            activeOpacity={0.8}
+            disabled={isDisabled}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {getLanguageName(option)}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}
             <Text style={styles.label}>
               {language === 'es'
                 ? '¿Cuál es tu nivel actual?'

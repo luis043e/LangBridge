@@ -1,15 +1,18 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth, db } from '../firebaseConfig';
 
 import { type AppLanguage } from '../translations';
 type SelectorType =
@@ -95,7 +98,55 @@ const [level, setLevel] =
 const [activeSelector, setActiveSelector] =
   useState<SelectorType>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+const [isSaving, setIsSaving] = useState(false);
+useEffect(() => {
+  const loadLanguageSettings = async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const userReference = doc(
+        db,
+        'users',
+        currentUser.uid
+      );
+
+      const userSnapshot = await getDoc(userReference);
+
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data();
+
+        if (userData.nativeLanguage) {
+          setNativeLanguage(userData.nativeLanguage);
+        }
+
+        if (userData.learningLanguage) {
+          setLearningLanguage(userData.learningLanguage);
+        }
+
+        if (userData.level) {
+          setLevel(userData.level);
+        }
+      }
+    } catch (error) {
+      console.error(
+        'Error loading language settings:',
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadLanguageSettings();
+}, []);
   const getLanguageName = (code: string) => {
+
     const languageNames: Record<string, string> = {
       es: language === 'es' ? 'Español' : 'Spanish',
       en: language === 'es' ? 'Inglés' : 'English',
@@ -187,7 +238,68 @@ const [activeSelector, setActiveSelector] =
 
     setActiveSelector(null);
   };
+const handleSaveChanges = async () => {
+  const currentUser = auth.currentUser;
 
+  if (!currentUser) {
+    Alert.alert(
+      language === 'es'
+        ? 'Sesión no disponible'
+        : 'Session unavailable',
+      language === 'es'
+        ? 'Inicia sesión nuevamente para guardar los cambios.'
+        : 'Please log in again to save your changes.'
+    );
+    return;
+  }
+
+  try {
+    setIsSaving(true);
+
+    const userReference = doc(
+      db,
+      'users',
+      currentUser.uid
+    );
+
+    await setDoc(
+      userReference,
+      {
+        nativeLanguage,
+        learningLanguage,
+        level,
+      },
+      {
+        merge: true,
+      }
+    );
+
+    Alert.alert(
+      language === 'es'
+        ? 'Cambios guardados'
+        : 'Changes saved',
+      language === 'es'
+        ? 'Tus idiomas y nivel se actualizaron correctamente.'
+        : 'Your languages and level were updated successfully.'
+    );
+  } catch (error) {
+    console.error(
+      'Error saving language settings:',
+      error
+    );
+
+    Alert.alert(
+      language === 'es'
+        ? 'No se pudieron guardar los cambios'
+        : 'Changes could not be saved',
+      language === 'es'
+        ? 'Revisa tu conexión e inténtalo nuevamente.'
+        : 'Check your connection and try again.'
+    );
+  } finally {
+    setIsSaving(false);
+  }
+};
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -230,7 +342,11 @@ const [activeSelector, setActiveSelector] =
 
             <TouchableOpacity
   style={styles.selectorButton}
-  onPress={() => setActiveSelector('native')}
+  onPress={() =>
+  setActiveSelector((currentSelector) =>
+    currentSelector === 'native' ? null : 'native'
+  )
+}
   activeOpacity={0.85}
 >
   <Text style={styles.selectorText}>
@@ -241,7 +357,93 @@ const [activeSelector, setActiveSelector] =
     ▼
   </Text>
 </TouchableOpacity>
+{activeSelector === 'native' && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 20,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {languageOptions.map((option) => {
+        const isSelected =
+          option.code === nativeLanguage;
 
+        const isDisabled =
+          option.code === learningLanguage;
+
+        const optionName =
+          language === 'es'
+            ? option.nameEs
+            : option.nameEn;
+
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+              opacity: isDisabled ? 0.4 : 1,
+            }}
+            onPress={() =>
+              handleOptionSelect(option.code)
+            }
+            activeOpacity={0.8}
+            disabled={isDisabled}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {optionName}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}
             <Text style={styles.label}>
               {language === 'es'
                 ? 'Quiero aprender'
@@ -250,7 +452,13 @@ const [activeSelector, setActiveSelector] =
 
             <TouchableOpacity
   style={styles.selectorButton}
-  onPress={() => setActiveSelector('learning')}
+  onPress={() =>
+  setActiveSelector((currentSelector) =>
+    currentSelector === 'learning'
+      ? null
+      : 'learning'
+  )
+}
   activeOpacity={0.85}
 >
   <Text style={styles.selectorText}>
@@ -261,7 +469,93 @@ const [activeSelector, setActiveSelector] =
     ▼
   </Text>
 </TouchableOpacity>
+{activeSelector === 'learning' && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 20,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {languageOptions.map((option) => {
+        const isSelected =
+          option.code === learningLanguage;
 
+        const isDisabled =
+          option.code === nativeLanguage;
+
+        const optionName =
+          language === 'es'
+            ? option.nameEs
+            : option.nameEn;
+
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+              opacity: isDisabled ? 0.4 : 1,
+            }}
+            onPress={() =>
+              handleOptionSelect(option.code)
+            }
+            activeOpacity={0.8}
+            disabled={isDisabled}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {optionName}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}
             <Text style={styles.label}>
               {language === 'es'
                 ? 'Mi nivel actual'
@@ -270,7 +564,11 @@ const [activeSelector, setActiveSelector] =
 
             <TouchableOpacity
   style={styles.selectorButton}
-  onPress={() => setActiveSelector('level')}
+  onPress={() =>
+  setActiveSelector((currentSelector) =>
+    currentSelector === 'level' ? null : 'level'
+  )
+}
   activeOpacity={0.85}
 >
   <Text style={styles.selectorText}>
@@ -281,21 +579,118 @@ const [activeSelector, setActiveSelector] =
     ▼
   </Text>
 </TouchableOpacity>
+{activeSelector === 'level' && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 4,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {levelOptions.map((option) => {
+        const isSelected =
+          option.code === level;
+
+        const optionName =
+          language === 'es'
+            ? option.nameEs
+            : option.nameEn;
+
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+            }}
+            onPress={() =>
+              handleOptionSelect(option.code)
+            }
+            activeOpacity={0.8}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {optionName}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}
           </View>
 
           <TouchableOpacity
-            style={styles.saveButton}
-            activeOpacity={0.85}
-          >
+  style={[
+    styles.saveButton,
+    (isLoading || isSaving) && {
+      opacity: 0.55,
+    },
+  ]}
+  onPress={handleSaveChanges}
+  activeOpacity={0.85}
+  disabled={isLoading || isSaving}
+>
             <Text style={styles.saveButtonText}>
-              {language === 'es'
-                ? 'Guardar cambios'
-                : 'Save changes'}
+              {isLoading
+  ? language === 'es'
+    ? 'Cargando...'
+    : 'Loading...'
+  : isSaving
+    ? language === 'es'
+      ? 'Guardando...'
+      : 'Saving...'
+    : language === 'es'
+      ? 'Guardar cambios'
+      : 'Save changes'}
             </Text>
           </TouchableOpacity>
         </ScrollView>
         <Modal
-  visible={activeSelector !== null}
+  visible={false}
   transparent
   animationType="fade"
   onRequestClose={() => setActiveSelector(null)}
@@ -328,6 +723,87 @@ const [activeSelector, setActiveSelector] =
       >
         {selectorTitle}
       </Text>
+
+            <ScrollView
+        style={{
+          marginBottom: 14,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {activeOptions.map((option) => {
+          const isSelected =
+            option.code === selectedCode;
+
+          const isDisabled =
+            activeSelector === 'native'
+              ? option.code === learningLanguage
+              : activeSelector === 'learning'
+                ? option.code === nativeLanguage
+                : false;
+
+          const optionName =
+            language === 'es'
+              ? option.nameEs
+              : option.nameEn;
+
+          return (
+            <TouchableOpacity
+              key={option.code}
+              style={{
+                minHeight: 52,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: isSelected
+                  ? '#25356B'
+                  : '#0B1430',
+                borderWidth: 1.5,
+                borderColor: isSelected
+                  ? '#22D3EE'
+                  : '#334C7D',
+                borderRadius: 14,
+                paddingHorizontal: 15,
+                paddingVertical: 12,
+                marginBottom: 10,
+                opacity: isDisabled ? 0.4 : 1,
+              }}
+              onPress={() =>
+                handleOptionSelect(option.code)
+              }
+              activeOpacity={0.8}
+              disabled={isDisabled}
+            >
+              <Text
+                style={{
+                  flex: 1,
+                  color: isSelected
+                    ? '#FFFFFF'
+                    : '#D7E0F5',
+                  fontSize: 15,
+                  fontWeight: isSelected
+                    ? 'bold'
+                    : '600',
+                }}
+              >
+                {optionName}
+              </Text>
+
+              {isSelected && (
+                <Text
+                  style={{
+                    color: '#22D3EE',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    marginLeft: 12,
+                  }}
+                >
+                  ✓
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
       <TouchableOpacity
         style={{

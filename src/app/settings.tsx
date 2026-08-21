@@ -238,33 +238,38 @@ useFocusEffect(
 </TouchableOpacity>
 
 <View style={styles.divider} />
-            <View style={styles.settingRow}>
-              <View style={styles.settingIcon}>
-                <Text style={styles.settingIconText}>
-                  🌍
-                </Text>
-              </View>
+            <TouchableOpacity
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/language-settings',
+      params: {
+        lang: language,
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.settingIcon}>
+    <Text style={styles.settingIconText}>
+      🌍
+    </Text>
+  </View>
 
-              <View style={styles.settingInformation}>
-                <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Idiomas y nivel'
-                    : 'Languages and level'}
-                </Text>
+  <View style={styles.settingInformation}>
+    <Text style={styles.settingTitle}>
+      {language === 'es'
+        ? 'Idiomas y nivel'
+        : 'Languages and level'}
+    </Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Actualiza tu perfil lingüístico.'
-                    : 'Update your language profile.'}
-                </Text>
-              </View>
-
-              <Text style={styles.comingSoon}>
-                {language === 'es'
-                  ? 'PRONTO'
-                  : 'SOON'}
-              </Text>
-            </View>
+    <Text style={styles.settingDescription}>
+      {language === 'es'
+        ? 'Actualiza tu perfil lingüístico.'
+        : 'Update your language profile.'}
+    </Text>
+  </View>
+</TouchableOpacity>
 
             <View style={styles.divider} />
 
