@@ -15,9 +15,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { auth } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import { auth } from '../../firebaseConfig';
+import { type AppLanguage } from '../../translations';
 export default function SettingsScreen() {
   const router = useRouter();
 
@@ -111,7 +110,10 @@ useFocusEffect(
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+  style={styles.safeArea}
+  edges={['top', 'left', 'right']}
+>
       <View style={styles.container}>
         <StatusBar style="light" />
 
@@ -236,7 +238,6 @@ useFocusEffect(
     ›
   </Text>
 </TouchableOpacity>
-
 <View style={styles.divider} />
             <TouchableOpacity
   style={styles.settingRow}
@@ -273,35 +274,43 @@ useFocusEffect(
 
             <View style={styles.divider} />
 
-            <View style={styles.settingRow}>
-              <View style={styles.settingIcon}>
-                <Text style={styles.settingIconText}>
-                  🔒
-                </Text>
-              </View>
+            <TouchableOpacity
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/privacy-security',
+      params: {
+        lang: language,
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.settingIcon}>
+    <Text style={styles.settingIconText}>
+      🔒
+    </Text>
+  </View>
 
-              <View style={styles.settingInformation}>
-                <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Privacidad y seguridad'
-                    : 'Privacy and security'}
-                </Text>
+  <View style={styles.settingInformation}>
+    <Text style={styles.settingTitle}>
+      {language === 'es'
+        ? 'Privacidad y seguridad'
+        : 'Privacy and security'}
+    </Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Bloqueos, reportes y controles de cuenta.'
-                    : 'Blocks, reports, and account controls.'}
-                </Text>
-              </View>
+    <Text style={styles.settingDescription}>
+      {language === 'es'
+        ? 'Bloqueos, reportes y controles de cuenta.'
+        : 'Blocks, reports, and account controls.'}
+    </Text>
+  </View>
 
-              <Text style={styles.comingSoon}>
-                {language === 'es'
-                  ? 'PRONTO'
-                  : 'SOON'}
-              </Text>
-            </View>
-          </View>
-
+  <Text style={styles.settingArrow}>
+    ›
+  </Text>
+</TouchableOpacity>
+</View>
           <TouchableOpacity
             style={styles.signOutButton}
             onPress={handleSignOut}

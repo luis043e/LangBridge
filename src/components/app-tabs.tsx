@@ -1,32 +1,201 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useColorScheme } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  useLocalSearchParams,
+  usePathname,
+  useRouter,
+} from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { type AppLanguage } from '../translations';
 
-import { Colors } from '@/constants/theme';
+type TabItem = {
+  route:
+    | '/home'
+    | '/explore'
+    | '/conversations'
+    | '/settings';
+icon: keyof typeof Ionicons.glyphMap;
+labelEs: string;
+labelEn: string;
+iconColor: string;
+iconBackground: string;
+};
+
+const tabItems: TabItem[] = [
+  {
+    route: '/home',
+    icon: 'home',
+    labelEs: 'Inicio',
+    labelEn: 'Home',
+    iconColor: '#22D3EE',
+    iconBackground: '#123B5D',
+  },
+  {
+    route: '/explore',
+    icon: 'search',
+    labelEs: 'Explorar',
+    labelEn: 'Explore',
+    iconColor: '#A78BFA',
+    iconBackground: '#30245C',
+  },
+  {
+    route: '/conversations',
+    icon: 'chatbubbles',
+    labelEs: 'Chats',
+    labelEn: 'Chats',
+    iconColor: '#34D399',
+    iconBackground: '#123F3A',
+  },
+  {
+    route: '/settings',
+    icon: 'person',
+    labelEs: 'Perfil',
+    labelEn: 'Profile',
+    iconColor: '#F472B6',
+    iconBackground: '#4A2146',
+  },
+];
 
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const router = useRouter();
+  const pathname = usePathname();
+    const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams<{
+    lang?: string;
+  }>();
+
+  const language: AppLanguage =
+    params.lang === 'es' ? 'es' : 'en';
+
+  const handleTabPress = (route: TabItem['route']) => {
+    if (pathname === route) {
+      return;
+    }
+
+    router.replace({
+      pathname: route,
+      params: {
+        lang: language,
+      },
+    });
+  };
 
   return (
-    <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/home.png')}
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
+    <View
+  style={[
+    styles.navigationContainer,
+    {
+      paddingBottom: Math.max(insets.bottom, 8),
+      minHeight: 64 + Math.max(insets.bottom, 8),
+    },
+  ]}
+>
+      {tabItems.map((tab) => {
+        const isActive = pathname === tab.route;
 
-      <NativeTabs.Trigger name="explore">
-        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+        return (
+          <TouchableOpacity
+            key={tab.route}
+            style={styles.tabButton}
+            onPress={() => handleTabPress(tab.route)}
+            activeOpacity={0.8}
+          >
+            <View
+  style={[
+    styles.iconContainer,
+    {
+      backgroundColor: tab.iconBackground,
+      borderColor: isActive
+        ? '#22D3EE'
+        : `${tab.iconColor}80`,
+    },
+    isActive && styles.activeIconContainer,
+  ]}
+>
+  <Ionicons
+    name={tab.icon}
+    size={24}
+    color={tab.iconColor}
+  />
+</View>
+
+            <Text
+  style={[
+    styles.label,
+    {
+      color: isActive
+        ? tab.iconColor
+        : '#8B9ABA',
+    },
+    isActive && styles.activeLabel,
+  ]}
+>
+              {language === 'es'
+                ? tab.labelEs
+                : tab.labelEn}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  navigationContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#0B1430',
+    borderTopWidth: 1,
+    borderTopColor: '#25365F',
+    paddingHorizontal: 8,
+    paddingTop: 8,
+  },
+
+  tabButton: {
+    flex: 1,
+    minHeight: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  iconContainer: {
+  width: 42,
+  height: 38,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 14,
+  borderWidth: 1.5,
+},
+
+  activeIconContainer: {
+  borderWidth: 2,
+  shadowColor: '#22D3EE',
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.35,
+  shadowRadius: 7,
+  elevation: 6,
+},
+
+  label: {
+    color: '#7485A8',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+
+  activeLabel: {
+    color: '#22D3EE',
+    fontWeight: 'bold',
+  },
+});

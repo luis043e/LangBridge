@@ -13,9 +13,9 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { auth, db } from '../firebaseConfig';
+import { auth, db } from '../../firebaseConfig';
 
-import { type AppLanguage } from '../translations';
+import { type AppLanguage } from '../../translations';
 
 type Partner = {
   id: string;
@@ -235,7 +235,10 @@ useEffect(() => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+  style={styles.safeArea}
+  edges={['top', 'left', 'right']}
+>
       <View style={styles.container}>
         <StatusBar style="light" />
 

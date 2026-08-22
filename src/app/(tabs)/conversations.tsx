@@ -1,27 +1,26 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    where,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import { auth, db } from '../../firebaseConfig';
+import { type AppLanguage } from '../../translations';
 type ConversationItem = {
   id: string;
   partnerId: string;
@@ -183,7 +182,10 @@ return {
   loadConversations();
 }, [language]);
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+  style={styles.safeArea}
+  edges={['top', 'left', 'right']}
+>
       <View style={styles.container}>
         <StatusBar style="light" />
 

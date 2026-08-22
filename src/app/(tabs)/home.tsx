@@ -1,5 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -8,13 +10,73 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { translations, type AppLanguage } from '../translations';
+import { auth, db } from '../../firebaseConfig';
+import { translations, type AppLanguage } from '../../translations';
 export default function HomeScreen() {
     const router = useRouter();
     const params = useLocalSearchParams<{ lang?: string }>();
     const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
     const text = translations[language];
-    
+
+    const [profileProgress, setProfileProgress] =
+  useState(0);
+  useEffect(() => {
+  const loadProfileProgress = async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      setProfileProgress(0);
+      return;
+    }
+
+    try {
+      const userReference = doc(
+        db,
+        'users',
+        currentUser.uid
+      );
+
+      const userSnapshot = await getDoc(userReference);
+
+      if (!userSnapshot.exists()) {
+        setProfileProgress(0);
+        return;
+      }
+
+      const userData = userSnapshot.data();
+
+      const profileFields = [
+        userData.fullName,
+        userData.city,
+        userData.bio,
+        userData.nativeLanguage,
+        userData.learningLanguage,
+        userData.level,
+      ];
+
+      const completedFields = profileFields.filter(
+        (field) =>
+          typeof field === 'string' &&
+          field.trim().length > 0
+      ).length;
+
+      const calculatedProgress = Math.round(
+        (completedFields / profileFields.length) * 100
+      );
+
+      setProfileProgress(calculatedProgress);
+    } catch (error) {
+      console.error(
+        'Error loading profile progress:',
+        error
+      );
+
+      setProfileProgress(0);
+    }
+  };
+
+  loadProfileProgress();
+}, []); 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -36,7 +98,7 @@ export default function HomeScreen() {
 
           <View style={styles.avatar}>
             <Image
-  source={require('../../assets/images/langbridge-logo.png')}
+  source={require('../../../assets/images/langbridge-logo.png')}
   style={styles.avatarImage}
   resizeMode="contain"
 />
@@ -54,13 +116,22 @@ export default function HomeScreen() {
           <Text style={styles.progressDescription}>
   {text.homeScreen.profileDescription}
 </Text>
-
           <View style={styles.progressBar}>
-            <View style={styles.progressValue} />
-          </View>
+  <View
+    style={[
+      styles.progressValue,
+      {
+        width: `${Math.min(
+          Math.max(profileProgress, 0),
+          100
+        )}%`,
+      },
+    ]}
+  />
+</View>
 
-          <Text style={styles.progressText}>
-  {text.homeScreen.profileProgress}: 20%
+<Text style={styles.progressText}>
+  {text.homeScreen.profileProgress}: {profileProgress}%
 </Text>
         </View>
 
@@ -113,16 +184,16 @@ export default function HomeScreen() {
   }
   activeOpacity={0.85}
 >
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionIconText}>🌍</Text>
-          </View>
+<View style={[styles.actionIcon, styles.profileIcon]}>
+  <Text style={styles.actionIconText}>🌍</Text>
+</View>
 
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>
   {text.homeScreen.completeProfile}
   </Text>
             <Text style={styles.actionDescription}>
-  {text.homeScreen.conversationsDescription}
+  {text.homeScreen.completeProfileDescription}
 </Text>
           </View>
 
@@ -139,6 +210,9 @@ export default function HomeScreen() {
   }
   activeOpacity={0.85}
 >
+<View style={[styles.actionIcon, styles.exploreIcon]}>
+  <Text style={styles.actionIconText}>🔎</Text>
+</View>
 
     <View style={styles.actionContent}>
   <Text style={styles.actionTitle}>
@@ -224,12 +298,18 @@ export default function HomeScreen() {
   }
   activeOpacity={0.85}
 >
-
+<View style={[styles.actionIcon, styles.conversationsIcon]}>
+  <Text style={styles.actionIconText}>💬</Text>
+</View>
           <View style={styles.actionContent}>
-           <Text style={styles.actionTitle}>
-  {text.homeScreen.conversations}
-</Text>
-          </View>
+  <Text style={styles.actionTitle}>
+    {text.homeScreen.conversations}
+  </Text>
+
+  <Text style={styles.actionDescription}>
+    {text.homeScreen.conversationsDescription}
+  </Text>
+</View>
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -317,16 +397,16 @@ const styles = StyleSheet.create({
   flexShrink: 1,
 },
  avatar: {
-  width: 52,
-  height: 52,
-  borderRadius: 18,
-  backgroundColor: '#111C3A',
+  width: 76,
+  height: 76,
+  borderRadius: 24,
+  backgroundColor: '#0B1430',
   borderWidth: 1.5,
   borderColor: '#22D3EE',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  marginRight: 8,
+  padding: 5,
   shadowColor: '#22D3EE',
   shadowOffset: {
     width: 0,
@@ -336,10 +416,10 @@ const styles = StyleSheet.create({
   shadowRadius: 10,
   elevation: 7,
 },
+
 avatarImage: {
-  width: '200%',
-  height: '200%',
-  borderRadius: 16,
+  width: '100%',
+  height: '100%',
 },
   avatarText: {
   color: '#22D3EE',
@@ -382,15 +462,14 @@ avatarImage: {
     marginTop: 10,
   },
   progressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#334155',
-    borderRadius: 8,
-    marginTop: 22,
-    overflow: 'hidden',
-  },
+  width: '100%',
+  height: 8,
+  backgroundColor: '#334155',
+  borderRadius: 8,
+  marginTop: 22,
+  overflow: 'hidden',
+},
   progressValue: {
-  width: '20%',
   height: '100%',
   backgroundColor: '#22D3EE',
   borderRadius: 8,
@@ -425,7 +504,21 @@ learnIcon: {
   borderWidth: 1,
   borderColor: '#8B5CF6',
 },
-
+profileIcon: {
+  backgroundColor: '#123B5D',
+  borderWidth: 1,
+  borderColor: '#22D3EE',
+},
+exploreIcon: {
+  backgroundColor: '#30245C',
+  borderWidth: 1,
+  borderColor: '#A78BFA',
+},
+conversationsIcon: {
+  backgroundColor: '#123F3A',
+  borderWidth: 1,
+  borderColor: '#34D399',
+},
 learnTitleRow: {
   flexDirection: 'row',
   alignItems: 'center',

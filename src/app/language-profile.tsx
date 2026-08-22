@@ -93,9 +93,16 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
   useState(false);
   const [learningLanguage, setLearningLanguage] =
     useState<LanguageOption | null>(null);
+  
+    const [isLearningLanguageOpen, setIsLearningLanguageOpen] =
+  useState(false);
 
   const [selectedLevel, setSelectedLevel] =
     useState<LevelOption['id'] | null>(null);
+
+  const [isLevelOpen, setIsLevelOpen] =
+  useState(false);
+
     const [isSaving, setIsSaving] = useState(false);
 
   const getLanguageName = (option: LanguageOption) => {
@@ -111,25 +118,10 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
 };
 
   const showLearningLanguageSelector = () => {
-    Alert.alert(
-      language === 'es'
-        ? 'Idioma que quieres aprender'
-        : 'Language you want to learn',
-      language === 'es'
-        ? 'Selecciona el idioma que quieres aprender.'
-        : 'Select the language you want to learn.',
-      [
-        ...languageOptions.map((option) => ({
-          text: getLanguageName(option),
-          onPress: () => setLearningLanguage(option),
-        })),
-        {
-          text: language === 'es' ? 'Cancelar' : 'Cancel',
-          style: 'cancel' as const,
-        },
-      ]
-    );
-  };
+  setIsLearningLanguageOpen(
+    (currentValue) => !currentValue
+  );
+};
   const handleContinue = async () => {
   if (isSaving) {
     return;
@@ -365,6 +357,89 @@ const goBack = () => {
 
               <Text style={styles.arrow}>⌄</Text>
             </TouchableOpacity>
+   {isLearningLanguageOpen && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 20,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {languageOptions.map((option) => {
+        const isSelected =
+          option.code === learningLanguage?.code;
+
+        const isDisabled =
+          option.code === nativeLanguage?.code;
+
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+              opacity: isDisabled ? 0.4 : 1,
+            }}
+            onPress={() => {
+              setLearningLanguage(option);
+              setIsLearningLanguageOpen(false);
+            }}
+            activeOpacity={0.8}
+            disabled={isDisabled}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {getLanguageName(option)}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}         
 {isNativeLanguageOpen && (
   <View
     style={{
@@ -454,61 +529,116 @@ const goBack = () => {
                 : 'What is your current level?'}
             </Text>
 
-            <View style={styles.levelContainer}>
-              {levelOptions.map((option) => {
-                const isSelected =
-                  selectedLevel === option.id;
+            <TouchableOpacity
+  style={[
+    styles.selector,
+    selectedLevel && styles.selectedSelector,
+  ]}
+  onPress={() =>
+    setIsLevelOpen((currentValue) => !currentValue)
+  }
+  activeOpacity={0.85}
+>
+  <Text
+    style={[
+      styles.selectorText,
+      selectedLevel && styles.selectedSelectorText,
+    ]}
+  >
+    {selectedLevel
+      ? getLevelName(
+          levelOptions.find(
+            (option) => option.id === selectedLevel
+          )!
+        )
+      : language === 'es'
+        ? 'Selecciona tu nivel actual'
+        : 'Select your current level'}
+  </Text>
 
-                return (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.levelButton,
-                      isSelected &&
-                        styles.selectedLevelButton,
-                    ]}
-                    onPress={() =>
-                      setSelectedLevel(option.id)
-                    }
-                    activeOpacity={0.85}
-                  >
-                    <View style={styles.levelTextContainer}>
-                      <Text
-                        style={[
-                          styles.levelTitle,
-                          isSelected &&
-                            styles.selectedLevelTitle,
-                        ]}
-                      >
-                        {getLevelName(option)}
-                      </Text>
+  <Text style={styles.arrow}>
+    {isLevelOpen ? '▲' : '▼'}
+  </Text>
+</TouchableOpacity>
 
-                      <Text
-                        style={[
-                          styles.levelCode,
-                          isSelected &&
-                            styles.selectedLevelCode,
-                        ]}
-                      >
-                        {option.code}
-                      </Text>
-                    </View>
+{isLevelOpen && (
+  <View
+    style={{
+      backgroundColor: '#0B1430',
+      borderWidth: 1.5,
+      borderColor: '#334C7D',
+      borderRadius: 16,
+      padding: 10,
+      marginTop: -10,
+      marginBottom: 20,
+      maxHeight: 280,
+    }}
+  >
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+    >
+      {levelOptions.map((option) => {
+        const isSelected =
+          selectedLevel === option.id;
 
-                    <View
-                      style={[
-                        styles.radioOuter,
-                        isSelected &&
-                          styles.selectedRadioOuter,
-                      ]}
-                    >
-                      {isSelected && (
-                        <View style={styles.radioInner} />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+        return (
+          <TouchableOpacity
+            key={option.id}
+            style={{
+              minHeight: 48,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: isSelected
+                ? '#25356B'
+                : 'transparent',
+              borderWidth: isSelected ? 1.5 : 0,
+              borderColor: '#22D3EE',
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 11,
+              marginBottom: 6,
+            }}
+            onPress={() => {
+              setSelectedLevel(option.id);
+              setIsLevelOpen(false);
+            }}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={{
+                flex: 1,
+                color: isSelected
+                  ? '#FFFFFF'
+                  : '#D7E0F5',
+                fontSize: 15,
+                fontWeight: isSelected
+                  ? 'bold'
+                  : '600',
+              }}
+            >
+              {getLevelName(option)}
+            </Text>
+
+            {isSelected && (
+              <Text
+                style={{
+                  color: '#22D3EE',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 12,
+                }}
+              >
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+)}
 
             <View style={styles.infoCard}>
               <Text style={styles.infoTitle}>
