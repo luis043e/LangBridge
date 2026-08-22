@@ -118,8 +118,16 @@ useEffect(() => {
       const loadedPartners: Partner[] =
         usersSnapshot.docs
           .filter((userDocument) => {
-            return userDocument.id !== currentUserId;
-          })
+  const data = userDocument.data();
+
+  const isVisible =
+    data.isProfileVisible !== false;
+
+  const isNotCurrentUser =
+    userDocument.id !== currentUserId;
+
+  return isNotCurrentUser && isVisible;
+})
           .map((userDocument) => {
             const data = userDocument.data();
 

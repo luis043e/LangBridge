@@ -1,17 +1,19 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
 
 export default function PrivacySecurityScreen() {
@@ -26,7 +28,119 @@ export default function PrivacySecurityScreen() {
 
   const [isProfileVisible, setIsProfileVisible] =
     useState(true);
+  useEffect(() => {
+  let isMounted = true;
 
+  const loadPrivacySettings = async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      return;
+    }
+
+    try {
+      const userReference = doc(
+        db,
+        'users',
+        currentUser.uid
+      );
+
+      const userSnapshot = await getDoc(userReference);
+
+      if (!isMounted || !userSnapshot.exists()) {
+        return;
+      }
+
+      const userData = userSnapshot.data();
+
+      if (typeof userData.isProfileVisible === 'boolean') {
+        setIsProfileVisible(userData.isProfileVisible);
+      }
+    } catch (error) {
+      console.error(
+        'Error loading privacy settings:',
+        error
+      );
+    }
+  };
+
+  loadPrivacySettings();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+const handleChangePassword = async () => {
+  const currentUser = auth.currentUser;
+  const userEmail = currentUser?.email;
+
+  if (!userEmail) {
+    Alert.alert(
+      language === 'es'
+        ? 'Correo no disponible'
+        : 'Email unavailable',
+      language === 'es'
+        ? 'No encontramos un correo asociado a esta cuenta.'
+        : 'No email address was found for this account.'
+    );
+    return;
+  }
+
+  Alert.alert(
+    language === 'es'
+      ? 'Cambiar contraseña'
+      : 'Change password',
+    language === 'es'
+      ? `Enviaremos un enlace de cambio de contraseña a ${userEmail}.`
+      : `We will send a password change link to ${userEmail}.`,
+    [
+      {
+        text:
+          language === 'es'
+            ? 'Cancelar'
+            : 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text:
+          language === 'es'
+            ? 'Enviar correo'
+            : 'Send email',
+        onPress: async () => {
+          try {
+            await sendPasswordResetEmail(
+              auth,
+              userEmail
+            );
+
+            Alert.alert(
+              language === 'es'
+                ? 'Correo enviado'
+                : 'Email sent',
+              language === 'es'
+                ? 'Revisa tu bandeja de entrada y la carpeta de correo no deseado.'
+                : 'Check your inbox and spam folder.'
+            );
+          } catch (error) {
+            console.error(
+              'Error sending password reset email:',
+              error
+            );
+
+            Alert.alert(
+              language === 'es'
+                ? 'No se pudo enviar'
+                : 'Could not send',
+              language === 'es'
+                ? 'Revisa tu conexión e inténtalo nuevamente.'
+                : 'Check your connection and try again.'
+            );
+          }
+        },
+      },
+    ]
+  );
+};
   const showComingSoon = () => {
     Alert.alert(
       language === 'es'
@@ -38,8 +152,43 @@ export default function PrivacySecurityScreen() {
     );
   };
 
-  const handleVisibilityChange = (newValue: boolean) => {
-    setIsProfileVisible(newValue);
+  const handleVisibilityChange = async (
+  newValue: boolean
+) => {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    Alert.alert(
+      language === 'es'
+        ? 'Sesión no disponible'
+        : 'Session unavailable',
+      language === 'es'
+        ? 'Inicia sesión nuevamente para cambiar esta opción.'
+        : 'Please log in again to change this option.'
+    );
+    return;
+  }
+
+  const previousValue = isProfileVisible;
+
+  setIsProfileVisible(newValue);
+
+  try {
+    const userReference = doc(
+      db,
+      'users',
+      currentUser.uid
+    );
+
+    await setDoc(
+      userReference,
+      {
+        isProfileVisible: newValue,
+      },
+      {
+        merge: true,
+      }
+    );
 
     Alert.alert(
       language === 'es'
@@ -53,8 +202,24 @@ export default function PrivacySecurityScreen() {
           ? 'Tu perfil dejará de aparecer en las búsquedas.'
           : 'Your profile will no longer appear in searches.'
     );
-  };
+  } catch (error) {
+    console.error(
+      'Error saving privacy settings:',
+      error
+    );
 
+    setIsProfileVisible(previousValue);
+
+    Alert.alert(
+      language === 'es'
+        ? 'No se pudo guardar'
+        : 'Could not save',
+      language === 'es'
+        ? 'Revisa tu conexión e inténtalo nuevamente.'
+        : 'Check your connection and try again.'
+    );
+  }
+};
   return (
     <SafeAreaView
       style={styles.safeArea}
@@ -110,7 +275,7 @@ export default function PrivacySecurityScreen() {
           <View style={styles.card}>
             <TouchableOpacity
               style={styles.settingRow}
-              onPress={showComingSoon}
+              onPress={handleChangePassword}
               activeOpacity={0.85}
             >
               <View style={styles.settingIcon}>
@@ -140,7 +305,14 @@ export default function PrivacySecurityScreen() {
 
             <TouchableOpacity
               style={styles.settingRow}
-              onPress={showComingSoon}
+              onPress={() =>
+  router.push({
+    pathname: '/blocked-users',
+    params: {
+      lang: language,
+    },
+  })
+}
               activeOpacity={0.85}
             >
               <View style={styles.settingIcon}>
@@ -219,10 +391,17 @@ export default function PrivacySecurityScreen() {
 
           <View style={styles.card}>
             <TouchableOpacity
-              style={styles.settingRow}
-              onPress={showComingSoon}
-              activeOpacity={0.85}
-            >
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/report-problem',
+      params: {
+        lang: language,
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
               <View style={styles.settingIcon}>
                 <Text style={styles.settingIconText}>
                   ⚠️
@@ -249,10 +428,17 @@ export default function PrivacySecurityScreen() {
 
           <View style={styles.dangerCard}>
             <TouchableOpacity
-              style={styles.settingRow}
-              onPress={showComingSoon}
-              activeOpacity={0.85}
-            >
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/delete-account',
+      params: {
+        lang: language,
+      },
+    })
+  }
+  activeOpacity={0.85}
+>
               <View style={styles.dangerIcon}>
                 <Text style={styles.settingIconText}>
                   🗑️

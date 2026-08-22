@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  arrayUnion,
   doc,
   getDoc,
   serverTimestamp,
@@ -254,7 +255,107 @@ const displayedOnline =
   loadedProfile?.online ?? isOnline;
 
 const [isSending, setIsSending] = useState(false);
-  
+  const handleBlockUser = () => {
+  const currentUser = auth.currentUser;
+  const partnerId = params.partnerId;
+
+  if (!currentUser || !partnerId) {
+    Alert.alert(
+      language === 'es'
+        ? 'No se pudo bloquear'
+        : 'Could not block',
+      language === 'es'
+        ? 'No encontramos la información necesaria del usuario.'
+        : 'The required user information could not be found.'
+    );
+    return;
+  }
+
+  if (currentUser.uid === partnerId) {
+    Alert.alert(
+      language === 'es'
+        ? 'Acción no válida'
+        : 'Invalid action',
+      language === 'es'
+        ? 'No puedes bloquear tu propio perfil.'
+        : 'You cannot block your own profile.'
+    );
+    return;
+  }
+
+  Alert.alert(
+    language === 'es'
+      ? 'Bloquear usuario'
+      : 'Block user',
+    language === 'es'
+      ? `¿Quieres bloquear a ${name}? Esta persona dejará de aparecer en Explorar.`
+      : `Do you want to block ${name}? This person will no longer appear in Explore.`,
+    [
+      {
+        text:
+          language === 'es'
+            ? 'Cancelar'
+            : 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text:
+          language === 'es'
+            ? 'Bloquear'
+            : 'Block',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const currentUserReference = doc(
+              db,
+              'users',
+              currentUser.uid
+            );
+
+            await setDoc(
+              currentUserReference,
+              {
+                blockedUserIds: arrayUnion(partnerId),
+              },
+              {
+                merge: true,
+              }
+            );
+
+            Alert.alert(
+              language === 'es'
+                ? 'Usuario bloqueado'
+                : 'User blocked',
+              language === 'es'
+                ? `${name} fue bloqueado correctamente.`
+                : `${name} was blocked successfully.`,
+              [
+                {
+                  text: 'OK',
+                  onPress: () => router.back(),
+                },
+              ]
+            );
+          } catch (error) {
+            console.error(
+              'Error blocking user:',
+              error
+            );
+
+            Alert.alert(
+              language === 'es'
+                ? 'No se pudo bloquear'
+                : 'Could not block',
+              language === 'es'
+                ? 'Revisa tu conexión e inténtalo nuevamente.'
+                : 'Check your connection and try again.'
+            );
+          }
+        },
+      },
+    ]
+  );
+};
   const handleConnect = async () => {
   if (isSending) {
     return;
@@ -550,6 +651,19 @@ const [isSending, setIsSending] = useState(false);
     )}
   </TouchableOpacity>
 ) : null}
+{!isOwnProfile ? (
+  <TouchableOpacity
+    style={styles.blockButton}
+    onPress={handleBlockUser}
+    activeOpacity={0.85}
+  >
+    <Text style={styles.blockButtonText}>
+      {language === 'es'
+        ? 'Bloquear usuario'
+        : 'Block user'}
+    </Text>
+  </TouchableOpacity>
+) : null}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -802,6 +916,27 @@ connectButton: {
 connectButtonText: {
   color: '#050B24',
   fontSize: 17,
+  fontWeight: 'bold',
+},
+
+blockButton: {
+  width: '100%',
+  minHeight: 54,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#321B2B',
+  borderWidth: 1.5,
+  borderColor: '#FB7185',
+  borderRadius: 17,
+  paddingHorizontal: 18,
+  paddingVertical: 15,
+  marginTop: 14,
+  marginBottom: 12,
+},
+
+blockButtonText: {
+  color: '#FDA4AF',
+  fontSize: 15,
   fontWeight: 'bold',
 },
 disabledConnectButton: {

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "390796304873",
+    "project_id": "langbridge-d048f",
+    "storage_bucket": "langbridge-d048f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390796304873:android:4348b6e412d5c628aaab78",
+        "android_client_info": {
+          "package_name": "com.luis043e.langbridge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "390796304873-n4c6l3galj46i05nsvpcb9vab1ma7g9u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.luis043e.langbridge",
+            "certificate_hash": "6d8038088a807705e41a0c90feea398513363a38"
+          }
+        },
+        {
+          "client_id": "390796304873-unp0kmv4r0dusgpc38o1rqeapcton0cs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR-tGnxpuM9T7224QXjDeOujxjPa6VHzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "390796304873-unp0kmv4r0dusgpc38o1rqeapcton0cs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

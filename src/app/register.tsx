@@ -23,6 +23,7 @@ import {
 } from 'firebase/auth';
 
 import { auth } from '../firebaseConfig';
+import { signInWithGoogle } from '../googleAuth';
 import { translations, type AppLanguage } from '../translations';
 
 export default function RegisterScreen() {
@@ -168,7 +169,57 @@ export default function RegisterScreen() {
       params: { lang: language },
     });
   };
+const handleGoogleSignIn = async () => {
+  if (isLoading) {
+    return;
+  }
 
+  try {
+    setIsLoading(true);
+
+    const googleResult =
+      await signInWithGoogle(language);
+
+    if (!googleResult) {
+      return;
+    }
+
+    if (googleResult.isNewUser) {
+      router.replace({
+        pathname: '/language-profile',
+        params: {
+          lang: language,
+        },
+      });
+      return;
+    }
+
+    router.replace({
+      pathname: '/home',
+      params: {
+        lang: language,
+      },
+    });
+  } catch (error) {
+    console.error(
+      'Error registering with Google:',
+      error
+    );
+
+    Alert.alert(
+      language === 'es'
+        ? 'No se pudo continuar con Google'
+        : 'Could not continue with Google',
+      error instanceof Error
+        ? error.message
+        : language === 'es'
+          ? 'Inténtalo nuevamente.'
+          : 'Please try again.'
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
   const goToLogin = () => {
     router.push({
       pathname: '/login',
@@ -310,7 +361,37 @@ export default function RegisterScreen() {
               )}
               </LinearGradient>
             </TouchableOpacity>
+<View style={styles.googleDividerContainer}>
+  <View style={styles.googleDividerLine} />
 
+  <Text style={styles.googleDividerText}>
+    {language === 'es' ? 'o' : 'or'}
+  </Text>
+
+  <View style={styles.googleDividerLine} />
+</View>
+
+<TouchableOpacity
+  style={[
+    styles.googleButton,
+    isLoading && styles.disabledButton,
+  ]}
+  onPress={handleGoogleSignIn}
+  activeOpacity={0.85}
+  disabled={isLoading}
+>
+  <View style={styles.googleIconContainer}>
+    <Text style={styles.googleIconText}>
+      G
+    </Text>
+  </View>
+
+  <Text style={styles.googleButtonText}>
+    {language === 'es'
+      ? 'Continuar con Google'
+      : 'Continue with Google'}
+  </Text>
+</TouchableOpacity>
             <Text style={styles.terms}>
               {text.registerScreen.terms}
             </Text>
@@ -492,6 +573,64 @@ disabledButton: {
 
   loginLink: {
   color: '#22D3EE',
+  fontWeight: 'bold',
+},
+googleDividerContainer: {
+  width: '100%',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: 22,
+  marginBottom: 16,
+},
+
+googleDividerLine: {
+  flex: 1,
+  height: 1,
+  backgroundColor: '#334C7D',
+},
+
+googleDividerText: {
+  color: '#94A3B8',
+  fontSize: 13,
+  fontWeight: '600',
+  marginHorizontal: 12,
+},
+
+googleButton: {
+  width: '100%',
+  minHeight: 56,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderWidth: 1.5,
+  borderColor: '#D7DEEA',
+  borderRadius: 18,
+  paddingHorizontal: 18,
+  paddingVertical: 14,
+},
+
+googleIconContainer: {
+  width: 30,
+  height: 30,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderWidth: 1,
+  borderColor: '#D7DEEA',
+  borderRadius: 15,
+  marginRight: 11,
+},
+
+googleIconText: {
+  color: '#4285F4',
+  fontSize: 18,
+  fontWeight: 'bold',
+},
+
+googleButtonText: {
+  color: '#1F2937',
+  fontSize: 16,
   fontWeight: 'bold',
 },
 });
