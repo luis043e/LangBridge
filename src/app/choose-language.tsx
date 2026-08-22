@@ -2,10 +2,11 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,9 +28,12 @@ export default function ChooseLanguageScreen() {
       <StatusBar style="light" />
 
       <View style={styles.logo}>
-        <Text style={styles.logoText}>LB</Text>
-      </View>
-
+  <Image
+    source={require('../../assets/images/langbridge-logo.png')}
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+</View>
       <Text style={styles.title}>Choose your language</Text>
 
       <Text style={styles.subtitle}>
@@ -120,6 +124,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
   },
+  logoImage: {
+  width: '100%',
+  height: '100%',
+},
   title: {
     color: '#FFFFFF',
     fontSize: 32,

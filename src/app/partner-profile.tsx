@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -151,8 +152,8 @@ const getLevelName = (levelCode: string) => {
   const isOnline = params.online === 'true';
 
 const [loadedProfile, setLoadedProfile] = useState<{
-
   fullName: string;
+  photoURL: string;
   city: string;
   bio: string;
   nativeLanguage: string;
@@ -198,6 +199,7 @@ useEffect(() => {
             ? 'Ubicación no indicada'
             : 'Location not provided'),
         bio: profileData.bio?.trim() || '',
+        photoURL: profileData.photoURL || '',
         nativeLanguage:
           profileData.nativeLanguage || '',
         learningLanguage:
@@ -222,6 +224,9 @@ useEffect(() => {
 
 const displayedName =
   loadedProfile?.fullName || name;
+
+const displayedPhotoURL =
+  loadedProfile?.photoURL || '';
 
 const displayedInitials =
   displayedName
@@ -473,11 +478,18 @@ const [isSending, setIsSending] = useState(false);
           <View style={styles.profileHeader}>
             <View style={styles.avatarWrapper}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {displayedInitials}
-                </Text>
-              </View>
-
+  {displayedPhotoURL ? (
+    <Image
+      source={{ uri: displayedPhotoURL }}
+      style={styles.avatarImage}
+      resizeMode="cover"
+    />
+  ) : (
+    <Text style={styles.avatarText}>
+      {displayedInitials}
+    </Text>
+  )}
+</View>
               {displayedOnline && (
                 <View style={styles.onlineIndicator} />
               )}
@@ -729,8 +741,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 10,
+    overflow: 'hidden',
   },
-
+avatarImage: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 999,
+},
   avatarText: {
     color: '#22D3EE',
     fontSize: 30,

@@ -38,9 +38,11 @@ export async function signInWithGoogle(
   await GoogleSignin.hasPlayServices({
     showPlayServicesUpdateDialog: true,
   });
-
+  
+  await GoogleSignin.signOut();
+  
   const googleResponse = await GoogleSignin.signIn();
-
+  
   if (!isSuccessResponse(googleResponse)) {
     return null;
   }

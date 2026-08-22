@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -43,6 +45,13 @@ export default function EditProfileScreen() {
 
   const [city, setCity] = useState('');
   const [bio, setBio] = useState('');
+  const [photoURL, setPhotoURL] = useState(
+  currentUser?.photoURL || ''
+);
+
+const [googlePhotoURL, setGooglePhotoURL] = useState(
+  currentUser?.photoURL || ''
+);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isSaving, setIsSaving] = useState(false);
@@ -79,6 +88,19 @@ export default function EditProfileScreen() {
 
         setCity(profileData.city || '');
         setBio(profileData.bio || '');
+
+        setPhotoURL(
+  profileData.photoURL ||
+    user.photoURL ||
+    ''
+);
+
+setGooglePhotoURL(
+  profileData.googlePhotoURL ||
+    user.photoURL ||
+    profileData.photoURL ||
+    ''
+);
       }
     } catch (error) {
       console.error(
@@ -88,10 +110,54 @@ export default function EditProfileScreen() {
     } finally {
       setIsLoading(false);
     }
+
   };
 
   loadProfile();
 }, []);
+const handleUseGooglePhoto = () => {
+  if (!googlePhotoURL) {
+    Alert.alert(
+      language === 'es'
+        ? 'Foto no disponible'
+        : 'Photo unavailable',
+      language === 'es'
+        ? 'Esta cuenta no tiene una foto de Google disponible.'
+        : 'This account does not have a Google photo available.'
+    );
+    return;
+  }
+
+  setPhotoURL(googlePhotoURL);
+};
+
+const handleRemovePhoto = () => {
+  Alert.alert(
+    language === 'es'
+      ? 'Eliminar foto'
+      : 'Remove photo',
+    language === 'es'
+      ? 'Se mostrarán las iniciales de tu nombre.'
+      : 'Your name initials will be displayed.',
+    [
+      {
+        text:
+          language === 'es'
+            ? 'Cancelar'
+            : 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text:
+          language === 'es'
+            ? 'Eliminar'
+            : 'Remove',
+        style: 'destructive',
+        onPress: () => setPhotoURL(''),
+      },
+    ]
+  );
+};
 const handleSaveProfile = async () => {
   if (isSaving) {
     return;
@@ -130,21 +196,24 @@ const handleSaveProfile = async () => {
     setIsSaving(true);
 
     await updateProfile(user, {
-      displayName: cleanName,
-    });
+  displayName: cleanName,
+  photoURL: photoURL || null,
+});
 
     await setDoc(
-      doc(db, 'users', user.uid),
-      {
-        fullName: cleanName,
-        city: cleanCity,
-        bio: cleanBio,
-        updatedAt: serverTimestamp(),
-      },
-      {
-        merge: true,
-      }
-    );
+  doc(db, 'users', user.uid),
+  {
+    fullName: cleanName,
+    city: cleanCity,
+    bio: cleanBio,
+    photoURL,
+    googlePhotoURL,
+    updatedAt: serverTimestamp(),
+  },
+  {
+    merge: true,
+  }
+);
 
     Alert.alert(
       language === 'es'
@@ -218,7 +287,84 @@ const handleSaveProfile = async () => {
               ? 'Actualiza la información que verán tus compañeros.'
               : 'Update the information your partners will see.'}
           </Text>
+<Text style={styles.photoSectionTitle}>
+  {language === 'es'
+    ? 'Foto de perfil'
+    : 'Profile photo'}
+</Text>
 
+<View style={styles.photoSection}>
+  <View style={styles.photoPreview}>
+    {photoURL ? (
+      <Image
+        source={{ uri: photoURL }}
+        style={styles.photoImage}
+        resizeMode="cover"
+      />
+    ) : (
+      <Text style={styles.photoInitials}>
+        {fullName
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) =>
+            part.charAt(0).toUpperCase()
+          )
+          .join('') || 'LB'}
+      </Text>
+    )}
+  </View>
+  <View style={styles.photoActions}>
+  <TouchableOpacity
+    style={styles.changePhotoButton}
+    onPress={() =>
+      Alert.alert(
+        language === 'es'
+          ? 'Cambiar foto'
+          : 'Change photo',
+        language === 'es'
+          ? 'Conectaremos la galería del teléfono en el siguiente paso.'
+          : 'We will connect the phone gallery in the next step.'
+      )
+    }
+    activeOpacity={0.85}
+  >
+    <Text style={styles.changePhotoButtonText}>
+      {language === 'es'
+        ? 'Cambiar foto'
+        : 'Change photo'}
+    </Text>
+  </TouchableOpacity>
+
+  {!!googlePhotoURL && (
+    <TouchableOpacity
+      style={styles.secondaryPhotoButton}
+      onPress={handleUseGooglePhoto}
+      activeOpacity={0.85}
+    >
+      <Text style={styles.secondaryPhotoButtonText}>
+        {language === 'es'
+          ? 'Usar foto de Google'
+          : 'Use Google photo'}
+      </Text>
+    </TouchableOpacity>
+  )}
+
+  {!!photoURL && (
+    <TouchableOpacity
+      style={styles.removePhotoButton}
+      onPress={handleRemovePhoto}
+      activeOpacity={0.85}
+    >
+      <Text style={styles.removePhotoButtonText}>
+        {language === 'es'
+          ? 'Eliminar foto'
+          : 'Remove photo'}
+      </Text>
+    </TouchableOpacity>
+  )}
+</View>
+</View>
           <Text style={styles.label}>
             {language === 'es'
               ? 'Nombre completo'
@@ -423,4 +569,109 @@ disabledSaveButton: {
     fontSize: 17,
     fontWeight: 'bold',
   },
+ photoSectionTitle: {
+  color: '#E8EEFF',
+  fontSize: 15,
+  fontWeight: 'bold',
+  textAlign: 'center',
+  marginBottom: 12,
+},
+
+photoSection: {
+  alignItems: 'center',
+  marginBottom: 26,
+},
+
+photoPreview: {
+  width: 112,
+  height: 112,
+  borderRadius: 36,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#19284A',
+  borderWidth: 2,
+  borderColor: '#22D3EE',
+  overflow: 'hidden',
+  shadowColor: '#22D3EE',
+  shadowOffset: {
+    width: 0,
+    height: 5,
+  },
+  shadowOpacity: 0.3,
+  shadowRadius: 10,
+  elevation: 7,
+},
+
+photoImage: {
+  width: '100%',
+  height: '100%',
+},
+
+photoInitials: {
+  color: '#FFFFFF',
+  fontSize: 30,
+  fontWeight: 'bold',
+}, 
+photoActions: {
+  width: '100%',
+  alignItems: 'center',
+  marginTop: 16,
+},
+
+changePhotoButton: {
+  minWidth: 190,
+  minHeight: 46,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#22D3EE',
+  borderRadius: 14,
+  paddingHorizontal: 18,
+  paddingVertical: 12,
+},
+
+changePhotoButtonText: {
+  color: '#050B24',
+  fontSize: 14,
+  fontWeight: 'bold',
+},
+
+secondaryPhotoButton: {
+  minWidth: 190,
+  minHeight: 44,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#30245C',
+  borderWidth: 1,
+  borderColor: '#A78BFA',
+  borderRadius: 14,
+  paddingHorizontal: 18,
+  paddingVertical: 11,
+  marginTop: 10,
+},
+
+secondaryPhotoButtonText: {
+  color: '#DDD6FE',
+  fontSize: 13,
+  fontWeight: 'bold',
+},
+
+removePhotoButton: {
+  minWidth: 190,
+  minHeight: 42,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#321B2B',
+  borderWidth: 1,
+  borderColor: '#FB7185',
+  borderRadius: 14,
+  paddingHorizontal: 18,
+  paddingVertical: 10,
+  marginTop: 10,
+},
+
+removePhotoButtonText: {
+  color: '#FDA4AF',
+  fontSize: 13,
+  fontWeight: 'bold',
+},
 });
