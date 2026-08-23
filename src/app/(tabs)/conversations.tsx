@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ type ConversationItem = {
   id: string;
   partnerId: string;
   partnerName: string;
+  photoURL: string;
   lastMessage: string;
   lastMessageTime: string;
 };
@@ -96,6 +98,8 @@ const [loadError, setLoadError] =
           language === 'es'
             ? 'Compañero de LangBridge'
             : 'LangBridge partner';
+        
+        let partnerPhotoURL = '';  
 
         if (partnerId) {
           const partnerProfileSnapshot =
@@ -111,6 +115,11 @@ const [loadError, setLoadError] =
               partnerProfile.fullName?.trim() ||
               partnerProfile.email?.split('@')[0] ||
               partnerName;
+
+          partnerPhotoURL =
+  typeof partnerProfile.photoURL === 'string'
+    ? partnerProfile.photoURL
+    : '';
           }
         }
 
@@ -151,6 +160,7 @@ return {
   id: conversationDocument.id,
   partnerId,
   partnerName,
+  photoURL: partnerPhotoURL,
   lastMessage:
     latestMessageData?.text ||
     (language === 'es'
@@ -270,23 +280,32 @@ return {
             connectionId: conversation.id,
             partnerId: conversation.partnerId,
             partnerName: conversation.partnerName,
+            partnerPhotoURL: conversation.photoURL,
           },
         })
       }
       activeOpacity={0.85}
     >
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>
-          {conversation.partnerName
-            .split(' ')
-            .filter(Boolean)
-            .slice(0, 2)
-            .map((part) =>
-              part.charAt(0).toUpperCase()
-            )
-            .join('') || 'LB'}
-        </Text>
-      </View>
+  {conversation.photoURL ? (
+    <Image
+      source={{ uri: conversation.photoURL }}
+      style={styles.avatarImage}
+      resizeMode="cover"
+    />
+  ) : (
+    <Text style={styles.avatarText}>
+      {conversation.partnerName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) =>
+          part.charAt(0).toUpperCase()
+        )
+        .join('') || 'LB'}
+    </Text>
+  )}
+</View>
 
       <View style={styles.conversationInformation}>
         <Text
@@ -419,6 +438,13 @@ avatar: {
   alignItems: 'center',
   justifyContent: 'center',
   marginRight: 14,
+  overflow: 'hidden',
+},
+
+avatarImage: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 999,
 },
 
 avatarText: {

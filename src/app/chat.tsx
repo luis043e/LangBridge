@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -20,7 +21,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -39,6 +40,7 @@ export default function ChatScreen() {
 
   const params = useLocalSearchParams<{
   lang?: string;
+  partnerPhotoURL?: string;
   connectionId?: string;
   partnerId?: string;
   partnerName?: string;
@@ -52,6 +54,9 @@ export default function ChatScreen() {
     (language === 'es'
       ? 'Compañero de LangBridge'
       : 'LangBridge partner');
+  const partnerPhotoURL =
+  params.partnerPhotoURL || '';
+
   const connectionId = params.connectionId || '';
  const [isPreparingChat, setIsPreparingChat] =
   useState(true);
@@ -276,11 +281,18 @@ return {
           </TouchableOpacity>
 
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {initials || 'LB'}
-            </Text>
-          </View>
-
+  {partnerPhotoURL ? (
+    <Image
+      source={{ uri: partnerPhotoURL }}
+      style={styles.avatarImage}
+      resizeMode="cover"
+    />
+  ) : (
+    <Text style={styles.avatarText}>
+      {initials || 'LB'}
+    </Text>
+  )}
+</View>
           <View style={styles.headerInformation}>
             <Text
               style={styles.partnerName}
@@ -448,7 +460,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    overflow: 'hidden',
   },
+
+  avatarImage: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 999,
+},
 
   avatarText: {
     color: '#22D3EE',

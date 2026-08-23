@@ -24,6 +24,10 @@ import {
   setDoc,
 } from 'firebase/firestore';
 
+import {
+  getCountryName,
+  getCountryOptions,
+} from '../countries';
 import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
 
@@ -43,7 +47,15 @@ export default function EditProfileScreen() {
     currentUser?.displayName || ''
   );
 
-  const [city, setCity] = useState('');
+  const [countryCode, setCountryCode] =
+  useState('');
+
+const [countrySearch, setCountrySearch] =
+  useState('');
+
+const [isCountryListOpen, setIsCountryListOpen] =
+  useState(false);
+
   const [bio, setBio] = useState('');
   const [photoURL, setPhotoURL] = useState(
   currentUser?.photoURL || ''
@@ -55,7 +67,22 @@ const [googlePhotoURL, setGooglePhotoURL] = useState(
   const [isLoading, setIsLoading] = useState(true);
 
   const [isSaving, setIsSaving] = useState(false);
+  const countryOptions =
+  getCountryOptions(language);
 
+const selectedCountry =
+  countryOptions.find(
+    (country) => country.code === countryCode
+  );
+
+const filteredCountries =
+  countryOptions.filter((country) =>
+    country.name
+      .toLowerCase()
+      .includes(
+        countrySearch.trim().toLowerCase()
+      )
+  );
   useEffect(() => {
   const loadProfile = async () => {
     const user = auth.currentUser;
@@ -86,7 +113,11 @@ const [googlePhotoURL, setGooglePhotoURL] = useState(
           ''
         );
 
-        setCity(profileData.city || '');
+        setCountryCode(
+  typeof profileData.countryCode === 'string'
+    ? profileData.countryCode.toUpperCase()
+    : ''
+);
         setBio(profileData.bio || '');
 
         setPhotoURL(
@@ -165,7 +196,6 @@ const handleSaveProfile = async () => {
 
   const user = auth.currentUser;
   const cleanName = fullName.trim();
-  const cleanCity = city.trim();
   const cleanBio = bio.trim();
 
   if (!user) {
@@ -191,7 +221,17 @@ const handleSaveProfile = async () => {
     );
     return;
   }
-
+if (!countryCode) {
+  Alert.alert(
+    language === 'es'
+      ? 'País requerido'
+      : 'Country required',
+    language === 'es'
+      ? 'Selecciona tu país para continuar.'
+      : 'Select your country to continue.'
+  );
+  return;
+}
   try {
     setIsSaving(true);
 
@@ -204,7 +244,9 @@ const handleSaveProfile = async () => {
   doc(db, 'users', user.uid),
   {
     fullName: cleanName,
-    city: cleanCity,
+    countryCode,
+countryName:
+  getCountryName(countryCode, language),
     bio: cleanBio,
     photoURL,
     googlePhotoURL,
@@ -386,25 +428,151 @@ const handleSaveProfile = async () => {
           />
 
           <Text style={styles.label}>
-            {language === 'es'
-              ? 'Ciudad o ubicación'
-              : 'City or location'}
+  {language === 'es'
+    ? 'País'
+    : 'Country'}
+</Text>
+
+<TouchableOpacity
+  style={[
+    styles.countrySelector,
+    isCountryListOpen &&
+      styles.openCountrySelector,
+  ]}
+  onPress={() =>
+    setIsCountryListOpen(
+      (currentValue) => !currentValue
+    )
+  }
+  activeOpacity={0.85}
+>
+  <View style={styles.selectedCountryContent}>
+    <View style={styles.countryFlagContainer}>
+      <Text style={styles.countryFlag}>
+        {selectedCountry?.flag || '🌍'}
+      </Text>
+    </View>
+
+    <View style={styles.countryInformation}>
+      <Text
+        style={[
+          styles.countryName,
+          !selectedCountry &&
+            styles.countryPlaceholder,
+        ]}
+        numberOfLines={1}
+      >
+        {selectedCountry?.name ||
+          (language === 'es'
+            ? 'Selecciona tu país'
+            : 'Select your country')}
+      </Text>
+
+      <Text style={styles.countryHelper}>
+        {language === 'es'
+          ? 'Solo mostraremos tu país públicamente.'
+          : 'Only your country will be shown publicly.'}
+      </Text>
+    </View>
+  </View>
+
+  <View style={styles.countryArrowContainer}>
+    <Text style={styles.countryArrow}>
+      {isCountryListOpen ? '▲' : '▼'}
+    </Text>
+  </View>
+</TouchableOpacity>
+
+{isCountryListOpen && (
+  <View style={styles.countryList}>
+    <TextInput
+      style={styles.countrySearchInput}
+      value={countrySearch}
+      onChangeText={setCountrySearch}
+      placeholder={
+        language === 'es'
+          ? 'Buscar país...'
+          : 'Search country...'
+      }
+      placeholderTextColor="#64748B"
+      autoCapitalize="none"
+      autoCorrect={false}
+    />
+
+    <ScrollView
+      style={styles.countryListScroll}
+      contentContainerStyle={
+        styles.countryListContent
+      }
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      {filteredCountries.length > 0 ? (
+        filteredCountries.map((country) => {
+          const isSelected =
+            country.code === countryCode;
+
+          return (
+            <TouchableOpacity
+              key={country.code}
+              style={[
+                styles.countryOption,
+                isSelected &&
+                  styles.selectedCountryOption,
+              ]}
+              onPress={() => {
+                setCountryCode(country.code);
+                setCountrySearch('');
+                setIsCountryListOpen(false);
+              }}
+              activeOpacity={0.8}
+            >
+              <View
+                style={styles.optionCountryFlagContainer}
+              >
+                <Text style={styles.optionCountryFlag}>
+                  {country.flag}
+                </Text>
+              </View>
+
+              <Text
+                style={[
+                  styles.optionCountryName,
+                  isSelected &&
+                    styles.selectedCountryName,
+                ]}
+                numberOfLines={2}
+              >
+                {country.name}
+              </Text>
+
+              {isSelected && (
+                <View style={styles.countryCheckContainer}>
+                  <Text style={styles.countryCheckMark}>
+                    ✓
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })
+      ) : (
+        <View style={styles.noCountryResults}>
+          <Text style={styles.noCountryResultsIcon}>
+            🔎
           </Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder={
-              language === 'es'
-                ? 'Ejemplo: Santo Domingo'
-                : 'Example: Santo Domingo'
-            }
-            placeholderTextColor="#64748B"
-            value={city}
-            onChangeText={setCity}
-            autoCapitalize="words"
-            maxLength={80}
-          />
-
+          <Text style={styles.noCountryResultsText}>
+            {language === 'es'
+              ? 'No encontramos ese país.'
+              : 'We could not find that country.'}
+          </Text>
+        </View>
+      )}
+    </ScrollView>
+  </View>
+)}
           <Text style={styles.label}>
             {language === 'es'
               ? 'Acerca de mí'
@@ -674,4 +842,210 @@ removePhotoButtonText: {
   fontSize: 13,
   fontWeight: 'bold',
 },
+countrySelector: {
+  width: '100%',
+  minHeight: 74,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 16,
+  paddingHorizontal: 13,
+  paddingVertical: 11,
+  marginBottom: 18,
+},
+
+openCountrySelector: {
+  backgroundColor: '#141F42',
+  borderColor: '#22D3EE',
+  marginBottom: 10,
+},
+
+selectedCountryContent: {
+  flex: 1,
+  minWidth: 0,
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+countryFlagContainer: {
+  width: 48,
+  height: 48,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#19284A',
+  borderWidth: 1,
+  borderColor: '#334C7D',
+  borderRadius: 15,
+  marginRight: 12,
+},
+
+countryFlag: {
+  fontSize: 26,
+},
+
+countryInformation: {
+  flex: 1,
+  minWidth: 0,
+  paddingRight: 8,
+},
+
+countryName: {
+  color: '#FFFFFF',
+  fontSize: 15,
+  lineHeight: 20,
+  fontWeight: 'bold',
+},
+
+countryPlaceholder: {
+  color: '#94A3B8',
+},
+
+countryHelper: {
+  color: '#8492B0',
+  fontSize: 11,
+  lineHeight: 16,
+  marginTop: 3,
+},
+
+countryArrowContainer: {
+  width: 34,
+  height: 34,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#123B5D',
+  borderRadius: 12,
+  marginLeft: 8,
+},
+
+countryArrow: {
+  color: '#22D3EE',
+  fontSize: 12,
+  fontWeight: 'bold',
+},
+
+countryList: {
+  width: '100%',
+  backgroundColor: '#0B1430',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 18,
+  padding: 9,
+  marginBottom: 18,
+  overflow: 'hidden',
+},
+
+countrySearchInput: {
+  width: '100%',
+  minHeight: 48,
+  backgroundColor: '#111C3A',
+  borderWidth: 1,
+  borderColor: '#334C7D',
+  borderRadius: 13,
+  color: '#FFFFFF',
+  fontSize: 14,
+  paddingHorizontal: 14,
+  paddingVertical: 11,
+  marginBottom: 8,
+},
+
+countryListScroll: {
+  width: '100%',
+  maxHeight: 280,
+},
+
+countryListContent: {
+  paddingBottom: 2,
+},
+
+countryOption: {
+  width: '100%',
+  minHeight: 58,
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#0F1935',
+  borderWidth: 1,
+  borderColor: '#1F3158',
+  borderRadius: 14,
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  marginBottom: 6,
+},
+
+selectedCountryOption: {
+  backgroundColor: '#25356B',
+  borderColor: '#22D3EE',
+},
+
+optionCountryFlagContainer: {
+  width: 42,
+  height: 42,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#19284A',
+  borderRadius: 13,
+  marginRight: 11,
+},
+
+optionCountryFlag: {
+  fontSize: 23,
+},
+
+optionCountryName: {
+  flex: 1,
+  minWidth: 0,
+  color: '#D7E0F5',
+  fontSize: 14,
+  lineHeight: 19,
+  fontWeight: '600',
+  paddingRight: 8,
+},
+
+selectedCountryName: {
+  color: '#FFFFFF',
+  fontWeight: 'bold',
+},
+
+countryCheckContainer: {
+  width: 30,
+  height: 30,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#123B5D',
+  borderWidth: 1,
+  borderColor: '#22D3EE',
+  borderRadius: 15,
+},
+
+countryCheckMark: {
+  color: '#22D3EE',
+  fontSize: 17,
+  fontWeight: 'bold',
+},
+
+noCountryResults: {
+  minHeight: 120,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: 20,
+},
+
+noCountryResultsIcon: {
+  fontSize: 27,
+},
+
+noCountryResultsText: {
+  color: '#94A3B8',
+  fontSize: 13,
+  lineHeight: 19,
+  textAlign: 'center',
+  marginTop: 8,
+},
+
 });

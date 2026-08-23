@@ -2,9 +2,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
-
 import {
-  Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,14 +12,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { auth, db } from '../../firebaseConfig';
 
+import { auth, db } from '../../firebaseConfig';
 import { type AppLanguage } from '../../translations';
 
 type Partner = {
   id: string;
   name: string;
+  photoURL: string;
   initials: string;
+  countryCode: string;
+  countryName: string;
   city: string;
   bio: string;
   nativeLanguage: string;
@@ -29,224 +31,360 @@ type Partner = {
   online: boolean;
 };
 
+const getCountryFlag = (countryCode: string) => {
+  const normalizedCode =
+    countryCode.trim().toUpperCase();
 
+  if (!/^[A-Z]{2}$/.test(normalizedCode)) {
+    return '🌍';
+  }
+
+  return normalizedCode
+    .split('')
+    .map((character) =>
+      String.fromCodePoint(
+        127397 + character.charCodeAt(0)
+      )
+    )
+    .join('');
+};
 
 export default function ExploreScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ lang?: string }>();
+
+  const params = useLocalSearchParams<{
+    lang?: string;
+  }>();
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
-    const getLanguageName = (code: string) => {
-  const languageNames: Record<string, { es: string; en: string }> = {
-    es: {
-      es: 'Español',
-      en: 'Spanish',
-    },
-    en: {
-      es: 'Inglés',
-      en: 'English',
-    },
-    fr: {
-      es: 'Francés',
-      en: 'French',
-    },
-    pt: {
-      es: 'Portugués',
-      en: 'Portuguese',
-    },
-    de: {
-      es: 'Alemán',
-      en: 'German',
-    },
-    it: {
-      es: 'Italiano',
-      en: 'Italian',
-    },
-  };
-
-  return (
-    languageNames[code]?.[language] ||
-    (language === 'es'
-      ? 'No especificado'
-      : 'Not specified')
-  );
-};
-
-const getLevelName = (level: string) => {
-  const levelNames: Record<string, { es: string; en: string }> = {
-    beginner: {
-      es: 'Principiante',
-      en: 'Beginner',
-    },
-    intermediate: {
-      es: 'Intermedio',
-      en: 'Intermediate',
-    },
-    advanced: {
-      es: 'Avanzado',
-      en: 'Advanced',
-    },
-  };
-
-  return (
-    levelNames[level]?.[language] ||
-    (language === 'es'
-      ? 'Nivel no especificado'
-      : 'Level not specified')
-  );
-};
 
   const [searchText, setSearchText] = useState('');
   const [onlineOnly, setOnlineOnly] = useState(false);
 
-  const [realPartners, setRealPartners] = useState<Partner[]>([]);
-const [isLoading, setIsLoading] = useState(true);
-const [loadError, setLoadError] = useState<string | null>(null);
-useEffect(() => {
-  const loadPartners = async () => {
-    try {
-      setIsLoading(true);
-      setLoadError(null);
+  const [realPartners, setRealPartners] =
+    useState<Partner[]>([]);
 
-      const usersSnapshot = await getDocs(
-        collection(db, 'users')
-      );
+  const [isLoading, setIsLoading] = useState(true);
 
-      const currentUserId = auth.currentUser?.uid;
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
 
-      const loadedPartners: Partner[] =
-        usersSnapshot.docs
-          .filter((userDocument) => {
-  const data = userDocument.data();
+  const getLanguageName = (code: string) => {
+    const languageNames: Record<
+      string,
+      {
+        es: string;
+        en: string;
+      }
+    > = {
+      es: {
+        es: 'Español',
+        en: 'Spanish',
+      },
+      en: {
+        es: 'Inglés',
+        en: 'English',
+      },
+      fr: {
+        es: 'Francés',
+        en: 'French',
+      },
+      pt: {
+        es: 'Portugués',
+        en: 'Portuguese',
+      },
+      de: {
+        es: 'Alemán',
+        en: 'German',
+      },
+      it: {
+        es: 'Italiano',
+        en: 'Italian',
+      },
+    };
 
-  const isVisible =
-    data.isProfileVisible !== false;
-
-  const isNotCurrentUser =
-    userDocument.id !== currentUserId;
-
-  return isNotCurrentUser && isVisible;
-})
-          .map((userDocument) => {
-            const data = userDocument.data();
-
-            const displayName =
-              data.fullName?.trim() ||
-              data.email?.split('@')[0] ||
-              (language === 'es'
-                ? 'Usuario de LangBridge'
-                : 'LangBridge user');
-
-            const nameParts = displayName
-              .split(' ')
-              .filter(Boolean);
-
-            const initials = nameParts
-              .slice(0, 2)
-              .map((part: string) =>
-                part.charAt(0).toUpperCase()
-              )
-              .join('');
-
-            return {
-              id: userDocument.id,
-              name: displayName,
-              initials: initials || 'LB',
-              city:
-                data.city ||
-                (language === 'es'
-                  ? 'Ubicación no indicada'
-                  : 'Location not provided'),
-              bio: data.bio || '',    
-              nativeLanguage:
-                data.nativeLanguage || '',
-              learningLanguage:
-                data.learningLanguage || '',
-              level: data.level || 'beginner',
-              online: data.online === true,
-            };
-          });
-
-      setRealPartners(loadedPartners);
-    } catch (error) {
-      console.error(
-        'Error loading partners:',
-        error
-      );
-
-      setLoadError(
-        language === 'es'
-          ? 'No se pudieron cargar los compañeros.'
-          : 'Partners could not be loaded.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    return (
+      languageNames[code]?.[language] ||
+      (language === 'es'
+        ? 'No especificado'
+        : 'Not specified')
+    );
   };
 
-  loadPartners();
-}, [language]);
+  const getLevelName = (level: string) => {
+    const levelNames: Record<
+      string,
+      {
+        es: string;
+        en: string;
+      }
+    > = {
+      beginner: {
+        es: 'Principiante',
+        en: 'Beginner',
+      },
+      intermediate: {
+        es: 'Intermedio',
+        en: 'Intermediate',
+      },
+      advanced: {
+        es: 'Avanzado',
+        en: 'Advanced',
+      },
+    };
+
+    return (
+      levelNames[level]?.[language] ||
+      (language === 'es'
+        ? 'Nivel no especificado'
+        : 'Level not specified')
+    );
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPartners = async () => {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+
+        const usersSnapshot = await getDocs(
+          collection(db, 'users')
+        );
+
+        const currentUserId =
+          auth.currentUser?.uid;
+
+        const loadedPartners: Partner[] =
+          usersSnapshot.docs
+            .filter((userDocument) => {
+              const data =
+                userDocument.data();
+
+              const isVisible =
+                data.isProfileVisible !== false;
+
+              const isNotCurrentUser =
+                userDocument.id !==
+                currentUserId;
+
+              return (
+                isNotCurrentUser &&
+                isVisible
+              );
+            })
+            .map((userDocument) => {
+              const data =
+                userDocument.data();
+
+              const displayName =
+                data.fullName?.trim() ||
+                data.email?.split('@')[0] ||
+                (language === 'es'
+                  ? 'Usuario de LangBridge'
+                  : 'LangBridge user');
+
+              const nameParts = displayName
+                .split(' ')
+                .filter(Boolean);
+
+              const initials = nameParts
+                .slice(0, 2)
+                .map((part: string) =>
+                  part
+                    .charAt(0)
+                    .toUpperCase()
+                )
+                .join('');
+
+              return {
+                id: userDocument.id,
+                name: displayName,
+
+                photoURL:
+                  typeof data.photoURL ===
+                  'string'
+                    ? data.photoURL
+                    : '',
+
+                initials:
+                  initials || 'LB',
+
+                countryCode:
+                  typeof data.countryCode ===
+                  'string'
+                    ? data.countryCode
+                        .trim()
+                        .toUpperCase()
+                    : '',
+
+                countryName:
+                  typeof data.countryName ===
+                  'string'
+                    ? data.countryName.trim()
+                    : '',
+
+                city:
+                  typeof data.city === 'string' &&
+                  data.city.trim()
+                    ? data.city.trim()
+                    : language === 'es'
+                      ? 'Ubicación no indicada'
+                      : 'Location not provided',
+
+                bio:
+                  typeof data.bio === 'string'
+                    ? data.bio
+                    : '',
+
+                nativeLanguage:
+                  typeof data.nativeLanguage ===
+                  'string'
+                    ? data.nativeLanguage
+                    : '',
+
+                learningLanguage:
+                  typeof data.learningLanguage ===
+                  'string'
+                    ? data.learningLanguage
+                    : '',
+
+                level:
+                  typeof data.level === 'string'
+                    ? data.level
+                    : 'beginner',
+
+                online:
+                  data.online === true,
+              };
+            });
+
+        if (isMounted) {
+          setRealPartners(loadedPartners);
+        }
+      } catch (error) {
+        console.error(
+          'Error loading partners:',
+          error
+        );
+
+        if (isMounted) {
+          setLoadError(
+            language === 'es'
+              ? 'No se pudieron cargar los compañeros.'
+              : 'Partners could not be loaded.'
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadPartners();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [language]);
 
   const filteredPartners = useMemo(() => {
-    const search = searchText.trim().toLowerCase();
+    const search =
+      searchText.trim().toLowerCase();
 
     return realPartners.filter((partner) => {
       const matchesSearch =
         !search ||
-        partner.name.toLowerCase().includes(search) ||
-        partner.city.toLowerCase().includes(search) ||
-        partner.nativeLanguage.toLowerCase().includes(search);
+        partner.name
+          .toLowerCase()
+          .includes(search) ||
+        partner.countryName
+          .toLowerCase()
+          .includes(search) ||
+        partner.city
+          .toLowerCase()
+          .includes(search) ||
+        partner.nativeLanguage
+          .toLowerCase()
+          .includes(search) ||
+        getLanguageName(
+          partner.nativeLanguage
+        )
+          .toLowerCase()
+          .includes(search) ||
+        getLanguageName(
+          partner.learningLanguage
+        )
+          .toLowerCase()
+          .includes(search);
 
       const matchesOnline =
         !onlineOnly || partner.online;
 
       return matchesSearch && matchesOnline;
     });
-  }, [searchText, onlineOnly, realPartners]);
+  }, [
+    searchText,
+    onlineOnly,
+    realPartners,
+    language,
+  ]);
 
-  const handleConnect = (partner: Partner) => {
-    Alert.alert(
-      language === 'es'
-        ? 'Solicitud enviada'
-        : 'Request sent',
-      language === 'es'
-        ? `Se envió una solicitud de conexión a ${partner.name}.`
-        : `A connection request was sent to ${partner.name}.`
-    );
+  const handleViewProfile = (
+    partner: Partner
+  ) => {
+    router.push({
+      pathname: '/partner-profile',
+      params: {
+        lang: language,
+        partnerId: partner.id,
+        name: partner.name,
+        photoURL: partner.photoURL,
+        initials: partner.initials,
+        countryCode:
+          partner.countryCode,
+        countryName:
+          partner.countryName,
+        city: partner.city,
+        bio: partner.bio,
+        nativeLanguage:
+          partner.nativeLanguage,
+        learningLanguage:
+          partner.learningLanguage,
+        level: partner.level,
+        online: String(partner.online),
+      },
+    });
   };
 
-  const handleViewProfile = (partner: Partner) => {
-  router.push({
-    pathname: '/partner-profile',
-    params: {
-      lang: language,
-      partnerId: partner.id,
-      name: partner.name,
-      initials: partner.initials,
-      city: partner.city,
-      bio: partner.bio,
-      nativeLanguage: getLanguageName(
-        partner.nativeLanguage
-      ),
-      learningLanguage: getLanguageName(
-        partner.learningLanguage
-      ),
-      level: getLevelName(partner.level),
-      online: String(partner.online),
-    },
-  });
-};
+  const getDisplayedLocation = (
+    partner: Partner
+  ) => {
+    const locationName =
+      partner.countryName ||
+      partner.city ||
+      (language === 'es'
+        ? 'País no indicado'
+        : 'Country not provided');
 
-  const goBack = () => {
-    router.back();
+    const locationFlag =
+      partner.countryCode
+        ? getCountryFlag(
+            partner.countryCode
+          )
+        : '🌍';
+
+    return `${locationFlag} ${locationName}`;
   };
 
   return (
     <SafeAreaView
-  style={styles.safeArea}
-  edges={['top', 'left', 'right']}
->
+      style={styles.safeArea}
+      edges={['top', 'left', 'right']}
+    >
       <View style={styles.container}>
         <StatusBar style="light" />
 
@@ -257,7 +395,7 @@ useEffect(() => {
         >
           <TouchableOpacity
             style={styles.backButton}
-            onPress={goBack}
+            onPress={() => router.back()}
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
@@ -283,8 +421,8 @@ useEffect(() => {
             style={styles.searchInput}
             placeholder={
               language === 'es'
-                ? 'Buscar por nombre, ciudad o idioma'
-                : 'Search by name, city, or language'
+                ? 'Buscar por nombre, país o idioma'
+                : 'Search by name, country, or language'
             }
             placeholderTextColor="#64748B"
             value={searchText}
@@ -304,9 +442,15 @@ useEffect(() => {
             <TouchableOpacity
               style={[
                 styles.filterButton,
-                onlineOnly && styles.activeFilterButton,
+                onlineOnly &&
+                  styles.activeFilterButton,
               ]}
-              onPress={() => setOnlineOnly(!onlineOnly)}
+              onPress={() =>
+                setOnlineOnly(
+                  (currentValue) =>
+                    !currentValue
+                )
+              }
               activeOpacity={0.8}
             >
               <Text
@@ -325,85 +469,156 @@ useEffect(() => {
 
           {filteredPartners.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyIcon}>🔎</Text>
+              <Text style={styles.emptyIcon}>
+                🔎
+              </Text>
 
               <Text style={styles.emptyTitle}>
-  {isLoading
-    ? language === 'es'
-      ? 'Buscando compañeros...'
-      : 'Finding partners...'
-    : loadError
-      ? language === 'es'
-        ? 'No pudimos cargar los perfiles'
-        : 'Profiles could not be loaded'
-      : searchText.trim()
-        ? language === 'es'
-          ? 'No encontramos resultados'
-          : 'No results found'
-        : language === 'es'
-          ? 'Aún no hay otros compañeros'
-          : 'No other partners yet'}
-</Text>
+                {isLoading
+                  ? language === 'es'
+                    ? 'Buscando compañeros...'
+                    : 'Finding partners...'
+                  : loadError
+                    ? language === 'es'
+                      ? 'No pudimos cargar los perfiles'
+                      : 'Profiles could not be loaded'
+                    : searchText.trim()
+                      ? language === 'es'
+                        ? 'No encontramos resultados'
+                        : 'No results found'
+                      : language === 'es'
+                        ? 'Aún no hay otros compañeros'
+                        : 'No other partners yet'}
+              </Text>
 
               <Text style={styles.emptyText}>
-                {language === 'es'
-                  ? 'Prueba con otro nombre, ciudad o idioma.'
-                  : 'Try another name, city, or language.'}
+                {loadError
+                  ? loadError
+                  : language === 'es'
+                    ? 'Prueba con otro nombre, país o idioma.'
+                    : 'Try another name, country, or language.'}
               </Text>
             </View>
           ) : (
-            filteredPartners.map((partner) => (
-              <TouchableOpacity
-                key={partner.id}
-                style={styles.partnerCard}
-                onPress={() =>
-                  handleViewProfile(partner)
-                }
-                activeOpacity={0.85}
-              >
-                <View style={styles.avatarContainer}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {partner.initials}
-                    </Text>
+            filteredPartners.map(
+              (partner) => (
+                <TouchableOpacity
+                  key={partner.id}
+                  style={styles.partnerCard}
+                  onPress={() =>
+                    handleViewProfile(
+                      partner
+                    )
+                  }
+                  activeOpacity={0.85}
+                >
+                  <View
+                    style={
+                      styles.avatarContainer
+                    }
+                  >
+                    <View style={styles.avatar}>
+                      {partner.photoURL ? (
+                        <Image
+                          source={{
+                            uri: partner.photoURL,
+                          }}
+                          style={
+                            styles.avatarImage
+                          }
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <Text
+                          style={
+                            styles.avatarText
+                          }
+                        >
+                          {partner.initials}
+                        </Text>
+                      )}
+                    </View>
+
+                    {partner.online && (
+                      <View
+                        style={
+                          styles.onlineIndicator
+                        }
+                      />
+                    )}
                   </View>
 
-                  {partner.online && (
-                    <View style={styles.onlineIndicator} />
-                  )}
-                </View>
-
-                <View style={styles.partnerInformation}>
-                  <Text style={styles.partnerName}>
-                    {partner.name}
-                  </Text>
-
-                  <Text style={styles.partnerLocation}>
-                    📍 {partner.city}
-                  </Text>
-
-                  <Text style={styles.languageInformation}>
-                    {language === 'es'
-  ? `Habla: ${getLanguageName(partner.nativeLanguage)}`
-  : `Speaks: ${getLanguageName(partner.nativeLanguage)}`}
-                  </Text>
-
-                  <Text style={styles.languageInformation}>
-                    {language === 'es'
-  ? `Aprende: ${getLanguageName(partner.learningLanguage)}`
-  : `Learning: ${getLanguageName(partner.learningLanguage)}`}
-                  </Text>
-
-                  <View style={styles.levelBadge}>
-                    <Text style={styles.levelBadgeText}>
-                      {getLevelName(partner.level)}
+                  <View
+                    style={
+                      styles.partnerInformation
+                    }
+                  >
+                    <Text
+                      style={styles.partnerName}
+                    >
+                      {partner.name}
                     </Text>
-                  </View>
-                </View>
 
-                <Text style={styles.arrow}>›</Text>
-              </TouchableOpacity>
-            ))
+                    <Text
+                      style={
+                        styles.partnerLocation
+                      }
+                      numberOfLines={1}
+                    >
+                      {getDisplayedLocation(
+                        partner
+                      )}
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.languageInformation
+                      }
+                    >
+                      {language === 'es'
+                        ? `Habla: ${getLanguageName(
+                            partner.nativeLanguage
+                          )}`
+                        : `Speaks: ${getLanguageName(
+                            partner.nativeLanguage
+                          )}`}
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.languageInformation
+                      }
+                    >
+                      {language === 'es'
+                        ? `Aprende: ${getLanguageName(
+                            partner.learningLanguage
+                          )}`
+                        : `Learning: ${getLanguageName(
+                            partner.learningLanguage
+                          )}`}
+                    </Text>
+
+                    <View
+                      style={styles.levelBadge}
+                    >
+                      <Text
+                        style={
+                          styles.levelBadgeText
+                        }
+                      >
+                        {getLevelName(
+                          partner.level
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.arrow}>
+                    ›
+                  </Text>
+                </TouchableOpacity>
+              )
+            )
           )}
         </ScrollView>
       </View>
@@ -532,6 +747,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366F1',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 19,
   },
 
   avatarText: {
@@ -554,6 +776,7 @@ const styles = StyleSheet.create({
 
   partnerInformation: {
     flex: 1,
+    minWidth: 0,
   },
 
   partnerName: {
@@ -565,6 +788,7 @@ const styles = StyleSheet.create({
   partnerLocation: {
     color: '#94A3B8',
     fontSize: 12,
+    lineHeight: 17,
     marginTop: 4,
     marginBottom: 7,
   },
@@ -615,6 +839,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 14,
+    textAlign: 'center',
   },
 
   emptyText: {

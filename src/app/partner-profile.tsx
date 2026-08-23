@@ -154,6 +154,8 @@ const getLevelName = (levelCode: string) => {
 const [loadedProfile, setLoadedProfile] = useState<{
   fullName: string;
   photoURL: string;
+  countryCode: string;
+  countryName: string;
   city: string;
   bio: string;
   nativeLanguage: string;
@@ -193,6 +195,15 @@ useEffect(() => {
           (language === 'es'
             ? 'Usuario de LangBridge'
             : 'LangBridge user'),
+        countryCode:
+  typeof profileData.countryCode === 'string'
+    ? profileData.countryCode.toUpperCase()
+    : '',
+
+countryName:
+  typeof profileData.countryName === 'string'
+    ? profileData.countryName.trim()
+    : '',
         city:
           profileData.city?.trim() ||
           (language === 'es'
@@ -239,9 +250,25 @@ const displayedInitials =
     .join('') ||
   initials;
 
-const displayedCity =
-  loadedProfile?.city || city;
+const displayedLocation =
+  loadedProfile?.countryName ||
+  loadedProfile?.city ||
+  (language === 'es'
+    ? 'País no indicado'
+    : 'Country not provided');
 
+const displayedCountryFlag =
+  loadedProfile?.countryCode
+    ? loadedProfile.countryCode
+        .split('')
+        .map((character) =>
+          String.fromCodePoint(
+            127397 +
+              character.toUpperCase().charCodeAt(0)
+          )
+        )
+        .join('')
+    : '🌍';
   const displayedNativeLanguage =
   loadedProfile?.nativeLanguage ||
   nativeLanguage;
@@ -500,7 +527,7 @@ const [isSending, setIsSending] = useState(false);
             </Text>
 
             <Text style={styles.location}>
-              📍 {displayedCity}
+              {displayedCountryFlag} {displayedLocation}
             </Text>
 
             <View
