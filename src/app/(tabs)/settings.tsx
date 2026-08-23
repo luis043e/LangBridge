@@ -8,6 +8,7 @@ import { signOut } from 'firebase/auth';
 import { useCallback, useState } from 'react';
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -39,9 +40,17 @@ const getCurrentDisplayName = () =>
 const [displayName, setDisplayName] =
   useState(getCurrentDisplayName);
 
+const [photoURL, setPhotoURL] = useState(
+  auth.currentUser?.photoURL || ''
+);
+
 useFocusEffect(
   useCallback(() => {
     setDisplayName(getCurrentDisplayName());
+
+    setPhotoURL(
+      auth.currentUser?.photoURL || ''
+    );
   }, [language])
 );
 
@@ -144,14 +153,20 @@ useFocusEffect(
               ? 'Administra tu cuenta y tus preferencias.'
               : 'Manage your account and preferences.'}
           </Text>
-
           <View style={styles.profileCard}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {initials || 'LB'}
-              </Text>
-            </View>
-
+          <View style={styles.avatar}>
+  {photoURL ? (
+    <Image
+      source={{ uri: photoURL }}
+      style={styles.avatarImage}
+      resizeMode="cover"
+    />
+  ) : (
+    <Text style={styles.avatarText}>
+      {initials || 'LB'}
+    </Text>
+  )}
+</View>
             <Text style={styles.name}>
               {displayName}
             </Text>
@@ -408,8 +423,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 14,
     elevation: 8,
+    overflow: 'hidden',
   },
-
+avatarImage: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 999,
+},
   avatarText: {
     color: '#22D3EE',
     fontSize: 27,

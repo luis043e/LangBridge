@@ -20,10 +20,14 @@ export default function HomeScreen() {
 
     const [profileProgress, setProfileProgress] =
   useState(0);
+
+  const [userName, setUserName] = useState('');
+const [userPhotoURL, setUserPhotoURL] =
+  useState('');
+
   useEffect(() => {
   const loadProfileProgress = async () => {
     const currentUser = auth.currentUser;
-
     if (!currentUser) {
       setProfileProgress(0);
       return;
@@ -43,8 +47,7 @@ export default function HomeScreen() {
         return;
       }
 
-      const userData = userSnapshot.data();
-
+      const userData = userSnapshot.data();      
       const profileFields = [
         userData.fullName,
         userData.city,
@@ -97,12 +100,12 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.avatar}>
-            <Image
-  source={require('../../../assets/images/langbridge-logo.png')}
-  style={styles.avatarImage}
-  resizeMode="contain"
-/>
-          </View>
+  <Image
+    source={require('../../../assets/images/langbridge-logo.png')}
+    style={styles.avatarImage}
+    resizeMode="contain"
+  />
+</View>
         </View>
 
         <View style={styles.progressCard}>
@@ -407,6 +410,7 @@ const styles = StyleSheet.create({
   justifyContent: 'center',
   flexShrink: 0,
   padding: 5,
+  overflow: 'hidden',
   shadowColor: '#22D3EE',
   shadowOffset: {
     width: 0,
@@ -420,6 +424,7 @@ const styles = StyleSheet.create({
 avatarImage: {
   width: '100%',
   height: '100%',
+  borderRadius: 20,
 },
   avatarText: {
   color: '#22D3EE',
