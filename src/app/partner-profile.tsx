@@ -2,10 +2,14 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   arrayUnion,
+  collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
@@ -22,6 +26,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
+
+type ConnectionState =
+  | 'loading'
+  | 'none'
+  | 'sent'
+  | 'received'
+  | 'connected'
+  | 'rejected'
+  | 'blocked';
 
 export default function PartnerProfileScreen() {
   const router = useRouter();
@@ -285,8 +298,237 @@ const displayedBio =
 
 const displayedOnline =
   loadedProfile?.online ?? isOnline;
+const [connectionState, setConnectionState] =
+  useState<ConnectionState>('loading');
+
+const [activeConnectionId, setActiveConnectionId] =
+  useState('');
 
 const [isSending, setIsSending] = useState(false);
+  useEffect(() => {
+  let isMounted = true;
+
+  const loadConnectionState = async () => {
+    const currentUser = auth.currentUser;
+    const partnerId = params.partnerId;
+
+    if (isOwnProfile) {
+      if (isMounted) {
+        setConnectionState('none');
+        setActiveConnectionId('');
+      }
+
+      return;
+    }
+
+    if (!currentUser || !partnerId) {
+      if (isMounted) {
+        setConnectionState('none');
+        setActiveConnectionId('');
+      }
+
+      return;
+    }
+
+    try {
+      if (isMounted) {
+        setConnectionState('loading');
+        setActiveConnectionId('');
+      }
+
+      const directRequestId =
+        `${currentUser.uid}_${partnerId}`;
+
+      const reverseRequestId =
+        `${partnerId}_${currentUser.uid}`;
+
+      const currentUserReference = doc(
+        db,
+        'users',
+        currentUser.uid
+      );
+
+      const partnerReference = doc(
+        db,
+        'users',
+        partnerId
+      );
+
+      const sentRequestsQuery = query(
+  collection(db, 'connectionRequests'),
+  where(
+    'senderId',
+    '==',
+    currentUser.uid
+  )
+);
+
+const receivedRequestsQuery = query(
+  collection(db, 'connectionRequests'),
+  where(
+    'recipientId',
+    '==',
+    currentUser.uid
+  )
+);
+      const [
+  currentUserSnapshot,
+  partnerSnapshot,
+  sentRequestsSnapshot,
+  receivedRequestsSnapshot,
+] = await Promise.all([
+  getDoc(currentUserReference),
+  getDoc(partnerReference),
+  getDocs(sentRequestsQuery),
+  getDocs(receivedRequestsQuery),
+]);
+      const currentUserData =
+        currentUserSnapshot.exists()
+          ? currentUserSnapshot.data()
+          : null;
+
+      const partnerData =
+        partnerSnapshot.exists()
+          ? partnerSnapshot.data()
+          : null;
+
+      const currentUserBlockedIds =
+        Array.isArray(
+          currentUserData?.blockedUserIds
+        )
+          ? currentUserData.blockedUserIds
+          : [];
+
+      const partnerBlockedIds =
+        Array.isArray(partnerData?.blockedUserIds)
+          ? partnerData.blockedUserIds
+          : [];
+
+      const isBlocked =
+        currentUserBlockedIds.includes(partnerId) ||
+        partnerBlockedIds.includes(
+          currentUser.uid
+        );
+
+      if (isBlocked) {
+        if (isMounted) {
+          setConnectionState('blocked');
+          setActiveConnectionId('');
+        }
+
+        return;
+      }
+
+      const directRequestDocument =
+  sentRequestsSnapshot.docs.find(
+    (requestDocument) =>
+      requestDocument.data().recipientId ===
+      partnerId
+  );
+
+const reverseRequestDocument =
+  receivedRequestsSnapshot.docs.find(
+    (requestDocument) =>
+      requestDocument.data().senderId ===
+      partnerId
+  );
+
+const directRequestData =
+  directRequestDocument?.data() || null;
+
+const reverseRequestData =
+  reverseRequestDocument?.data() || null;
+
+      if (
+        directRequestData?.status === 'accepted'
+      ) {
+        if (isMounted) {
+          setConnectionState('connected');
+          setActiveConnectionId(
+            directRequestId
+          );
+        }
+
+        return;
+      }
+
+      if (
+        reverseRequestData?.status === 'accepted'
+      ) {
+        if (isMounted) {
+          setConnectionState('connected');
+          setActiveConnectionId(
+            reverseRequestId
+          );
+        }
+
+        return;
+      }
+
+      if (
+        directRequestData?.status === 'pending'
+      ) {
+        if (isMounted) {
+          setConnectionState('sent');
+          setActiveConnectionId(
+            directRequestId
+          );
+        }
+
+        return;
+      }
+
+      if (
+        reverseRequestData?.status === 'pending'
+      ) {
+        if (isMounted) {
+          setConnectionState('received');
+          setActiveConnectionId(
+            reverseRequestId
+          );
+        }
+
+        return;
+      }
+
+      if (
+        directRequestData?.status === 'rejected' ||
+        reverseRequestData?.status === 'rejected'
+      ) {
+        if (isMounted) {
+          setConnectionState('rejected');
+          setActiveConnectionId('');
+        }
+
+        return;
+      }
+
+      if (isMounted) {
+        setConnectionState('none');
+        setActiveConnectionId('');
+      }
+    } catch (error) {
+      console.error(
+        'Error loading connection state:',
+        error
+      );
+
+      if (isMounted) {
+        setConnectionState('none');
+        setActiveConnectionId('');
+      }
+    }
+  };
+
+  loadConnectionState();
+
+  return () => {
+    isMounted = false;
+  };
+}, [
+  isOwnProfile,
+  params.partnerId,
+]);
   const handleBlockUser = () => {
   const currentUser = auth.currentUser;
   const partnerId = params.partnerId;
@@ -432,38 +674,240 @@ const [isSending, setIsSending] = useState(false);
     return;
   }
 
-  const requestId =
-    `${currentUser.uid}_${partnerId}`;
-
-  const requestReference = doc(
-    db,
-    'connectionRequests',
-    requestId
-  );
-
   try {
     setIsSending(true);
+
+    const currentUserReference = doc(
+      db,
+      'users',
+      currentUser.uid
+    );
+
+    const partnerReference = doc(
+      db,
+      'users',
+      partnerId
+    );
+
+    const sentRequestsQuery = query(
+      collection(db, 'connectionRequests'),
+      where(
+        'senderId',
+        '==',
+        currentUser.uid
+      )
+    );
+
+    const receivedRequestsQuery = query(
+      collection(db, 'connectionRequests'),
+      where(
+        'recipientId',
+        '==',
+        currentUser.uid
+      )
+    );
+
+    const [
+      currentUserSnapshot,
+      partnerSnapshot,
+      sentRequestsSnapshot,
+      receivedRequestsSnapshot,
+    ] = await Promise.all([
+      getDoc(currentUserReference),
+      getDoc(partnerReference),
+      getDocs(sentRequestsQuery),
+      getDocs(receivedRequestsQuery),
+    ]);
+
+    const currentUserData =
+      currentUserSnapshot.exists()
+        ? currentUserSnapshot.data()
+        : null;
+
+    const partnerData =
+      partnerSnapshot.exists()
+        ? partnerSnapshot.data()
+        : null;
+
+    const currentUserBlockedIds =
+      Array.isArray(
+        currentUserData?.blockedUserIds
+      )
+        ? currentUserData.blockedUserIds
+        : [];
+
+    const partnerBlockedIds =
+      Array.isArray(partnerData?.blockedUserIds)
+        ? partnerData.blockedUserIds
+        : [];
+
+    const isBlocked =
+      currentUserBlockedIds.includes(partnerId) ||
+      partnerBlockedIds.includes(
+        currentUser.uid
+      );
+
+    if (isBlocked) {
+      setConnectionState('blocked');
+      setActiveConnectionId('');
+
+      Alert.alert(
+        language === 'es'
+          ? 'Interacción no disponible'
+          : 'Interaction unavailable',
+        language === 'es'
+          ? 'No es posible enviar una solicitud a este perfil.'
+          : 'A request cannot be sent to this profile.'
+      );
+      return;
+    }
+
+    const directRequestDocument =
+      sentRequestsSnapshot.docs.find(
+        (requestDocument) =>
+          requestDocument.data().recipientId ===
+          partnerId
+      );
+
+    const reverseRequestDocument =
+      receivedRequestsSnapshot.docs.find(
+        (requestDocument) =>
+          requestDocument.data().senderId ===
+          partnerId
+      );
+
+    const directRequestData =
+      directRequestDocument?.data() || null;
+
+    const reverseRequestData =
+      reverseRequestDocument?.data() || null;
+
+    if (
+      directRequestData?.status === 'accepted'
+    ) {
+      setConnectionState('connected');
+      setActiveConnectionId(
+        directRequestDocument?.id || ''
+      );
+
+      Alert.alert(
+        language === 'es'
+          ? 'Conexión existente'
+          : 'Existing connection',
+        language === 'es'
+          ? `Ya estás conectado con ${displayedName}.`
+          : `You are already connected with ${displayedName}.`
+      );
+      return;
+    }
+
+    if (
+      reverseRequestData?.status === 'accepted'
+    ) {
+      setConnectionState('connected');
+      setActiveConnectionId(
+        reverseRequestDocument?.id || ''
+      );
+
+      Alert.alert(
+        language === 'es'
+          ? 'Conexión existente'
+          : 'Existing connection',
+        language === 'es'
+          ? `Ya estás conectado con ${displayedName}.`
+          : `You are already connected with ${displayedName}.`
+      );
+      return;
+    }
+
+    if (
+      directRequestData?.status === 'pending'
+    ) {
+      setConnectionState('sent');
+      setActiveConnectionId(
+        directRequestDocument?.id || ''
+      );
+
+      Alert.alert(
+        language === 'es'
+          ? 'Solicitud ya enviada'
+          : 'Request already sent',
+        language === 'es'
+          ? `Ya enviaste una solicitud a ${displayedName}.`
+          : `You already sent a request to ${displayedName}.`
+      );
+      return;
+    }
+
+    if (
+      reverseRequestData?.status === 'pending'
+    ) {
+      setConnectionState('received');
+      setActiveConnectionId(
+        reverseRequestDocument?.id || ''
+      );
+
+      Alert.alert(
+        language === 'es'
+          ? 'Solicitud recibida'
+          : 'Request received',
+        language === 'es'
+          ? `${displayedName} ya te envió una solicitud. Revísala en Solicitudes.`
+          : `${displayedName} already sent you a request. Review it in Requests.`
+      );
+      return;
+    }
+
+    if (
+      directRequestData?.status === 'rejected' ||
+      reverseRequestData?.status === 'rejected'
+    ) {
+      setConnectionState('rejected');
+      setActiveConnectionId('');
+
+      Alert.alert(
+        language === 'es'
+          ? 'Solicitud no disponible'
+          : 'Request unavailable',
+        language === 'es'
+          ? 'Esta relación tiene una solicitud rechazada y no puede reabrirse automáticamente.'
+          : 'This relationship has a rejected request and cannot be reopened automatically.'
+      );
+      return;
+    }
+
+    const requestId =
+      `${currentUser.uid}_${partnerId}`;
+
+    const requestReference = doc(
+      db,
+      'connectionRequests',
+      requestId
+    );
 
     await setDoc(requestReference, {
       senderId: currentUser.uid,
       recipientId: partnerId,
       senderName:
-        currentUser.displayName ||
+        currentUser.displayName?.trim() ||
         currentUser.email?.split('@')[0] ||
         'LangBridge',
-      recipientName: name,
+      recipientName: displayedName,
       status: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+
+    setConnectionState('sent');
+    setActiveConnectionId(requestId);
 
     Alert.alert(
       language === 'es'
         ? 'Solicitud enviada'
         : 'Request sent',
       language === 'es'
-        ? `Tu solicitud de conexión fue enviada a ${name}.`
-        : `Your connection request was sent to ${name}.`
+        ? `Tu solicitud de conexión fue enviada a ${displayedName}.`
+        : `Your connection request was sent to ${displayedName}.`
     );
   } catch (error) {
     console.error(
@@ -481,6 +925,41 @@ const [isSending, setIsSending] = useState(false);
     );
   } finally {
     setIsSending(false);
+  }
+};
+const handleConnectionAction = () => {
+  const partnerId = params.partnerId;
+
+  if (connectionState === 'none') {
+    handleConnect();
+    return;
+  }
+
+  if (connectionState === 'received') {
+    router.push({
+      pathname: '/requests',
+      params: {
+        lang: language,
+      },
+    });
+    return;
+  }
+
+  if (
+    connectionState === 'connected' &&
+    activeConnectionId &&
+    partnerId
+  ) {
+    router.push({
+      pathname: '/chat',
+      params: {
+        lang: language,
+        connectionId: activeConnectionId,
+        partnerId,
+        partnerName: displayedName,
+        partnerPhotoURL: displayedPhotoURL,
+      },
+    });
   }
 };
     return (
@@ -659,39 +1138,80 @@ const [isSending, setIsSending] = useState(false);
           </View>
           
          {!isOwnProfile ? (
+          <>
   <TouchableOpacity
-    style={[
-      styles.connectButton,
-      isSending && styles.disabledConnectButton,
-    ]}
-    onPress={handleConnect}
-    activeOpacity={0.85}
-    disabled={isSending}
-  >
-    {isSending ? (
-      <View style={styles.sendingContent}>
-        <ActivityIndicator
-          color="#050B24"
-          size="small"
-        />
+  style={[
+    styles.connectButton,
+    (
+      isSending ||
+      connectionState === 'loading' ||
+      connectionState === 'sent' ||
+      connectionState === 'rejected' ||
+      connectionState === 'blocked'
+    ) &&
+      styles.disabledConnectButton,
+    connectionState === 'connected' &&
+      styles.connectedButton,
+    connectionState === 'received' &&
+      styles.receivedRequestButton,
+  ]}
+  onPress={handleConnectionAction}
+  activeOpacity={0.85}
+  disabled={
+    isSending ||
+    connectionState === 'loading' ||
+    connectionState === 'sent' ||
+    connectionState === 'rejected' ||
+    connectionState === 'blocked'
+  }
+>
+  {isSending ||
+  connectionState === 'loading' ? (
+    <View style={styles.sendingContent}>
+      <ActivityIndicator
+        color="#050B24"
+        size="small"
+      />
 
-        <Text style={styles.sendingText}>
-          {language === 'es'
+      <Text style={styles.sendingText}>
+        {isSending
+          ? language === 'es'
             ? 'Enviando...'
-            : 'Sending...'}
-        </Text>
-      </View>
-    ) : (
-      <Text style={styles.connectButtonText}>
-        {language === 'es'
-          ? 'Enviar solicitud'
-          : 'Send request'}
+            : 'Sending...'
+          : language === 'es'
+            ? 'Comprobando relación...'
+            : 'Checking connection...'}
       </Text>
-    )}
-  </TouchableOpacity>
-) : null}
-{!isOwnProfile ? (
-  <TouchableOpacity
+    </View>
+  ) : (
+    <Text style={styles.connectButtonText}>
+      {connectionState === 'none'
+        ? language === 'es'
+          ? 'Enviar solicitud'
+          : 'Send request'
+        : connectionState === 'sent'
+          ? language === 'es'
+            ? 'Solicitud enviada'
+            : 'Request sent'
+          : connectionState === 'received'
+            ? language === 'es'
+              ? 'Ver solicitud recibida'
+              : 'View received request'
+            : connectionState === 'connected'
+              ? language === 'es'
+                ? 'Abrir conversación'
+                : 'Open conversation'
+              : connectionState === 'rejected'
+                ? language === 'es'
+                  ? 'Solicitud no disponible'
+                  : 'Request unavailable'
+                : language === 'es'
+                  ? 'Interacción no disponible'
+                  : 'Interaction unavailable'}
+    </Text>
+  )}
+</TouchableOpacity>
+<TouchableOpacity
     style={styles.blockButton}
     onPress={handleBlockUser}
     activeOpacity={0.85}
@@ -702,6 +1222,7 @@ const [isSending, setIsSending] = useState(false);
         : 'Block user'}
     </Text>
   </TouchableOpacity>
+  </>
 ) : null}
         </ScrollView>
       </View>
@@ -985,6 +1506,16 @@ blockButtonText: {
 },
 disabledConnectButton: {
   opacity: 0.65,
+},
+
+connectedButton: {
+  backgroundColor: '#22D3EE',
+  borderColor: '#67E8F9',
+},
+
+receivedRequestButton: {
+  backgroundColor: '#6366F1',
+  borderColor: '#818CF8',
 },
 
 sendingContent: {
