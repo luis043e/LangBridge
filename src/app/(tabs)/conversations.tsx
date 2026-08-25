@@ -1,8 +1,12 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  useLocalSearchParams,
+  useRouter
+} from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   collection,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -29,6 +33,7 @@ type ConversationItem = {
   photoURL: string;
   lastMessage: string;
   lastMessageTime: string;
+  unreadCount: number;
 };
 export default function ConversationsScreen() {
   const router = useRouter();
@@ -143,6 +148,23 @@ const latestMessageDocument =
 const latestMessageData =
   latestMessageDocument?.data();
 
+const unreadMessagesQuery = query(
+  collection(
+    db,
+    'conversations',
+    conversationDocument.id,
+    'messages'
+  ),
+  where('senderId', '==', partnerId),
+  where('readAt', '==', null)
+);
+
+const unreadMessagesSnapshot =
+  await getCountFromServer(unreadMessagesQuery);
+
+const unreadCount =
+  unreadMessagesSnapshot.data().count;
+
 const latestMessageDate =
   latestMessageData?.createdAt?.toDate?.();
 
@@ -167,6 +189,7 @@ return {
       ? 'Todavía no hay mensajes.'
       : 'No messages yet.'),
   lastMessageTime: formattedTime,
+  unreadCount,
 };
       }
     )
@@ -324,12 +347,22 @@ return {
       </View>
 
       <View style={styles.timeContainer}>
-        <Text style={styles.lastMessageTime}>
-          {conversation.lastMessageTime}
-        </Text>
+  <Text style={styles.lastMessageTime}>
+    {conversation.lastMessageTime}
+  </Text>
 
-        <Text style={styles.arrow}>›</Text>
-      </View>
+  {conversation.unreadCount > 0 ? (
+    <View style={styles.unreadBadge}>
+      <Text style={styles.unreadBadgeText}>
+        {conversation.unreadCount > 99
+          ? '99+'
+          : conversation.unreadCount}
+      </Text>
+    </View>
+  ) : null}
+
+  <Text style={styles.arrow}>›</Text>
+</View>
     </TouchableOpacity>
   ))
 )}
@@ -486,5 +519,21 @@ lastMessageTime: {
 arrow: {
   color: '#64748B',
   fontSize: 26,
+},
+unreadBadge: {
+  minWidth: 22,
+  height: 22,
+  borderRadius: 11,
+  paddingHorizontal: 6,
+  backgroundColor: '#22D3EE',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: 7,
+},
+
+unreadBadgeText: {
+  color: '#050B24',
+  fontSize: 11,
+  fontWeight: 'bold',
 },
 });

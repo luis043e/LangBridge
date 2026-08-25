@@ -4,6 +4,14 @@ import {
   usePathname,
   useRouter,
 } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,6 +19,8 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { auth, db } from '../firebaseConfig';
 import { type AppLanguage } from '../translations';
 
 type TabItem = {
@@ -71,7 +81,135 @@ export default function AppTabs() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+  
+  const [unreadMessagesTotal, setUnreadMessagesTotal] =
+  useState(0);
 
+useEffect(() => {
+  let conversationUnsubscribe: (() => void) | null =
+    null;
+
+  let messageUnsubscribers: Array<() => void> = [];
+
+  const clearMessageListeners = () => {
+    messageUnsubscribers.forEach((unsubscribe) => {
+      unsubscribe();
+    });
+
+    messageUnsubscribers = [];
+  };
+
+  const authUnsubscribe = onAuthStateChanged(
+    auth,
+    (currentUser) => {
+      if (conversationUnsubscribe) {
+        conversationUnsubscribe();
+        conversationUnsubscribe = null;
+      }
+
+      clearMessageListeners();
+      setUnreadMessagesTotal(0);
+
+      if (!currentUser) {
+        return;
+      }
+
+      const conversationsQuery = query(
+        collection(db, 'conversations'),
+        where(
+          'participants',
+          'array-contains',
+          currentUser.uid
+        )
+      );
+
+      conversationUnsubscribe = onSnapshot(
+        conversationsQuery,
+        (conversationsSnapshot) => {
+          clearMessageListeners();
+
+          const unreadCounts = new Map<string, number>();
+
+          const updateTotal = () => {
+            const total = Array.from(
+              unreadCounts.values()
+            ).reduce(
+              (sum, unreadCount) =>
+                sum + unreadCount,
+              0
+            );
+
+            setUnreadMessagesTotal(total);
+          };
+
+          if (conversationsSnapshot.empty) {
+            setUnreadMessagesTotal(0);
+            return;
+          }
+
+          conversationsSnapshot.docs.forEach(
+            (conversationDocument) => {
+              const unreadMessagesQuery = query(
+                collection(
+                  db,
+                  'conversations',
+                  conversationDocument.id,
+                  'messages'
+                ),
+                where('readAt', '==', null)
+              );
+
+              const messageUnsubscribe = onSnapshot(
+                unreadMessagesQuery,
+                (messagesSnapshot) => {
+                  const unreadCount =
+                    messagesSnapshot.docs.filter(
+                      (messageDocument) =>
+                        messageDocument.data()
+                          .senderId !== currentUser.uid
+                    ).length;
+
+                  unreadCounts.set(
+                    conversationDocument.id,
+                    unreadCount
+                  );
+
+                  updateTotal();
+                },
+                (error) => {
+                  console.error(
+                    'Error loading unread messages:',
+                    error
+                  );
+                }
+              );
+
+              messageUnsubscribers.push(
+                messageUnsubscribe
+              );
+            }
+          );
+        },
+        (error) => {
+          console.error(
+            'Error loading conversations:',
+            error
+          );
+        }
+      );
+    }
+  );
+
+  return () => {
+    authUnsubscribe();
+
+    if (conversationUnsubscribe) {
+      conversationUnsubscribe();
+    }
+
+    clearMessageListeners();
+  };
+}, []);  
   const handleTabPress = (route: TabItem['route']) => {
     if (pathname === route) {
       return;
@@ -122,6 +260,17 @@ export default function AppTabs() {
     size={24}
     color={tab.iconColor}
   />
+
+{tab.route === '/conversations' &&
+unreadMessagesTotal > 0 ? (
+  <View style={styles.unreadBadge}>
+    <Text style={styles.unreadBadgeText}>
+      {unreadMessagesTotal > 99
+        ? '99+'
+        : unreadMessagesTotal}
+    </Text>
+  </View>
+) : null}
 </View>
 
             <Text
@@ -198,4 +347,26 @@ const styles = StyleSheet.create({
     color: '#22D3EE',
     fontWeight: 'bold',
   },
+
+  unreadBadge: {
+  position: 'absolute',
+  top: -7,
+  right: -11,
+  minWidth: 19,
+  height: 19,
+  borderRadius: 10,
+  paddingHorizontal: 5,
+  backgroundColor: '#EF4444',
+  borderWidth: 2,
+  borderColor: '#050B24',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+unreadBadgeText: {
+  color: '#FFFFFF',
+  fontSize: 10,
+  lineHeight: 12,
+  fontWeight: 'bold',
+},
 });

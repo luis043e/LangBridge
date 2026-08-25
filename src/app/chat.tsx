@@ -10,6 +10,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -33,6 +34,7 @@ type Message = {
   text: string;
   isOwn: boolean;
   time: string;
+  readAt: Date | null;
 };
 
 export default function ChatScreen() {
@@ -177,11 +179,37 @@ return {
   text: data.text || '',
   isOwn:
     data.senderId === currentUser.uid,
+  readAt: data.readAt?.toDate?.() ?? null,  
   time: formattedTime,
 };
           }
         );
+const unreadReceivedMessages =
+  messagesSnapshot.docs.filter((messageDocument) => {
+    const data = messageDocument.data();
 
+    return (
+      data.senderId !== currentUser.uid &&
+      !data.readAt
+    );
+  });
+
+if (unreadReceivedMessages.length > 0) {
+  const readBatch = writeBatch(db);
+
+  unreadReceivedMessages.forEach((messageDocument) => {
+    readBatch.update(messageDocument.ref, {
+      readAt: serverTimestamp(),
+    });
+  });
+
+  void readBatch.commit().catch((error) => {
+    console.error(
+      'Error marking messages as read:',
+      error
+    );
+  });
+}
       setMessages(loadedMessages);
     },
     (error) => {
@@ -236,6 +264,7 @@ return {
         senderId: currentUser.uid,
         text: cleanMessage,
         createdAt: serverTimestamp(),
+        readAt: null,
       }
     );
 
@@ -364,6 +393,17 @@ return {
     ]}
   >
     {message.time}
+    {message.isOwn
+      ? ` · ${
+          message.readAt
+            ? language === 'es'
+              ? 'Visto'
+              : 'Seen'
+            : language === 'es'
+              ? 'Enviado'
+              : 'Sent'
+        }`
+      : ''}
   </Text>
 ) : null}
               </View>
