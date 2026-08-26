@@ -1,5 +1,53 @@
-export type AppLanguage = 'en' | 'es';
+export const supportedLanguageCodes = [
+  'en',
+  'es',
+  'fr',
+  'pt',
+  'de',
+  'it',
+  'ja',
+  'ko',
+  'zh',
+  'ar',
+  'ru',
+  'tr',
+  'nl',
+  'pl',
+  'hi',
+] as const;
 
+export type SupportedLanguageCode =
+  (typeof supportedLanguageCodes)[number];
+
+export const activeLanguageCodes = [
+  'en',
+  'es',
+] as const;
+
+export type AppLanguage =
+  (typeof activeLanguageCodes)[number];
+
+  export const isSupportedLanguageCode = (
+  value: unknown
+): value is SupportedLanguageCode => {
+  return (
+    typeof value === 'string' &&
+    supportedLanguageCodes.some(
+      (languageCode) => languageCode === value
+    )
+  );
+};
+
+export const isAppLanguage = (
+  value: unknown
+): value is AppLanguage => {
+  return (
+    typeof value === 'string' &&
+    activeLanguageCodes.some(
+      (languageCode) => languageCode === value
+    )
+  );
+};
 export const translations = {
   en: {
     chooseLanguage: {

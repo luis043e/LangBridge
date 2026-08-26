@@ -6,6 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,8 +15,14 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { translations, type AppLanguage } from '../translations';
-
+import {
+  isActiveLanguage,
+  languageCatalog,
+} from '../language-catalog';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 export default function WelcomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ lang?: string }>();
@@ -110,59 +117,97 @@ const handleLanguageChange = async (
 </TouchableOpacity>
 {isLanguageListOpen && (
   <View style={styles.languageDropdown}>
-    <TouchableOpacity
-      style={[
-        styles.languageOption,
-        language === 'en' &&
-          styles.selectedLanguageOption,
-      ]}
-      onPress={() => handleLanguageChange('en')}
-      activeOpacity={0.8}
-      disabled={isSavingLanguage}
-      accessibilityRole="button"
-      accessibilityLabel="English"
-      accessibilityState={{
-        selected: language === 'en',
-        disabled: isSavingLanguage,
-      }}
+    <ScrollView
+      style={styles.languageDropdownScroll}
+      contentContainerStyle={
+        styles.languageDropdownContent
+      }
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.languageOptionText}>
-        🇺🇸 English
-      </Text>
+      {languageCatalog.map((option) => {
+        const isAvailable =
+          isActiveLanguage(option.code);
 
-      {language === 'en' && (
-        <Text style={styles.languageCheck}>
-          ✓
-        </Text>
-      )}
-    </TouchableOpacity>
+        const isSelected =
+          language === option.code;
 
-    <TouchableOpacity
-      style={[
-        styles.languageOption,
-        language === 'es' &&
-          styles.selectedLanguageOption,
-      ]}
-      onPress={() => handleLanguageChange('es')}
-      activeOpacity={0.8}
-      disabled={isSavingLanguage}
-      accessibilityRole="button"
-      accessibilityLabel="Español"
-      accessibilityState={{
-        selected: language === 'es',
-        disabled: isSavingLanguage,
-      }}
-    >
-      <Text style={styles.languageOptionText}>
-        🇪🇸 Español
-      </Text>
+        return (
+          <TouchableOpacity
+            key={option.code}
+            style={[
+              styles.languageOption,
+              isSelected &&
+                styles.selectedLanguageOption,
+              !isAvailable &&
+                styles.unavailableLanguageOption,
+            ]}
+            onPress={() => {
+              if (isActiveLanguage(option.code)) {
+                handleLanguageChange(option.code);
+              }
+            }}
+            activeOpacity={isAvailable ? 0.8 : 1}
+            disabled={
+              !isAvailable || isSavingLanguage
+            }
+            accessibilityRole="button"
+            accessibilityLabel={
+              option.nativeName
+            }
+            accessibilityState={{
+              selected: isSelected,
+              disabled:
+                !isAvailable ||
+                isSavingLanguage,
+            }}
+          >
+            <View
+              style={
+                styles.languageOptionInformation
+              }
+            >
+              <Text
+                style={styles.languageOptionText}
+                numberOfLines={1}
+              >
+                {option.flag} {option.nativeName}
+              </Text>
 
-      {language === 'es' && (
-        <Text style={styles.languageCheck}>
-          ✓
-        </Text>
-      )}
-    </TouchableOpacity>
+              <Text
+                style={
+                  styles.languageOptionDescription
+                }
+                numberOfLines={2}
+              >
+                {language === 'es'
+                  ? option.descriptionEs
+                  : option.descriptionEn}
+              </Text>
+            </View>
+
+            {isSelected ? (
+              <Text style={styles.languageCheck}>
+                ✓
+              </Text>
+            ) : !isAvailable ? (
+              <View
+                style={styles.comingSoonBadge}
+              >
+                <Text
+                  style={styles.comingSoonText}
+                >
+                  {language === 'es'
+                    ? 'PRONTO'
+                    : 'SOON'}
+                </Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
   </View>
 )}
       <View style={styles.content}>
@@ -263,7 +308,8 @@ languageDropdown: {
   position: 'absolute',
   top: 58,
   right: 0,
-  width: 210,
+  width: 280,
+  maxHeight: 340,
   backgroundColor: '#0B1430',
   borderWidth: 1.5,
   borderColor: '#334C7D',
@@ -279,9 +325,57 @@ languageDropdown: {
   shadowOpacity: 0.3,
   shadowRadius: 12,
 },
+languageDropdownScroll: {
+  width: '100%',
+},
 
+languageDropdownContent: {
+  paddingBottom: 2,
+},
+
+unavailableLanguageOption: {
+  backgroundColor: '#0D1630',
+  borderColor: '#1C2A4D',
+  opacity: 0.72,
+},
+
+languageOptionInformation: {
+  flex: 1,
+  minWidth: 0,
+  justifyContent: 'center',
+  paddingRight: 8,
+},
+
+languageOptionDescription: {
+  color: '#8492B0',
+  fontSize: 10,
+  lineHeight: 14,
+  marginTop: 3,
+},
+
+comingSoonBadge: {
+  minWidth: 47,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#30245C',
+  borderWidth: 1,
+  borderColor: '#A78BFA',
+  borderRadius: 9,
+  paddingHorizontal: 6,
+  paddingVertical: 5,
+  marginLeft: 8,
+},
+
+comingSoonText: {
+  color: '#DDD6FE',
+  fontSize: 8,
+  fontWeight: 'bold',
+  letterSpacing: 0.4,
+},
 languageOption: {
-  minHeight: 48,
+  width: '100%',
+  minHeight: 62,
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -289,8 +383,8 @@ languageOption: {
   borderWidth: 1,
   borderColor: '#1F3158',
   borderRadius: 12,
-  paddingHorizontal: 13,
-  paddingVertical: 11,
+  paddingHorizontal: 12,
+  paddingVertical: 9,
   marginBottom: 6,
 },
 

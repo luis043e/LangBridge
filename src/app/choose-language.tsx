@@ -14,141 +14,25 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth } from '../firebaseConfig';
-import { translations } from '../translations';
+import {
+  isActiveLanguage,
+  languageCatalog,
+  type LanguageCatalogOption,
+} from '../language-catalog';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
-type AppLanguage = 'en' | 'es';
-
-type LanguageOption = {
-  code: string;
-  flag: string;
-  nativeName: string;
-  descriptionEs: string;
-  descriptionEn: string;
+type LanguageOption = LanguageCatalogOption & {
   available: boolean;
 };
 
-const languageOptions: LanguageOption[] = [
-  {
-    code: 'en',
-    flag: '🇺🇸',
-    nativeName: 'English',
-    descriptionEs: 'Usar LangBridge en inglés.',
-    descriptionEn: 'Use LangBridge in English.',
-    available: true,
-  },
-  {
-    code: 'es',
-    flag: '🇪🇸',
-    nativeName: 'Español',
-    descriptionEs: 'Usar LangBridge en español.',
-    descriptionEn: 'Use LangBridge in Spanish.',
-    available: true,
-  },
-  {
-    code: 'fr',
-    flag: '🇫🇷',
-    nativeName: 'Français',
-    descriptionEs: 'Interfaz en francés.',
-    descriptionEn: 'French interface.',
-    available: false,
-  },
-  {
-    code: 'pt',
-    flag: '🇧🇷',
-    nativeName: 'Português',
-    descriptionEs: 'Interfaz en portugués.',
-    descriptionEn: 'Portuguese interface.',
-    available: false,
-  },
-  {
-    code: 'de',
-    flag: '🇩🇪',
-    nativeName: 'Deutsch',
-    descriptionEs: 'Interfaz en alemán.',
-    descriptionEn: 'German interface.',
-    available: false,
-  },
-  {
-    code: 'it',
-    flag: '🇮🇹',
-    nativeName: 'Italiano',
-    descriptionEs: 'Interfaz en italiano.',
-    descriptionEn: 'Italian interface.',
-    available: false,
-  },
-  {
-    code: 'ja',
-    flag: '🇯🇵',
-    nativeName: '日本語',
-    descriptionEs: 'Interfaz en japonés.',
-    descriptionEn: 'Japanese interface.',
-    available: false,
-  },
-  {
-    code: 'ko',
-    flag: '🇰🇷',
-    nativeName: '한국어',
-    descriptionEs: 'Interfaz en coreano.',
-    descriptionEn: 'Korean interface.',
-    available: false,
-  },
-  {
-    code: 'zh',
-    flag: '🇨🇳',
-    nativeName: '中文',
-    descriptionEs: 'Interfaz en chino.',
-    descriptionEn: 'Chinese interface.',
-    available: false,
-  },
-  {
-    code: 'ar',
-    flag: '🇸🇦',
-    nativeName: 'العربية',
-    descriptionEs: 'Interfaz en árabe.',
-    descriptionEn: 'Arabic interface.',
-    available: false,
-  },
-  {
-    code: 'ru',
-    flag: '🇷🇺',
-    nativeName: 'Русский',
-    descriptionEs: 'Interfaz en ruso.',
-    descriptionEn: 'Russian interface.',
-    available: false,
-  },
-  {
-    code: 'tr',
-    flag: '🇹🇷',
-    nativeName: 'Türkçe',
-    descriptionEs: 'Interfaz en turco.',
-    descriptionEn: 'Turkish interface.',
-    available: false,
-  },
-  {
-    code: 'nl',
-    flag: '🇳🇱',
-    nativeName: 'Nederlands',
-    descriptionEs: 'Interfaz en neerlandés.',
-    descriptionEn: 'Dutch interface.',
-    available: false,
-  },
-  {
-    code: 'pl',
-    flag: '🇵🇱',
-    nativeName: 'Polski',
-    descriptionEs: 'Interfaz en polaco.',
-    descriptionEn: 'Polish interface.',
-    available: false,
-  },
-  {
-    code: 'hi',
-    flag: '🇮🇳',
-    nativeName: 'हिन्दी',
-    descriptionEs: 'Interfaz en hindi.',
-    descriptionEn: 'Hindi interface.',
-    available: false,
-  },
-];
+const languageOptions: LanguageOption[] =
+  languageCatalog.map((option) => ({
+    ...option,
+    available: isActiveLanguage(option.code),
+  }));
 
 export default function ChooseLanguageScreen() {
   const router = useRouter();
