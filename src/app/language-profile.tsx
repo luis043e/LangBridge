@@ -1,7 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { useState } from 'react';
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -20,8 +25,16 @@ type LanguageOption = {
   en: string;
 };
 
+type LevelId =
+  | 'a1'
+  | 'a2'
+  | 'b1'
+  | 'b2'
+  | 'c1'
+  | 'c2';
+
 type LevelOption = {
-  id: 'beginner' | 'intermediate' | 'advanced';
+  id: LevelId;
   code: string;
   es: string;
   en: string;
@@ -62,22 +75,40 @@ const languageOptions: LanguageOption[] = [
 
 const levelOptions: LevelOption[] = [
   {
-    id: 'beginner',
-    code: 'A1 - A2',
-    es: 'Principiante',
-    en: 'Beginner',
+    id: 'a1',
+    code: 'A1',
+    es: 'A1 · Principiante',
+    en: 'A1 · Beginner',
   },
   {
-    id: 'intermediate',
-    code: 'B1 - B2',
-    es: 'Intermedio',
-    en: 'Intermediate',
+    id: 'a2',
+    code: 'A2',
+    es: 'A2 · Básico',
+    en: 'A2 · Elementary',
   },
   {
-    id: 'advanced',
-    code: 'C1 - C2',
-    es: 'Avanzado',
-    en: 'Advanced',
+    id: 'b1',
+    code: 'B1',
+    es: 'B1 · Intermedio',
+    en: 'B1 · Intermediate',
+  },
+  {
+    id: 'b2',
+    code: 'B2',
+    es: 'B2 · Intermedio alto',
+    en: 'B2 · Upper intermediate',
+  },
+  {
+    id: 'c1',
+    code: 'C1',
+    es: 'C1 · Avanzado',
+    en: 'C1 · Advanced',
+  },
+  {
+    id: 'c2',
+    code: 'C2',
+    es: 'C2 · Dominio',
+    en: 'C2 · Proficiency',
   },
 ];
 
@@ -104,14 +135,109 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
   useState(false);
 
     const [isSaving, setIsSaving] = useState(false);
+  
+  const [isLoadingProfile, setIsLoadingProfile] =
+  useState(true);
+
+  const [existingUserData, setExistingUserData] =
+  useState<Record<string, unknown> | null>(null);
+
+   useEffect(() => {
+  let isActive = true;
+
+  const loadLanguageProfile = async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      if (isActive) {
+        setIsLoadingProfile(false);
+      }
+
+      return;
+    }
+
+    try {
+      const userSnapshot = await getDoc(
+        doc(db, 'users', currentUser.uid)
+      );
+
+      if (!userSnapshot.exists() || !isActive) {
+        return;
+      }
+
+      const userData = userSnapshot.data();
+
+setExistingUserData(userData);
+
+const savedNativeLanguage = languageOptions.find(
+        (option) =>
+          option.code === userData.nativeLanguage
+      );
+
+      const savedLearningLanguage = languageOptions.find(
+        (option) =>
+          option.code === userData.learningLanguage
+      );
+
+      const legacyLevelMap: Record<string, LevelId> = {
+  beginner: 'a1',
+  intermediate: 'b1',
+  advanced: 'c1',
+};
+
+const savedLevelId =
+  typeof userData.level === 'string'
+    ? legacyLevelMap[userData.level] ??
+      userData.level
+    : null;
+
+const savedLevel = levelOptions.find(
+  (option) => option.id === savedLevelId
+);
+
+      if (savedNativeLanguage) {
+        setNativeLanguage(savedNativeLanguage);
+      }
+
+      if (savedLearningLanguage) {
+        setLearningLanguage(savedLearningLanguage);
+      }
+
+      if (savedLevel) {
+        setSelectedLevel(savedLevel.id);
+      }
+    } catch (error) {
+      console.error(
+        'Error loading language profile:',
+        error
+      );
+    } finally {
+      if (isActive) {
+        setIsLoadingProfile(false);
+      }
+    }
+  };
+
+  loadLanguageProfile();
+
+  return () => {
+    isActive = false;
+  };
+}, []);
 
   const getLanguageName = (option: LanguageOption) => {
     return language === 'es' ? option.es : option.en;
   };
 
-  const getLevelName = (option: LevelOption) => {
-    return language === 'es' ? option.es : option.en;
-  };
+  const getLevelName = (option?: LevelOption) => {
+  if (!option) {
+    return language === 'es'
+      ? 'Selecciona tu nivel actual'
+      : 'Select your current level';
+  }
+
+  return language === 'es' ? option.es : option.en;
+};
 
   const showNativeLanguageSelector = () => {
   setIsNativeLanguageOpen((currentValue) => !currentValue);
@@ -196,8 +322,16 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
       doc(db, 'users', currentUser.uid),
       {
         uid: currentUser.uid,
-        fullName: currentUser.displayName ?? '',
-        email: currentUser.email ?? '',
+        fullName:
+  currentUser.displayName ||
+  (typeof existingUserData?.fullName === 'string'
+    ? existingUserData.fullName
+    : ''),
+email:
+  currentUser.email ||
+  (typeof existingUserData?.email === 'string'
+    ? existingUserData.email
+    : ''),
         interfaceLanguage: language,
         nativeLanguage: nativeLanguage.code,
         learningLanguage: learningLanguage.code,
@@ -260,6 +394,44 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
 const goBack = () => {
   router.back();
 };
+
+if (isLoadingProfile) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View
+        style={[
+          styles.container,
+          {
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+          },
+        ]}
+      >
+        <StatusBar style="light" />
+
+        <ActivityIndicator
+          color="#22D3EE"
+          size="large"
+        />
+
+        <Text
+          style={{
+            color: '#E2E8F0',
+            fontSize: 16,
+            fontWeight: '600',
+            marginTop: 16,
+            textAlign: 'center',
+          }}
+        >
+          {language === 'es'
+            ? 'Cargando tu perfil lingüístico...'
+            : 'Loading your language profile...'}
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
