@@ -1,24 +1,61 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect } from 'react';
+
+import { auth } from '../firebaseConfig';
 
 export default function IndexScreen() {
   const router = useRouter();
 
   useEffect(() => {
-  const openInitialScreen = async () => {
-    const savedLanguage = await AsyncStorage.getItem('appLanguage');
+    let isActive = true;
 
-    if (savedLanguage === 'en' || savedLanguage === 'es') {
-      router.replace({
-        pathname: './welcome',
-        params: { lang: savedLanguage },
-      });
-    } else {
-      router.replace('./choose-language');
-    }
-  };
+    const authUnsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
+        if (!isActive) {
+          return;
+        }
 
-  openInitialScreen();
-}, [router]);
+        const savedLanguage =
+          await AsyncStorage.getItem('appLanguage');
+
+        const language =
+          savedLanguage === 'es' ? 'es' : 'en';
+
+        if (currentUser) {
+          router.replace({
+            pathname: '/home',
+            params: {
+              lang: language,
+            },
+          });
+          return;
+        }
+
+        if (
+          savedLanguage === 'en' ||
+          savedLanguage === 'es'
+        ) {
+          router.replace({
+            pathname: '/welcome',
+            params: {
+              lang: savedLanguage,
+            },
+          });
+          return;
+        }
+
+        router.replace('/choose-language');
+      }
+    );
+
+    return () => {
+      isActive = false;
+      authUnsubscribe();
+    };
+  }, [router]);
+
+  return null;
 }
