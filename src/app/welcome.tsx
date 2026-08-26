@@ -1,3 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -17,13 +20,54 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ lang?: string }>();
 
+const [isLanguageListOpen, setIsLanguageListOpen] =
+  useState(false);
+
+const [isSavingLanguage, setIsSavingLanguage] =
+  useState(false);
+
   const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
   const text = translations[language];
 
-  const goToLanguageSelection = () => {
-    router.replace('/choose-language');
-  };
+  const toggleLanguageList = () => {
+  if (isSavingLanguage) {
+    return;
+  }
 
+  setIsLanguageListOpen(
+    (currentValue) => !currentValue
+  );
+};
+const handleLanguageChange = async (
+  newLanguage: AppLanguage
+) => {
+  if (isSavingLanguage || newLanguage === language) {
+    setIsLanguageListOpen(false);
+    return;
+  }
+
+  try {
+    setIsSavingLanguage(true);
+
+    await AsyncStorage.setItem(
+      'appLanguage',
+      newLanguage
+    );
+
+    setIsLanguageListOpen(false);
+
+    router.setParams({
+      lang: newLanguage,
+    });
+  } catch (error) {
+    console.error(
+      'Error changing interface language:',
+      error
+    );
+  } finally {
+    setIsSavingLanguage(false);
+  }
+};
   const goToRegister = () => {
     router.push({
       pathname: '/register',
@@ -43,15 +87,84 @@ export default function WelcomeScreen() {
       <StatusBar style="light" />
 
       <TouchableOpacity
-        style={styles.languageButton}
-        onPress={goToLanguageSelection}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.languageButtonText}>
-          {language === 'es' ? 'Idioma' : 'Language'}
-        </Text>
-      </TouchableOpacity>
+  style={styles.languageButton}
+  onPress={toggleLanguageList}
+  activeOpacity={0.8}
+  disabled={isSavingLanguage}
+  accessibilityRole="button"
+  accessibilityLabel={
+    language === 'es'
+      ? 'Cambiar idioma de la interfaz'
+      : 'Change interface language'
+  }
+  accessibilityState={{
+    expanded: isLanguageListOpen,
+    disabled: isSavingLanguage,
+  }}
+>
+  <Text style={styles.languageButtonText}>
+    {language === 'es'
+      ? `🌐 Español ${isLanguageListOpen ? '▲' : '▼'}`
+      : `🌐 English ${isLanguageListOpen ? '▲' : '▼'}`}
+  </Text>
+</TouchableOpacity>
+{isLanguageListOpen && (
+  <View style={styles.languageDropdown}>
+    <TouchableOpacity
+      style={[
+        styles.languageOption,
+        language === 'en' &&
+          styles.selectedLanguageOption,
+      ]}
+      onPress={() => handleLanguageChange('en')}
+      activeOpacity={0.8}
+      disabled={isSavingLanguage}
+      accessibilityRole="button"
+      accessibilityLabel="English"
+      accessibilityState={{
+        selected: language === 'en',
+        disabled: isSavingLanguage,
+      }}
+    >
+      <Text style={styles.languageOptionText}>
+        🇺🇸 English
+      </Text>
 
+      {language === 'en' && (
+        <Text style={styles.languageCheck}>
+          ✓
+        </Text>
+      )}
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[
+        styles.languageOption,
+        language === 'es' &&
+          styles.selectedLanguageOption,
+      ]}
+      onPress={() => handleLanguageChange('es')}
+      activeOpacity={0.8}
+      disabled={isSavingLanguage}
+      accessibilityRole="button"
+      accessibilityLabel="Español"
+      accessibilityState={{
+        selected: language === 'es',
+        disabled: isSavingLanguage,
+      }}
+    >
+      <Text style={styles.languageOptionText}>
+        🇪🇸 Español
+      </Text>
+
+      {language === 'es' && (
+        <Text style={styles.languageCheck}>
+          ✓
+        </Text>
+      )}
+    </TouchableOpacity>
+  </View>
+)}
       <View style={styles.content}>
         <View style={styles.logo}>
   <Image
@@ -146,7 +259,59 @@ const styles = StyleSheet.create({
   fontWeight: '700',
   letterSpacing: 0.2,
 },
+languageDropdown: {
+  position: 'absolute',
+  top: 58,
+  right: 0,
+  width: 210,
+  backgroundColor: '#0B1430',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 16,
+  padding: 8,
+  zIndex: 20,
+  elevation: 12,
+  shadowColor: '#000000',
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.3,
+  shadowRadius: 12,
+},
 
+languageOption: {
+  minHeight: 48,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: '#111C3A',
+  borderWidth: 1,
+  borderColor: '#1F3158',
+  borderRadius: 12,
+  paddingHorizontal: 13,
+  paddingVertical: 11,
+  marginBottom: 6,
+},
+
+selectedLanguageOption: {
+  backgroundColor: '#25356B',
+  borderColor: '#22D3EE',
+},
+
+languageOptionText: {
+  flex: 1,
+  color: '#D7E0F5',
+  fontSize: 14,
+  fontWeight: '700',
+},
+
+languageCheck: {
+  color: '#22D3EE',
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginLeft: 10,
+},
   logo: {
   width: 112,
   height: 112,

@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { auth } from '../firebaseConfig';
 import { translations } from '../translations';
 
 type AppLanguage = 'en' | 'es';
@@ -153,13 +155,49 @@ export default function ChooseLanguageScreen() {
 
   const [selectedLanguage, setSelectedLanguage] =
     useState<AppLanguage>('en');
+  
+  const [isLoadingLanguage, setIsLoadingLanguage] =
+  useState(true);
 
   const [isLanguageListOpen, setIsLanguageListOpen] =
     useState(false);
 
   const [isContinuing, setIsContinuing] =
     useState(false);
+  
+  useEffect(() => {
+  let isActive = true;
 
+  const loadSavedLanguage = async () => {
+    try {
+      const savedLanguage =
+        await AsyncStorage.getItem('appLanguage');
+
+      if (
+        isActive &&
+        (savedLanguage === 'en' ||
+          savedLanguage === 'es')
+      ) {
+        setSelectedLanguage(savedLanguage);
+      }
+    } catch (error) {
+      console.error(
+        'Error loading saved language:',
+        error
+      );
+    } finally {
+      if (isActive) {
+        setIsLoadingLanguage(false);
+      }
+    }
+  };
+
+  loadSavedLanguage();
+
+  return () => {
+    isActive = false;
+  };
+}, []);  
   const text = translations[selectedLanguage];
 
   const selectedOption =
@@ -194,17 +232,74 @@ export default function ChooseLanguageScreen() {
         selectedLanguage
       );
 
-      router.replace({
-        pathname: '/welcome',
-        params: {
-          lang: selectedLanguage,
-        },
-      });
-    } finally {
-      setIsContinuing(false);
-    }
-  };
+          if (auth.currentUser) {
+  router.replace({
+    pathname: '/home',
+    params: {
+      lang: selectedLanguage,
+    },
+  });
+  return;
+}
 
+router.replace({
+  pathname: '/welcome',
+  params: {
+    lang: selectedLanguage,
+  },
+});
+  } catch (error) {
+    console.error(
+      'Error saving interface language:',
+      error
+    );
+
+    Alert.alert(
+      selectedLanguage === 'es'
+        ? 'No se pudo guardar el idioma'
+        : 'Language could not be saved',
+      selectedLanguage === 'es'
+        ? 'Revisa tu conexión e inténtalo nuevamente.'
+        : 'Check your connection and try again.'
+    );
+  } finally {
+    setIsContinuing(false);
+  }
+};
+if (isLoadingLanguage) {
+  return (
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={['top', 'left', 'right', 'bottom']}
+    >
+      <View
+        style={[
+          styles.container,
+          {
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+          },
+        ]}
+      >
+        <StatusBar style="light" />
+
+        <Text
+          style={{
+            color: '#E8EEFF',
+            fontSize: 16,
+            fontWeight: '600',
+            textAlign: 'center',
+          }}
+        >
+          {selectedLanguage === 'es'
+            ? 'Cargando tu idioma...'
+            : 'Loading your language...'}
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
   return (
     <SafeAreaView
       style={styles.safeArea}
