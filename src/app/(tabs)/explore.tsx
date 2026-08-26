@@ -116,35 +116,58 @@ export default function ExploreScreen() {
   };
 
   const getLevelName = (level: string) => {
-    const levelNames: Record<
-      string,
-      {
-        es: string;
-        en: string;
-      }
-    > = {
-      beginner: {
-        es: 'Principiante',
-        en: 'Beginner',
-      },
-      intermediate: {
-        es: 'Intermedio',
-        en: 'Intermediate',
-      },
-      advanced: {
-        es: 'Avanzado',
-        en: 'Advanced',
-      },
-    };
-
-    return (
-      levelNames[level]?.[language] ||
-      (language === 'es'
-        ? 'Nivel no especificado'
-        : 'Level not specified')
-    );
+  const levelNames: Record<
+    string,
+    {
+      es: string;
+      en: string;
+    }
+  > = {
+    a1: {
+      es: 'A1 · Principiante',
+      en: 'A1 · Beginner',
+    },
+    a2: {
+      es: 'A2 · Básico',
+      en: 'A2 · Elementary',
+    },
+    b1: {
+      es: 'B1 · Intermedio',
+      en: 'B1 · Intermediate',
+    },
+    b2: {
+      es: 'B2 · Intermedio alto',
+      en: 'B2 · Upper intermediate',
+    },
+    c1: {
+      es: 'C1 · Avanzado',
+      en: 'C1 · Advanced',
+    },
+    c2: {
+      es: 'C2 · Dominio',
+      en: 'C2 · Proficiency',
+    },
+    beginner: {
+      es: 'A1 · Principiante',
+      en: 'A1 · Beginner',
+    },
+    intermediate: {
+      es: 'B1 · Intermedio',
+      en: 'B1 · Intermediate',
+    },
+    advanced: {
+      es: 'C1 · Avanzado',
+      en: 'C1 · Advanced',
+    },
   };
 
+  return (
+    levelNames[level]?.[language] ||
+    (language === 'es'
+      ? 'Nivel no especificado'
+      : 'Level not specified')
+  );
+};
   useEffect(() => {
     let isMounted = true;
 

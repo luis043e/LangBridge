@@ -138,9 +138,18 @@ const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
   
   const [isLoadingProfile, setIsLoadingProfile] =
   useState(true);
+  
+  const [hasLoadingError, setHasLoadingError] =
+  useState(false);
+
+  const [loadingAttempt, setLoadingAttempt] =
+  useState(0);
 
   const [existingUserData, setExistingUserData] =
   useState<Record<string, unknown> | null>(null);
+  
+  const isEditingProfile =
+  existingUserData?.profileCompleted === true;
 
    useEffect(() => {
   let isActive = true;
@@ -207,11 +216,15 @@ const savedLevel = levelOptions.find(
         setSelectedLevel(savedLevel.id);
       }
     } catch (error) {
-      console.error(
-        'Error loading language profile:',
-        error
-      );
-    } finally {
+  console.error(
+    'Error loading language profile:',
+    error
+  );
+
+  if (isActive) {
+    setHasLoadingError(true);
+  }
+} finally {
       if (isActive) {
         setIsLoadingProfile(false);
       }
@@ -220,10 +233,10 @@ const savedLevel = levelOptions.find(
 
   loadLanguageProfile();
 
-  return () => {
+    return () => {
     isActive = false;
   };
-}, []);
+}, [loadingAttempt]);
 
   const getLanguageName = (option: LanguageOption) => {
     return language === 'es' ? option.es : option.en;
@@ -255,12 +268,20 @@ const savedLevel = levelOptions.find(
 
   if (!nativeLanguage) {
     Alert.alert(
-      language === 'es'
-        ? 'Idioma nativo requerido'
-        : 'Native language required',
-      language === 'es'
-        ? 'Selecciona tu idioma nativo para continuar.'
-        : 'Select your native language to continue.'
+  isEditingProfile
+    ? language === 'es'
+      ? 'Cambios guardados'
+      : 'Changes saved'
+    : language === 'es'
+      ? 'Perfil guardado'
+      : 'Profile saved',
+  isEditingProfile
+    ? language === 'es'
+      ? 'Tu perfil lingüístico fue actualizado correctamente.'
+      : 'Your language profile was updated successfully.'
+    : language === 'es'
+      ? 'Tu perfil lingüístico fue guardado correctamente.'
+      : 'Your language profile was saved successfully.',
     );
     return;
   }
@@ -391,6 +412,13 @@ email:
     setIsSaving(false);
   }
 };
+const handleRetryLoading = () => {
+  setHasLoadingError(false);
+  setIsLoadingProfile(true);
+  setLoadingAttempt(
+    (currentAttempt) => currentAttempt + 1
+  );
+};
 const goBack = () => {
   router.back();
 };
@@ -432,6 +460,85 @@ if (isLoadingProfile) {
     </SafeAreaView>
   );
 }
+if (hasLoadingError) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View
+        style={[
+          styles.container,
+          {
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+          },
+        ]}
+      >
+        <StatusBar style="light" />
+
+        <Text
+          style={{
+            color: '#FFFFFF',
+            fontSize: 22,
+            fontWeight: 'bold',
+            textAlign: 'center',
+          }}
+        >
+          {language === 'es'
+            ? 'No pudimos cargar tu perfil'
+            : 'We could not load your profile'}
+        </Text>
+
+        <Text
+          style={{
+            color: '#94A3B8',
+            fontSize: 15,
+            lineHeight: 22,
+            marginTop: 12,
+            textAlign: 'center',
+          }}
+        >
+          {language === 'es'
+            ? 'Revisa tu conexión e inténtalo nuevamente.'
+            : 'Check your connection and try again.'}
+        </Text>
+
+        <TouchableOpacity
+          style={[
+            styles.primaryButton,
+            {
+              marginTop: 28,
+              maxWidth: 320,
+            },
+          ]}
+          onPress={handleRetryLoading}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.primaryButtonText}>
+            {language === 'es'
+              ? 'Reintentar'
+              : 'Try again'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            marginTop: 18,
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+          }}
+          onPress={goBack}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.backButtonText}>
+            {language === 'es'
+              ? 'Volver'
+              : 'Go back'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -459,16 +566,24 @@ if (isLoadingProfile) {
             </Text>
 
             <Text style={styles.title}>
-              {language === 'es'
-                ? 'Crea tu perfil lingüístico'
-                : 'Build your language profile'}
-            </Text>
+  {isEditingProfile
+    ? language === 'es'
+      ? 'Edita tu perfil lingüístico'
+      : 'Edit your language profile'
+    : language === 'es'
+      ? 'Crea tu perfil lingüístico'
+      : 'Build your language profile'}
+</Text>
 
             <Text style={styles.subtitle}>
-              {language === 'es'
-                ? 'Cuéntanos qué idioma hablas y cuál quieres aprender.'
-                : 'Tell us about the language you speak and want to learn.'}
-            </Text>
+  {isEditingProfile
+    ? language === 'es'
+      ? 'Actualiza tus idiomas y tu nivel cuando lo necesites.'
+      : 'Update your languages and level whenever you need to.'
+    : language === 'es'
+      ? 'Cuéntanos qué idioma hablas y cuál quieres aprender.'
+      : 'Tell us about the language you speak and want to learn.'}
+</Text>
 
             <Text style={styles.label}>
               {language === 'es'
@@ -850,10 +965,14 @@ if (isLoadingProfile) {
     </View>
   ) : (
     <Text style={styles.primaryButtonText}>
-      {language === 'es'
-        ? 'Continuar'
-        : 'Continue'}
-    </Text>
+  {isEditingProfile
+    ? language === 'es'
+      ? 'Guardar cambios'
+      : 'Save changes'
+    : language === 'es'
+      ? 'Continuar'
+      : 'Continue'}
+</Text>
   )}
 </TouchableOpacity>
           </View>

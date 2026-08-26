@@ -129,9 +129,18 @@ useEffect(() => {
           setLearningLanguage(userData.learningLanguage);
         }
 
-        if (userData.level) {
-          setLevel(userData.level);
-        }
+        if (typeof userData.level === 'string') {
+  const legacyLevelMap: Record<string, string> = {
+    beginner: 'a1',
+    intermediate: 'b1',
+    advanced: 'c1',
+  };
+
+  setLevel(
+    legacyLevelMap[userData.level] ??
+      userData.level
+  );
+}
       }
     } catch (error) {
       console.error(
@@ -239,6 +248,22 @@ useEffect(() => {
     setActiveSelector(null);
   };
 const handleSaveChanges = async () => {
+  if (isSaving) {
+    return;
+  }
+
+  if (nativeLanguage === learningLanguage) {
+    Alert.alert(
+      language === 'es'
+        ? 'Selecciona idiomas diferentes'
+        : 'Select different languages',
+      language === 'es'
+        ? 'El idioma nativo y el idioma que quieres aprender deben ser diferentes.'
+        : 'Your native language and learning language must be different.'
+    );
+    return;
+  }
+
   const currentUser = auth.currentUser;
 
   if (!currentUser) {

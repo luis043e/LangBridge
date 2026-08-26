@@ -100,23 +100,46 @@ const getLevelName = (levelCode: string) => {
     string,
     { es: string; en: string }
   > = {
+    a1: {
+      es: 'A1 · Principiante',
+      en: 'A1 · Beginner',
+    },
+    a2: {
+      es: 'A2 · Básico',
+      en: 'A2 · Elementary',
+    },
+    b1: {
+      es: 'B1 · Intermedio',
+      en: 'B1 · Intermediate',
+    },
+    b2: {
+      es: 'B2 · Intermedio alto',
+      en: 'B2 · Upper intermediate',
+    },
+    c1: {
+      es: 'C1 · Avanzado',
+      en: 'C1 · Advanced',
+    },
+    c2: {
+      es: 'C2 · Dominio',
+      en: 'C2 · Proficiency',
+    },
     beginner: {
-      es: 'Principiante',
-      en: 'Beginner',
+      es: 'A1 · Principiante',
+      en: 'A1 · Beginner',
     },
     intermediate: {
-      es: 'Intermedio',
-      en: 'Intermediate',
+      es: 'B1 · Intermedio',
+      en: 'B1 · Intermediate',
     },
     advanced: {
-      es: 'Avanzado',
-      en: 'Advanced',
+      es: 'C1 · Avanzado',
+      en: 'C1 · Advanced',
     },
   };
 
   return (
     levelNames[levelCode]?.[language] ||
-    levelCode ||
     (language === 'es'
       ? 'Nivel no especificado'
       : 'Level not specified')
