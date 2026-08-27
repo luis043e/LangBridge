@@ -10,13 +10,31 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
-import { translations, type AppLanguage } from '../../translations';
+import {
+  isActiveLanguage,
+  languageCatalog,
+} from '../../language-catalog';
+import {
+  translations,
+  type AppLanguage,
+} from '../../translations';
+
 export default function HomeScreen() {
-    const router = useRouter();
-    const params = useLocalSearchParams<{ lang?: string }>();
-    const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
-    const text = translations[language];
+  const router = useRouter();
+
+  const params = useLocalSearchParams<{
+    lang?: string;
+    openLanguageSelector?: string;
+  }>();
+
+  const {
+    language,
+    changeLanguage,
+  } = useLanguage();
+
+  const text = translations[language];
 
     const [profileProgress, setProfileProgress] =
   useState(0);
@@ -24,6 +42,59 @@ export default function HomeScreen() {
   const [userName, setUserName] = useState('');
 const [userPhotoURL, setUserPhotoURL] =
   useState('');
+
+  const [isLanguageListOpen, setIsLanguageListOpen] =
+  useState(false);
+
+const [isSavingLanguage, setIsSavingLanguage] =
+  useState(false);
+
+  useEffect(() => {
+  if (params.openLanguageSelector === 'true') {
+    setIsLanguageListOpen(true);
+
+    router.setParams({
+      openLanguageSelector: undefined,
+    });
+  }
+}, [params.openLanguageSelector, router]);
+
+  const toggleLanguageList = () => {
+  if (isSavingLanguage) {
+    return;
+  }
+
+  setIsLanguageListOpen(
+    (currentValue) => !currentValue
+  );
+};
+
+const handleLanguageChange = async (
+  newLanguage: AppLanguage
+) => {
+  if (
+    isSavingLanguage ||
+    newLanguage === language
+  ) {
+    setIsLanguageListOpen(false);
+    return;
+  }
+
+  try {
+    setIsSavingLanguage(true);
+
+    await changeLanguage(newLanguage);
+
+    setIsLanguageListOpen(false);
+  } catch (error) {
+    console.error(
+      'Error changing global interface language:',
+      error
+    );
+  } finally {
+    setIsSavingLanguage(false);
+  }
+};
 
   useEffect(() => {
   const loadProfileProgress = async () => {
@@ -106,6 +177,151 @@ const [userPhotoURL, setUserPhotoURL] =
     resizeMode="contain"
   />
 </View>
+                </View>
+
+               <View style={styles.languageSelectorContainer}>
+          <TouchableOpacity
+            style={[
+              styles.languageButton,
+              isLanguageListOpen &&
+                styles.openLanguageButton,
+            ]}
+            onPress={toggleLanguageList}
+            activeOpacity={0.8}
+            disabled={isSavingLanguage}
+            accessibilityRole="button"
+            accessibilityLabel={
+              language === 'es'
+                ? 'Cambiar idioma de la interfaz'
+                : 'Change interface language'
+            }
+            accessibilityState={{
+              expanded: isLanguageListOpen,
+              disabled: isSavingLanguage,
+            }}
+          >
+            <Text style={styles.languageButtonText}>
+              {language === 'es'
+                ? `🌐 Español ${
+                    isLanguageListOpen ? '▲' : '▼'
+                  }`
+                : `🌐 English ${
+                    isLanguageListOpen ? '▲' : '▼'
+                  }`}
+            </Text>
+          </TouchableOpacity>
+
+          {isLanguageListOpen && (
+            <View style={styles.languageDropdown}>
+              <ScrollView
+                style={styles.languageDropdownScroll}
+                contentContainerStyle={
+                  styles.languageDropdownContent
+                }
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                {languageCatalog.map((option) => {
+                  const isAvailable =
+                    isActiveLanguage(option.code);
+
+                  const isSelected =
+                    language === option.code;
+
+                  return (
+                    <TouchableOpacity
+                      key={option.code}
+                      style={[
+                        styles.languageOption,
+                        isSelected &&
+                          styles.selectedLanguageOption,
+                        !isAvailable &&
+                          styles.unavailableLanguageOption,
+                      ]}
+                      onPress={() => {
+                        if (
+                          isActiveLanguage(option.code)
+                        ) {
+                          handleLanguageChange(
+                            option.code
+                          );
+                        }
+                      }}
+                      activeOpacity={
+                        isAvailable ? 0.8 : 1
+                      }
+                      disabled={
+                        !isAvailable ||
+                        isSavingLanguage
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        option.nativeName
+                      }
+                      accessibilityState={{
+                        selected: isSelected,
+                        disabled:
+                          !isAvailable ||
+                          isSavingLanguage,
+                      }}
+                    >
+                      <View
+                        style={
+                          styles.languageOptionInformation
+                        }
+                      >
+                        <Text
+                          style={
+                            styles.languageOptionText
+                          }
+                          numberOfLines={1}
+                        >
+                          {option.flag}{' '}
+                          {option.nativeName}
+                        </Text>
+
+                        <Text
+                          style={
+                            styles.languageOptionDescription
+                          }
+                          numberOfLines={2}
+                        >
+                          {language === 'es'
+                            ? option.descriptionEs
+                            : option.descriptionEn}
+                        </Text>
+                      </View>
+
+                      {isSelected ? (
+                        <Text
+                          style={styles.languageCheck}
+                        >
+                          ✓
+                        </Text>
+                      ) : !isAvailable ? (
+                        <View
+                          style={
+                            styles.comingSoonBadge
+                          }
+                        >
+                          <Text
+                            style={
+                              styles.comingSoonText
+                            }
+                          >
+                            {language === 'es'
+                              ? 'PRONTO'
+                              : 'SOON'}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
         </View>
 
         <View style={styles.progressCard}>
@@ -364,6 +580,138 @@ const styles = StyleSheet.create({
   container: {
   flex: 1,
   backgroundColor: '#050B24',
+},
+languageSelectorContainer: {
+  width: '100%',
+  alignItems: 'flex-end',
+  marginBottom: 22,
+  zIndex: 20,
+},
+
+languageButton: {
+  minHeight: 44,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#111C3A',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 16,
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+},
+
+openLanguageButton: {
+  backgroundColor: '#141F42',
+  borderColor: '#22D3EE',
+},
+
+languageButtonText: {
+  color: '#D7E0F5',
+  fontSize: 15,
+  fontWeight: 'bold',
+},
+
+languageDropdown: {
+  width: '100%',
+  maxHeight: 340,
+  backgroundColor: '#0B1430',
+  borderWidth: 1.5,
+  borderColor: '#334C7D',
+  borderRadius: 18,
+  padding: 8,
+  marginTop: 10,
+  overflow: 'hidden',
+  elevation: 12,
+  shadowColor: '#000000',
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.3,
+  shadowRadius: 12,
+},
+
+languageDropdownScroll: {
+  width: '100%',
+},
+
+languageDropdownContent: {
+  paddingBottom: 2,
+},
+
+languageOption: {
+  width: '100%',
+  minHeight: 62,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: '#111C3A',
+  borderWidth: 1,
+  borderColor: '#1F3158',
+  borderRadius: 13,
+  paddingHorizontal: 12,
+  paddingVertical: 9,
+  marginBottom: 6,
+},
+
+selectedLanguageOption: {
+  backgroundColor: '#25356B',
+  borderColor: '#22D3EE',
+},
+
+unavailableLanguageOption: {
+  backgroundColor: '#0D1630',
+  borderColor: '#1C2A4D',
+  opacity: 0.72,
+},
+
+languageOptionInformation: {
+  flex: 1,
+  minWidth: 0,
+  justifyContent: 'center',
+  paddingRight: 8,
+},
+
+languageOptionText: {
+  color: '#D7E0F5',
+  fontSize: 15,
+  lineHeight: 20,
+  fontWeight: '700',
+},
+
+languageOptionDescription: {
+  color: '#8492B0',
+  fontSize: 11,
+  lineHeight: 15,
+  marginTop: 3,
+},
+
+languageCheck: {
+  color: '#22D3EE',
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginLeft: 10,
+},
+
+comingSoonBadge: {
+  minWidth: 48,
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#30245C',
+  borderWidth: 1,
+  borderColor: '#A78BFA',
+  borderRadius: 9,
+  paddingHorizontal: 7,
+  paddingVertical: 5,
+  marginLeft: 8,
+},
+
+comingSoonText: {
+  color: '#DDD6FE',
+  fontSize: 8,
+  fontWeight: 'bold',
+  letterSpacing: 0.4,
 },
   content: {
   width: '100%',

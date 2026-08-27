@@ -216,6 +216,7 @@ useFocusEffect(
             </TouchableOpacity>
 
             <View style={styles.divider} />
+
 <TouchableOpacity
   style={styles.settingRow}
   onPress={() =>
@@ -253,8 +254,56 @@ useFocusEffect(
     ›
   </Text>
 </TouchableOpacity>
+
 <View style={styles.divider} />
-            <TouchableOpacity
+
+<TouchableOpacity
+  style={styles.settingRow}
+  onPress={() =>
+    router.push({
+      pathname: '/home',
+      params: {
+        lang: language,
+        openLanguageSelector: 'true',
+      },
+    })
+  }
+  activeOpacity={0.85}
+  accessibilityRole="button"
+  accessibilityLabel={
+    language === 'es'
+      ? 'Cambiar idioma de la interfaz'
+      : 'Change interface language'
+  }
+>
+  <View style={styles.settingIcon}>
+    <Text style={styles.settingIconText}>
+      🌐
+    </Text>
+  </View>
+
+  <View style={styles.settingInformation}>
+    <Text style={styles.settingTitle}>
+      {language === 'es'
+        ? 'Idioma de la interfaz'
+        : 'Interface language'}
+    </Text>
+
+    <Text style={styles.settingDescription}>
+      {language === 'es'
+        ? 'Cambia el idioma de los textos y menús de LangBridge.'
+        : 'Change the language of LangBridge text and menus.'}
+    </Text>
+  </View>
+
+  <Text style={styles.settingArrow}>
+    ›
+  </Text>
+</TouchableOpacity>
+
+<View style={styles.divider} />
+
+<TouchableOpacity
   style={styles.settingRow}
   onPress={() =>
     router.push({
@@ -285,9 +334,13 @@ useFocusEffect(
         : 'Update your language profile.'}
     </Text>
   </View>
+
+  <Text style={styles.settingArrow}>
+    ›
+  </Text>
 </TouchableOpacity>
 
-            <View style={styles.divider} />
+<View style={styles.divider} />
 
             <TouchableOpacity
   style={styles.settingRow}

@@ -12,9 +12,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
-import { type AppLanguage } from '../../translations';
 
 type Partner = {
   id: string;
@@ -57,7 +56,7 @@ export default function ExploreScreen() {
     lang?: string;
   }>();
 
-  const language: AppLanguage =
+  const { language } = useLanguage();
     params.lang === 'es' ? 'es' : 'en';
 
   const [searchText, setSearchText] = useState('');

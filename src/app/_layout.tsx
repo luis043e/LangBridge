@@ -1,7 +1,9 @@
 import { Stack } from 'expo-router';
 
+import { LanguageProvider } from '../contexts/language-context';
 export default function RootLayout() {
   return (
+  <LanguageProvider>
     <Stack
       screenOptions={{
         headerShown: false,
@@ -25,5 +27,6 @@ export default function RootLayout() {
       <Stack.Screen name="language-profile" />
       <Stack.Screen name="choose-language" />
     </Stack>
-  );
+  </LanguageProvider>
+);
 }
