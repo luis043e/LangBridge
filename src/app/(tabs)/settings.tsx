@@ -16,8 +16,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '../../contexts/language-context';
 import { auth } from '../../firebaseConfig';
-import { type AppLanguage } from '../../translations';
 export default function SettingsScreen() {
   const router = useRouter();
 
@@ -25,8 +25,7 @@ export default function SettingsScreen() {
     lang?: string;
   }>();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  const { language } = useLanguage();
 
   const currentUser = auth.currentUser;
 

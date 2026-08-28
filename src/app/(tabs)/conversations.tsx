@@ -24,8 +24,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
-import { type AppLanguage } from '../../translations';
 type ConversationItem = {
   id: string;
   partnerId: string;
@@ -39,11 +39,10 @@ export default function ConversationsScreen() {
   const router = useRouter();
 
   const params = useLocalSearchParams<{
-    lang?: string;
-  }>();
+  lang?: string;
+}>();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+const { language } = useLanguage();
 const [conversations, setConversations] =
   useState<ConversationItem[]>([]);
 

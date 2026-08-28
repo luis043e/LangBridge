@@ -20,9 +20,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useLanguage } from '../contexts/language-context';
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
-
 type TabItem = {
   route:
     | '/home'
@@ -79,8 +78,7 @@ export default function AppTabs() {
     lang?: string;
   }>();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  const { language } = useLanguage();
   
   const [unreadMessagesTotal, setUnreadMessagesTotal] =
   useState(0);
