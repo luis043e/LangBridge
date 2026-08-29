@@ -13,6 +13,7 @@ import {
 import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
 import {
+  getLanguageDescription,
   isActiveLanguage,
   languageCatalog,
 } from '../../language-catalog';
@@ -191,24 +192,20 @@ const handleLanguageChange = async (
             disabled={isSavingLanguage}
             accessibilityRole="button"
             accessibilityLabel={
-              language === 'es'
-                ? 'Cambiar idioma de la interfaz'
-                : 'Change interface language'
-            }
+  text.chooseLanguage.changeInterfaceLanguage
+}
             accessibilityState={{
               expanded: isLanguageListOpen,
               disabled: isSavingLanguage,
             }}
           >
             <Text style={styles.languageButtonText}>
-              {language === 'es'
-                ? `🌐 Español ${
-                    isLanguageListOpen ? '▲' : '▼'
-                  }`
-                : `🌐 English ${
-                    isLanguageListOpen ? '▲' : '▼'
-                  }`}
-            </Text>
+  🌐{' '}
+  {languageCatalog.find(
+    (option) => option.code === language
+  )?.nativeName ?? 'English'}{' '}
+  {isLanguageListOpen ? '▲' : '▼'}
+</Text>
           </TouchableOpacity>
 
           {isLanguageListOpen && (
@@ -287,9 +284,10 @@ const handleLanguageChange = async (
                           }
                           numberOfLines={2}
                         >
-                          {language === 'es'
-                            ? option.descriptionEs
-                            : option.descriptionEn}
+                          {getLanguageDescription(
+  option,
+  language
+)}
                         </Text>
                       </View>
 
@@ -310,9 +308,7 @@ const handleLanguageChange = async (
                               styles.comingSoonText
                             }
                           >
-                            {language === 'es'
-                              ? 'PRONTO'
-                              : 'SOON'}
+                            {text.chooseLanguage.comingSoon}
                           </Text>
                         </View>
                       ) : null}
@@ -374,22 +370,20 @@ const handleLanguageChange = async (
   <View style={styles.actionContent}>
     <View style={styles.learnTitleRow}>
       <Text style={styles.actionTitle}>
-        {language === 'es' ? 'Aprender' : 'Learn'}
-      </Text>
+  {text.homeScreen.learn}
+</Text>
 
-      <View style={styles.newBadge}>
-        <Text style={styles.newBadgeText}>
-          {language === 'es' ? 'NUEVO' : 'NEW'}
-        </Text>
-      </View>
-    </View>
+<View style={styles.newBadge}>
+  <Text style={styles.newBadgeText}>
+    {text.homeScreen.newBadge}
+  </Text>
+</View>
+</View>
 
-    <Text style={styles.actionDescription}>
-      {language === 'es'
-        ? 'Lecciones, niveles, puntos y práctica diaria.'
-        : 'Lessons, levels, points, and daily practice.'}
-    </Text>
-  </View>
+<Text style={styles.actionDescription}>
+  {text.homeScreen.learnDescription}
+</Text>
+</View>
 
   <Text style={styles.arrow}>›</Text>
 </TouchableOpacity>
@@ -461,16 +455,12 @@ const handleLanguageChange = async (
 
   <View style={styles.actionContent}>
     <Text style={styles.actionTitle}>
-      {language === 'es'
-        ? 'Solicitudes'
-        : 'Requests'}
-    </Text>
+  {text.homeScreen.requests}
+</Text>
 
-    <Text style={styles.actionDescription}>
-      {language === 'es'
-        ? 'Revisa y responde tus solicitudes de conexión.'
-        : 'Review and respond to your connection requests.'}
-    </Text>
+<Text style={styles.actionDescription}>
+  {text.homeScreen.requestsDescription}
+</Text>
   </View>
 
   <Text style={styles.arrow}>›</Text>
@@ -492,16 +482,12 @@ const handleLanguageChange = async (
 
   <View style={styles.actionContent}>
     <Text style={styles.actionTitle}>
-      {language === 'es'
-        ? 'Mis conexiones'
-        : 'My connections'}
-    </Text>
+  {text.homeScreen.connections}
+</Text>
 
-    <Text style={styles.actionDescription}>
-      {language === 'es'
-        ? 'Consulta las personas con quienes ya puedes practicar.'
-        : 'View the people you can already practice with.'}
-    </Text>
+<Text style={styles.actionDescription}>
+  {text.homeScreen.connectionsDescription}
+</Text>
   </View>
 
   <Text style={styles.arrow}>›</Text>
@@ -548,16 +534,12 @@ const handleLanguageChange = async (
 
   <View style={styles.actionContent}>
     <Text style={styles.actionTitle}>
-      {language === 'es'
-        ? 'Perfil y configuración'
-        : 'Profile and settings'}
-    </Text>
+  {text.homeScreen.profileAndSettings}
+</Text>
 
-    <Text style={styles.actionDescription}>
-      {language === 'es'
-        ? 'Administra tu cuenta, preferencias y sesión.'
-        : 'Manage your account, preferences, and session.'}
-    </Text>
+<Text style={styles.actionDescription}>
+  {text.homeScreen.profileAndSettingsDescription}
+</Text>
   </View>
 
   <Text style={styles.arrow}>›</Text>

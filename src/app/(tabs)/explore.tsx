@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
+import { translations } from '../../translations';
 
 type Partner = {
   id: string;
@@ -57,7 +58,7 @@ export default function ExploreScreen() {
   }>();
 
   const { language } = useLanguage();
-    params.lang === 'es' ? 'es' : 'en';
+  const text = translations[language];
 
   const [searchText, setSearchText] = useState('');
   const [onlineOnly, setOnlineOnly] = useState(false);
@@ -108,9 +109,7 @@ export default function ExploreScreen() {
 
     return (
       languageNames[code]?.[language] ||
-      (language === 'es'
-        ? 'No especificado'
-        : 'Not specified')
+text.exploreScreen.unspecified
     );
   };
 
@@ -162,9 +161,7 @@ export default function ExploreScreen() {
 
   return (
     levelNames[level]?.[language] ||
-    (language === 'es'
-      ? 'Nivel no especificado'
-      : 'Level not specified')
+text.exploreScreen.levelNotSpecified
   );
 };
   useEffect(() => {

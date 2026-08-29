@@ -1,7 +1,7 @@
 import {
-    activeLanguageCodes,
-    type AppLanguage,
-    type SupportedLanguageCode,
+  activeLanguageCodes,
+  type AppLanguage,
+  type SupportedLanguageCode,
 } from './translations';
 
 export type LanguageDirection = 'ltr' | 'rtl';
@@ -152,4 +152,12 @@ export const getLanguageCatalogOption = (
   return languageCatalog.find(
     (option) => option.code === code
   );
+};
+export const getLanguageDescription = (
+  option: LanguageCatalogOption,
+  language: AppLanguage
+) => {
+  return language === 'es'
+    ? option.descriptionEs
+    : option.descriptionEn;
 };
