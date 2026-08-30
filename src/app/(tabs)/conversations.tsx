@@ -26,6 +26,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
+import { translations } from '../../translations';
 type ConversationItem = {
   id: string;
   partnerId: string;
@@ -43,6 +44,7 @@ export default function ConversationsScreen() {
 }>();
 
 const { language } = useLanguage();
+const text = translations[language];
 const [conversations, setConversations] =
   useState<ConversationItem[]>([]);
 
@@ -57,10 +59,8 @@ const [loadError, setLoadError] =
 
     if (!currentUser) {
       setLoadError(
-        language === 'es'
-          ? 'Debes iniciar sesión nuevamente.'
-          : 'You must log in again.'
-      );
+  text.conversationsScreen.loginRequired
+);
 
       setIsLoading(false);
       return;
@@ -99,9 +99,7 @@ const [loadError, setLoadError] =
           ) || '';
 
         let partnerName =
-          language === 'es'
-            ? 'Compañero de LangBridge'
-            : 'LangBridge partner';
+  text.conversationsScreen.defaultPartnerName;
         
         let partnerPhotoURL = '';  
 
@@ -169,7 +167,7 @@ const latestMessageDate =
 
 const formattedTime = latestMessageDate
   ? latestMessageDate.toLocaleTimeString(
-      language === 'es' ? 'es-DO' : 'en-US',
+      text.conversationsScreen.timeLocale,
       {
         hour: '2-digit',
         minute: '2-digit',
@@ -183,10 +181,8 @@ return {
   partnerName,
   photoURL: partnerPhotoURL,
   lastMessage:
-    latestMessageData?.text ||
-    (language === 'es'
-      ? 'Todavía no hay mensajes.'
-      : 'No messages yet.'),
+  latestMessageData?.text ||
+  text.conversationsScreen.noMessagesYet,
   lastMessageTime: formattedTime,
   unreadCount,
 };
@@ -202,10 +198,8 @@ return {
       );
 
       setLoadError(
-        language === 'es'
-          ? 'No se pudieron cargar las conversaciones.'
-          : 'Conversations could not be loaded.'
-      );
+  text.conversationsScreen.loadError
+);
     } finally {
       setIsLoading(false);
     }
@@ -231,22 +225,16 @@ return {
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.conversationsScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Conversaciones'
-              : 'Conversations'}
+            {text.conversationsScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Continúa practicando con tus conexiones.'
-              : 'Keep practicing with your connections.'}
+            {text.conversationsScreen.subtitle}
           </Text>
 
           {isLoading ? (
@@ -254,9 +242,7 @@ return {
     <Text style={styles.emptyIcon}>⏳</Text>
 
     <Text style={styles.emptyTitle}>
-      {language === 'es'
-        ? 'Cargando conversaciones...'
-        : 'Loading conversations...'}
+      {text.conversationsScreen.loading}
     </Text>
   </View>
 ) : loadError ? (
@@ -264,9 +250,7 @@ return {
     <Text style={styles.emptyIcon}>⚠️</Text>
 
     <Text style={styles.emptyTitle}>
-      {language === 'es'
-        ? 'No pudimos cargar las conversaciones'
-        : 'Conversations could not be loaded'}
+     {text.conversationsScreen.loadErrorTitle}
     </Text>
 
     <Text style={styles.emptyText}>
@@ -278,15 +262,11 @@ return {
     <Text style={styles.emptyIcon}>💬</Text>
 
     <Text style={styles.emptyTitle}>
-      {language === 'es'
-        ? 'Todavía no tienes conversaciones'
-        : 'No conversations yet'}
+      {text.conversationsScreen.emptyTitle}
     </Text>
 
     <Text style={styles.emptyText}>
-      {language === 'es'
-        ? 'Abre una conexión y envía un mensaje para comenzar.'
-        : 'Open a connection and send a message to get started.'}
+      {text.conversationsScreen.emptyDescription}
     </Text>
   </View>
 ) : (

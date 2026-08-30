@@ -247,9 +247,7 @@ const isIdealMatch =
               const displayName =
                 data.fullName?.trim() ||
                 data.email?.split('@')[0] ||
-                (language === 'es'
-                  ? 'Usuario de LangBridge'
-                  : 'LangBridge user');
+text.exploreScreen.defaultUserName
 
               const nameParts = displayName
                 .split(' ')
@@ -295,9 +293,7 @@ const isIdealMatch =
                   typeof data.city === 'string' &&
                   data.city.trim()
                     ? data.city.trim()
-                    : language === 'es'
-                      ? 'Ubicación no indicada'
-                      : 'Location not provided',
+                    : text.exploreScreen.locationNotSpecified,
 
                 bio:
                   typeof data.bio === 'string'
@@ -338,10 +334,8 @@ online:
 
         if (isMounted) {
           setLoadError(
-            language === 'es'
-              ? 'No se pudieron cargar los compañeros.'
-              : 'Partners could not be loaded.'
-          );
+  text.exploreScreen.loadError
+);
         }
       } finally {
         if (isMounted) {
@@ -440,9 +434,7 @@ return (
     const locationName =
       partner.countryName ||
       partner.city ||
-      (language === 'es'
-        ? 'País no indicado'
-        : 'Country not provided');
+text.exploreScreen.countryNotSpecified
 
     const locationFlag =
       partner.countryCode
@@ -469,35 +461,27 @@ return (
         >
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => router.replace('/home')}
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.exploreScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Encuentra compañeros'
-              : 'Find language partners'}
+            {text.exploreScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Conecta con personas que pueden ayudarte a practicar el idioma que estás aprendiendo.'
-              : 'Connect with people who can help you practice the language you are learning.'}
+            {text.exploreScreen.subtitle}
           </Text>
 
           <TextInput
             style={styles.searchInput}
             placeholder={
-              language === 'es'
-                ? 'Buscar por nombre, país o idioma'
-                : 'Search by name, country, or language'
-            }
+  text.exploreScreen.searchPlaceholder
+}
             placeholderTextColor="#64748B"
             value={searchText}
             onChangeText={setSearchText}
@@ -508,13 +492,9 @@ return (
           <View style={styles.filtersSection}>
   <Text style={styles.resultText}>
     {filteredPartners.length}{' '}
-    {language === 'es'
-      ? filteredPartners.length === 1
-        ? 'compañero encontrado'
-        : 'compañeros encontrados'
-      : filteredPartners.length === 1
-        ? 'partner found'
-        : 'partners found'}
+{filteredPartners.length === 1
+  ? text.exploreScreen.partnerFound
+  : text.exploreScreen.partnersFound}
   </Text>
 
   <ScrollView
@@ -543,9 +523,7 @@ return (
             styles.activeFilterButtonText,
         ]}
       >
-        {language === 'es'
-          ? 'Todos'
-          : 'All'}
+        {text.exploreScreen.allFilter}
       </Text>
     </TouchableOpacity>
 
@@ -569,9 +547,7 @@ return (
             styles.activeIdealFilterButtonText,
         ]}
       >
-        {language === 'es'
-          ? '✨ Coincidencias'
-          : '✨ Matches'}
+        {text.exploreScreen.matchesFilter}
       </Text>
     </TouchableOpacity>
 
@@ -595,9 +571,7 @@ return (
             styles.activeOnlineFilterButtonText,
         ]}
       >
-        {language === 'es'
-          ? '● En línea'
-          : '● Online'}
+        {text.exploreScreen.onlineFilter}
       </Text>
     </TouchableOpacity>
   </ScrollView>
@@ -610,42 +584,26 @@ return (
   </Text>
 
   <Text style={styles.emptyTitle}>
-    {isLoading
-      ? language === 'es'
-        ? 'Buscando compañeros...'
-        : 'Finding partners...'
-      : loadError
-        ? language === 'es'
-          ? 'No pudimos cargar los perfiles'
-          : 'Profiles could not be loaded'
-        : idealMatchesOnly
-          ? language === 'es'
-            ? 'Todavía no encontramos coincidencias ideales'
-            : 'No ideal matches found yet'
-          : searchText.trim()
-            ? language === 'es'
-              ? 'No encontramos resultados'
-              : 'No results found'
-            : language === 'es'
-              ? 'Aún no hay otros compañeros'
-              : 'No other partners yet'}
-  </Text>
+  {isLoading
+    ? text.exploreScreen.findingPartners
+    : loadError
+      ? text.exploreScreen.profilesCouldNotBeLoaded
+      : idealMatchesOnly
+        ? text.exploreScreen.noIdealMatchesFound
+        : searchText.trim()
+          ? text.exploreScreen.noResultsFound
+          : text.exploreScreen.noOtherPartners}
+</Text>
 
   <Text style={styles.emptyText}>
-    {loadError
-      ? loadError
-      : idealMatchesOnly && onlineOnly
-        ? language === 'es'
-          ? 'No hay coincidencias ideales en línea en este momento. Puedes ver todas las coincidencias o todos los compañeros.'
-          : 'There are no ideal matches online right now. You can view every match or all partners.'
-        : idealMatchesOnly
-          ? language === 'es'
-            ? 'Cuando encontremos una persona cuyos idiomas coincidan recíprocamente con los tuyos, aparecerá aquí.'
-            : 'When someone has a reciprocal language match with you, that person will appear here.'
-          : language === 'es'
-            ? 'Prueba con otro nombre, país o idioma.'
-            : 'Try another name, country, or language.'}
-  </Text>
+  {loadError
+    ? loadError
+    : idealMatchesOnly && onlineOnly
+      ? text.exploreScreen.noIdealMatchesOnline
+      : idealMatchesOnly
+        ? text.exploreScreen.idealMatchesDescription
+        : text.exploreScreen.tryAnotherSearch}
+</Text>
 
   {!isLoading &&
     !loadError &&
@@ -660,9 +618,7 @@ return (
         activeOpacity={0.85}
       >
         <Text style={styles.viewAllPartnersButtonText}>
-          {language === 'es'
-            ? 'Ver todos los compañeros'
-            : 'View all partners'}
+          {text.exploreScreen.viewAllPartners}
         </Text>
       </TouchableOpacity>
     )}
@@ -728,9 +684,7 @@ return (
     {partner.isIdealMatch && (
       <View style={styles.idealMatchBadge}>
         <Text style={styles.idealMatchBadgeText}>
-          {language === 'es'
-            ? '✨ Coincidencia ideal'
-            : '✨ Ideal match'}
+          {text.exploreScreen.idealMatchBadge}
         </Text>
       </View>
     )}
@@ -744,23 +698,15 @@ return (
   </Text>
 
   <Text style={styles.languageInformation}>
-    {language === 'es'
-      ? `Habla: ${getLanguageName(
-          partner.nativeLanguage
-        )}`
-      : `Speaks: ${getLanguageName(
-          partner.nativeLanguage
-        )}`}
+    {`${text.exploreScreen.speaks}: ${getLanguageName(
+  partner.nativeLanguage
+)}`}
   </Text>
 
   <Text style={styles.languageInformation}>
-    {language === 'es'
-      ? `Aprende: ${getLanguageName(
-          partner.learningLanguage
-        )}`
-      : `Learning: ${getLanguageName(
-          partner.learningLanguage
-        )}`}
+    {`${text.exploreScreen.learns}: ${getLanguageName(
+  partner.learningLanguage
+)}`}
   </Text>
 
   <View style={styles.levelBadge}>

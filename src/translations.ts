@@ -62,7 +62,94 @@ export const translations = {
       changeInterfaceLanguage:
   'Change interface language',
 comingSoon: 'SOON',
+saveErrorTitle:
+  'Language could not be saved',
+saveErrorMessage:
+  'Check your connection and try again.',
+loadingLanguage:
+  'Loading your language...',
+interfaceLanguage:
+  'Interface language',
+continuing:
+  'Continuing...',
+changeLater:
+  'You can change this language later.',
     },
+    settingsScreen: {
+  defaultUserName: 'LangBridge user',
+  emailUnavailable: 'Email unavailable',
+  signOutTitle: 'Sign out',
+  signOutConfirmation:
+    'Are you sure you want to sign out?',
+  cancel: 'Cancel',
+  signOut: 'Sign out',
+  signOutErrorTitle: 'Sign out failed',
+  tryAgain: 'Please try again.',
+  back: '‹ Back',
+  title: 'Profile and settings',
+  subtitle:
+    'Manage your account and preferences.',
+  accountSection: 'Account',
+  editProfile: 'Edit profile',
+  editProfileDescription:
+    'Name, location, and personal information.',
+  viewPublicProfile:
+    'View my public profile',
+  viewPublicProfileDescription:
+    'Preview how other people see your profile.',
+  changeInterfaceLanguage:
+    'Change interface language',
+  interfaceLanguage:
+    'Interface language',
+  interfaceLanguageDescription:
+    'Change the language of LangBridge text and menus.',
+  languagesAndLevel:
+    'Languages and level',
+  languagesAndLevelDescription:
+    'Update your language profile.',
+  privacyAndSecurity:
+    'Privacy and security',
+  privacyAndSecurityDescription:
+    'Blocks, reports, and account controls.',
+},
+tabs: {
+  home: 'Home',
+  explore: 'Explore',
+  conversations: 'Chats',
+  settings: 'Profile',
+},
+lessonScreen: {
+  exerciseProgress: 'EXERCISE 1 OF 3',
+  title: 'Choose the correct translation',
+  question:
+    'How do you say “Hola” in English?',
+  answerChecked: 'Answer checked',
+  check: 'Check',
+},
+learnScreen: {
+  back: '‹ Back',
+  title: 'Learn',
+  subtitle:
+    'Advance with short lessons and daily practice.',
+  streak: 'Streak',
+  points: 'Points',
+  lives: 'Lives',
+  dailyGoal: 'Daily goal',
+  dailyGoalDescription:
+    'Complete one lesson today',
+  unitOneTitle:
+    'Unit 1: First steps',
+  unitOneDescription:
+    'Learn greetings and essential expressions.',
+  lessonOneAvailable:
+    'Lesson 1 available',
+},
+googleAuth: {
+  missingWebClientId:
+    'The Google Web Client ID is not configured.',
+  invalidIdToken:
+    'Google did not return a valid token.',
+},
     welcome: {
       slogan: 'Practice. Connect. Grow.',
       description:
@@ -103,21 +190,90 @@ tipLabel: 'LANGBRIDGE TIP',
 tipText: 'A complete profile helps you find more reliable and compatible language partners.',
 },
 exploreScreen: {
-  unspecified: 'No especificado',
-  levelNotSpecified: 'Nivel no especificado',
-  defaultUserName: 'Usuario de LangBridge',
-  locationNotSpecified: 'Ubicación no indicada',
-  countryNotSpecified: 'País no indicado',
+  unspecified: 'Not specified',
+  levelNotSpecified: 'Level not specified',
+  defaultUserName: 'LangBridge user',
+  locationNotSpecified: 'Location not specified',
+  countryNotSpecified: 'Country not specified',
   loadError:
-    'No se pudieron cargar los compañeros.',
-  back: '‹ Atrás',
-  title: 'Encuentra compañeros',
+    'Language partners could not be loaded.',
+  back: '‹ Back',
+  title: 'Find language partners',
   subtitle:
-    'Conecta con personas que pueden ayudarte a practicar el idioma que estás aprendiendo.',
+    'Connect with people who can help you practice the language you are learning.',
   searchPlaceholder:
-    'Buscar por nombre, país o idioma',
+    'Search by name, country, or language',
+  partnerFound: 'partner found',
+  partnersFound: 'partners found',
+  allFilter: 'All',
+  matchesFilter: '✨ Matches',
+  onlineFilter: '● Online',
+  findingPartners: 'Finding partners...',
+  profilesCouldNotBeLoaded:
+    'Profiles could not be loaded',
+  noIdealMatchesFound:
+    'No ideal matches found yet',
+  noResultsFound: 'No results found',
+  noOtherPartners: 'No other partners yet',
+  noIdealMatchesOnline:
+    'There are no ideal matches online right now. You can view every match or all partners.',
+  idealMatchesDescription:
+    'When someone has a reciprocal language match with you, that person will appear here.',
+  tryAnotherSearch:
+    'Try another name, country, or language.',
+  viewAllPartners: 'View all partners',
+  idealMatchBadge: '✨ Ideal match',
+speaks: 'Speaks',
+learns: 'Learns',
 },
-
+conversationsScreen: {
+  loginRequired:
+    'You must log in again.',
+  defaultPartnerName:
+    'LangBridge partner',
+  timeLocale: 'en-US',
+  noMessagesYet:
+    'No messages yet.',
+  loadError:
+    'Conversations could not be loaded.',
+  back: '‹ Back',
+  title: 'Conversations',
+  subtitle:
+    'Keep practicing with your connections.',
+  loading:
+    'Loading conversations...',
+  loadErrorTitle:
+    'Conversations could not be loaded',
+  emptyTitle:
+    'No conversations yet',
+  emptyDescription:
+    'Open a connection and send a message to get started.',
+},
+chatScreen: {
+  defaultPartnerName:
+    'LangBridge partner',
+  preparationError:
+    'This conversation could not be prepared.',
+  openError:
+    'The conversation could not be opened. Try again.',
+  timeLocale: 'en-US',
+  messagesLoadError:
+    'Messages could not be loaded.',
+  identificationError:
+    'This conversation could not be identified.',
+  sendError:
+    'The message could not be sent. Check your connection and try again.',
+  connectionStatus:
+    'Language connection',
+  emptyTitle:
+    'Start the conversation',
+  emptyDescription:
+    'Send a message to {partnerName} to start practicing.',
+  seen: 'Seen',
+  sent: 'Sent',
+  messagePlaceholder:
+    'Write a message...',
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -130,6 +286,40 @@ exploreScreen: {
   loginButton: 'Log In',
   noAccount: "Don't have an account?",
   createOne: 'Create one',
+  back: '‹ Back',
+or: 'or',
+continueWithGoogle: 'Continue with Google',
+googleErrorTitle:
+  'Could not continue with Google',
+tryAgain: 'Please try again.',
+incompleteFieldsTitle: 'Incomplete fields',
+incompleteFieldsMessage:
+  'Enter your email address and password.',
+invalidEmailTitle: 'Invalid email',
+invalidEmailMessage:
+  'Enter a valid email address.',
+loginErrorTitle: 'Login error',
+genericLoginError:
+  'Unable to log in. Check your information and try again.',
+invalidCredentials:
+  'The email address or password is incorrect.',
+tooManyLoginAttempts:
+  'Too many attempts were made. Wait a few minutes and try again.',
+userDisabled:
+  'This account has been disabled.',
+networkError:
+  'Check your Internet connection and try again.',
+emailRequiredTitle: 'Email required',
+emailRequiredMessage:
+  'Enter your email address first.',
+resetEmailSentTitle: 'Email sent',
+resetEmailSentMessage:
+  'Check your inbox for instructions to reset your password.',
+resetErrorTitle: 'Reset error',
+genericResetError:
+  'The password reset email could not be sent. Check the address and try again.',
+tooManyResetRequests:
+  'Too many requests were made. Wait a few minutes and try again.',
 }, 
 registerScreen: {
   title: 'Create your account',
@@ -148,6 +338,41 @@ registerScreen: {
     'By creating an account, you agree to the Terms of Service and Privacy Policy.',
   hasAccount: 'Already have an account?',
   login: 'Log in',
+  accountCreatedTitle: 'Account created',
+accountCreatedMessage:
+  'Your LangBridge account was created successfully.',
+continue: 'Continue',
+googleErrorTitle:
+  'Could not continue with Google',
+tryAgain: 'Please try again.',
+back: '‹ Back',
+or: 'or',
+continueWithGoogle: 'Continue with Google',
+incompleteFieldsTitle: 'Incomplete fields',
+incompleteFieldsMessage:
+  'Complete all fields to create your account.',
+invalidNameTitle: 'Invalid name',
+invalidNameMessage: 'Enter your full name.',
+invalidEmailTitle: 'Invalid email',
+invalidEmailMessage:
+  'Enter a valid email address.',
+shortPasswordTitle: 'Password too short',
+shortPasswordMessage:
+  'The password must contain at least 6 characters.',
+passwordsDoNotMatchTitle:
+  'Passwords do not match',
+passwordsDoNotMatchMessage:
+  'Enter the same password in both fields.',
+registrationErrorTitle:
+  'Registration error',
+genericRegistrationError:
+  'The account could not be created. Try again.',
+emailAlreadyRegistered:
+  'This email address is already registered.',
+weakPassword:
+  'The password is too weak.',
+networkError:
+  'Check your Internet connection and try again.',
 },
   },
 
@@ -165,6 +390,18 @@ registerScreen: {
       changeInterfaceLanguage:
   'Cambiar idioma de la interfaz',
 comingSoon: 'PRONTO',
+saveErrorTitle:
+  'No se pudo guardar el idioma',
+saveErrorMessage:
+  'Revisa tu conexión e inténtalo nuevamente.',
+loadingLanguage:
+  'Cargando tu idioma...',
+interfaceLanguage:
+  'Idioma de la interfaz',
+continuing:
+  'Continuando...',
+changeLater:
+  'Podrás cambiar este idioma más adelante.',
     },
     welcome: {
       slogan: 'Practica. Conecta. Crece.',
@@ -205,19 +442,165 @@ profileAndSettingsDescription:
   tipText: 'Un perfil completo te ayuda a encontrar compañeros de idiomas más confiables y compatibles.',
 },
 exploreScreen: {
-  unspecified: 'Not specified',
-  levelNotSpecified: 'Level not specified',
-  defaultUserName: 'LangBridge user',
-  locationNotSpecified: 'Location not specified',
-  countryNotSpecified: 'Country not specified',
+  unspecified: 'No especificado',
+  levelNotSpecified: 'Nivel no especificado',
+  defaultUserName: 'Usuario de LangBridge',
+  locationNotSpecified: 'Ubicación no indicada',
+  countryNotSpecified: 'País no indicado',
   loadError:
-    'Language partners could not be loaded.',
-  back: '‹ Back',
-  title: 'Find language partners',
+    'No se pudieron cargar los compañeros.',
+  back: '‹ Atrás',
+  title: 'Encuentra compañeros',
   subtitle:
-    'Connect with people who can help you practice the language you are learning.',
+    'Conecta con personas que pueden ayudarte a practicar el idioma que estás aprendiendo.',
   searchPlaceholder:
-    'Search by name, country, or language',
+    'Buscar por nombre, país o idioma',
+  partnerFound: 'compañero encontrado',
+  partnersFound: 'compañeros encontrados',
+  allFilter: 'Todos',
+  matchesFilter: '✨ Coincidencias',
+  onlineFilter: '● En línea',
+  findingPartners: 'Buscando compañeros...',
+  profilesCouldNotBeLoaded:
+    'No pudimos cargar los perfiles',
+  noIdealMatchesFound:
+    'Todavía no encontramos coincidencias ideales',
+  noResultsFound: 'No encontramos resultados',
+  noOtherPartners: 'Aún no hay otros compañeros',
+  noIdealMatchesOnline:
+    'No hay coincidencias ideales en línea en este momento. Puedes ver todas las coincidencias o todos los compañeros.',
+  idealMatchesDescription:
+    'Cuando encontremos una persona cuyos idiomas coincidan recíprocamente con los tuyos, aparecerá aquí.',
+  tryAnotherSearch:
+    'Prueba con otro nombre, país o idioma.',
+  viewAllPartners: 'Ver todos los compañeros',
+  idealMatchBadge: '✨ Coincidencia ideal',
+speaks: 'Habla',
+learns: 'Aprende',
+},
+conversationsScreen: {
+  loginRequired:
+    'Debes iniciar sesión nuevamente.',
+  defaultPartnerName:
+    'Compañero de LangBridge',
+  timeLocale: 'es-DO',
+  noMessagesYet:
+    'Todavía no hay mensajes.',
+  loadError:
+    'No se pudieron cargar las conversaciones.',
+  back: '‹ Atrás',
+  title: 'Conversaciones',
+  subtitle:
+    'Continúa practicando con tus conexiones.',
+  loading:
+    'Cargando conversaciones...',
+  loadErrorTitle:
+    'No pudimos cargar las conversaciones',
+  emptyTitle:
+    'Todavía no tienes conversaciones',
+  emptyDescription:
+    'Abre una conexión y envía un mensaje para comenzar.',
+},
+chatScreen: {
+  defaultPartnerName:
+    'Compañero de LangBridge',
+  preparationError:
+    'No se pudo preparar esta conversación.',
+  openError:
+    'No se pudo abrir la conversación. Inténtalo nuevamente.',
+  timeLocale: 'es-DO',
+  messagesLoadError:
+    'No se pudieron cargar los mensajes.',
+  identificationError:
+    'No se pudo identificar esta conversación.',
+  sendError:
+    'No se pudo enviar el mensaje. Revisa tu conexión e inténtalo nuevamente.',
+  connectionStatus:
+    'Conexión de idiomas',
+  emptyTitle:
+    'Comienza la conversación',
+  emptyDescription:
+    'Envía un mensaje a {partnerName} para comenzar a practicar.',
+  seen: 'Visto',
+  sent: 'Enviado',
+  messagePlaceholder:
+    'Escribe un mensaje...',
+},
+settingsScreen: {
+  defaultUserName: 'Usuario de LangBridge',
+  emailUnavailable: 'Correo no disponible',
+  signOutTitle: 'Cerrar sesión',
+  signOutConfirmation:
+    '¿Estás seguro de que deseas cerrar tu sesión?',
+  cancel: 'Cancelar',
+  signOut: 'Cerrar sesión',
+  signOutErrorTitle:
+    'No se pudo cerrar la sesión',
+  tryAgain: 'Inténtalo nuevamente.',
+  back: '‹ Atrás',
+  title: 'Perfil y configuración',
+  subtitle:
+    'Administra tu cuenta y tus preferencias.',
+  accountSection: 'Cuenta',
+  editProfile: 'Editar perfil',
+  editProfileDescription:
+    'Nombre, ubicación e información personal.',
+  viewPublicProfile:
+    'Ver mi perfil público',
+  viewPublicProfileDescription:
+    'Comprueba cómo otras personas ven tu perfil.',
+  changeInterfaceLanguage:
+    'Cambiar idioma de la interfaz',
+  interfaceLanguage:
+    'Idioma de la interfaz',
+  interfaceLanguageDescription:
+    'Cambia el idioma de los textos y menús de LangBridge.',
+  languagesAndLevel:
+    'Idiomas y nivel',
+  languagesAndLevelDescription:
+    'Actualiza tu perfil lingüístico.',
+  privacyAndSecurity:
+    'Privacidad y seguridad',
+  privacyAndSecurityDescription:
+    'Bloqueos, reportes y controles de cuenta.',
+},
+tabs: {
+  home: 'Inicio',
+  explore: 'Explorar',
+  conversations: 'Chats',
+  settings: 'Perfil',
+},
+lessonScreen: {
+  exerciseProgress: 'EJERCICIO 1 DE 3',
+  title: 'Elige la traducción correcta',
+  question:
+    '¿Cómo se dice “Hola” en inglés?',
+  answerChecked: 'Respuesta comprobada',
+  check: 'Comprobar',
+},
+learnScreen: {
+  back: '‹ Atrás',
+  title: 'Aprender',
+  subtitle:
+    'Avanza con lecciones breves y práctica diaria.',
+  streak: 'Racha',
+  points: 'Puntos',
+  lives: 'Vidas',
+  dailyGoal: 'Meta diaria',
+  dailyGoalDescription:
+    'Completa una lección hoy',
+  unitOneTitle:
+    'Unidad 1: Primeros pasos',
+  unitOneDescription:
+    'Aprende saludos y expresiones esenciales.',
+  lessonOneAvailable:
+    'Lección 1 disponible',
+},
+googleAuth: {
+  missingWebClientId:
+    'Falta configurar el Web Client ID de Google.',
+  invalidIdToken:
+    'Google no devolvió un token válido.',
 },
     loginScreen: {
   title: 'Bienvenido de nuevo',
@@ -231,6 +614,40 @@ exploreScreen: {
   loginButton: 'Iniciar sesión',
   noAccount: '¿No tienes una cuenta?',
   createOne: 'Crear una',
+  back: '‹ Atrás',
+or: 'o',
+continueWithGoogle: 'Continuar con Google',
+googleErrorTitle:
+  'No se pudo continuar con Google',
+tryAgain: 'Inténtalo nuevamente.',
+incompleteFieldsTitle: 'Campos incompletos',
+incompleteFieldsMessage:
+  'Escribe tu correo electrónico y contraseña.',
+invalidEmailTitle: 'Correo no válido',
+invalidEmailMessage:
+  'Escribe una dirección de correo electrónico válida.',
+loginErrorTitle: 'Error al iniciar sesión',
+genericLoginError:
+  'No fue posible iniciar sesión. Verifica tus datos e inténtalo nuevamente.',
+invalidCredentials:
+  'El correo electrónico o la contraseña son incorrectos.',
+tooManyLoginAttempts:
+  'Se realizaron demasiados intentos. Espera unos minutos e inténtalo nuevamente.',
+userDisabled:
+  'Esta cuenta ha sido deshabilitada.',
+networkError:
+  'Revisa tu conexión a Internet e inténtalo nuevamente.',
+emailRequiredTitle: 'Correo requerido',
+emailRequiredMessage:
+  'Escribe primero tu dirección de correo electrónico.',
+resetEmailSentTitle: 'Correo enviado',
+resetEmailSentMessage:
+  'Revisa tu bandeja de entrada para restablecer tu contraseña.',
+resetErrorTitle: 'Error de recuperación',
+genericResetError:
+  'No se pudo enviar el correo de recuperación. Verifica la dirección e inténtalo nuevamente.',
+tooManyResetRequests:
+  'Se realizaron demasiadas solicitudes. Espera unos minutos e inténtalo nuevamente.',
   },
   registerScreen: {
   title: 'Crea tu cuenta',
@@ -249,6 +666,41 @@ exploreScreen: {
     'Al crear una cuenta, aceptas los Términos de servicio y la Política de privacidad.',
   hasAccount: '¿Ya tienes una cuenta?',
   login: 'Iniciar sesión',
+  accountCreatedTitle: 'Cuenta creada',
+accountCreatedMessage:
+  'Tu cuenta de LangBridge fue creada correctamente.',
+continue: 'Continuar',
+googleErrorTitle:
+  'No se pudo continuar con Google',
+tryAgain: 'Inténtalo nuevamente.',
+back: '‹ Atrás',
+or: 'o',
+continueWithGoogle: 'Continuar con Google',
+incompleteFieldsTitle: 'Campos incompletos',
+incompleteFieldsMessage:
+  'Completa todos los campos para crear tu cuenta.',
+invalidNameTitle: 'Nombre no válido',
+invalidNameMessage: 'Escribe tu nombre completo.',
+invalidEmailTitle: 'Correo no válido',
+invalidEmailMessage:
+  'Escribe una dirección de correo electrónico válida.',
+shortPasswordTitle: 'Contraseña muy corta',
+shortPasswordMessage:
+  'La contraseña debe tener por lo menos 6 caracteres.',
+passwordsDoNotMatchTitle:
+  'Las contraseñas no coinciden',
+passwordsDoNotMatchMessage:
+  'Escribe la misma contraseña en ambos campos.',
+registrationErrorTitle:
+  'Error de registro',
+genericRegistrationError:
+  'No se pudo crear la cuenta. Inténtalo nuevamente.',
+emailAlreadyRegistered:
+  'Este correo electrónico ya está registrado.',
+weakPassword:
+  'La contraseña es demasiado débil.',
+networkError:
+  'Revisa tu conexión a Internet e inténtalo nuevamente.',
 },
 },
 };

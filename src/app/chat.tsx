@@ -27,7 +27,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type Message = {
   id: string;
@@ -51,11 +54,11 @@ export default function ChatScreen() {
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
 
+    const text = translations[language];
+
   const partnerName =
-    params.partnerName ||
-    (language === 'es'
-      ? 'Compañero de LangBridge'
-      : 'LangBridge partner');
+  params.partnerName ||
+  text.chatScreen.defaultPartnerName;
   const partnerPhotoURL =
   params.partnerPhotoURL || '';
 
@@ -80,10 +83,8 @@ useEffect(() => {
 
     if (!currentUser || !connectionId || !partnerId) {
       setChatError(
-        language === 'es'
-          ? 'No se pudo preparar esta conversación.'
-          : 'This conversation could not be prepared.'
-      );
+  text.chatScreen.preparationError
+);
       setIsPreparingChat(false);
       return;
     }
@@ -120,10 +121,8 @@ useEffect(() => {
       );
 
       setChatError(
-        language === 'es'
-          ? 'No se pudo abrir la conversación. Inténtalo nuevamente.'
-          : 'The conversation could not be opened. Try again.'
-      );
+  text.chatScreen.openError
+);
     } finally {
       setIsPreparingChat(false);
     }
@@ -166,7 +165,7 @@ useEffect(() => {
 
 const formattedTime = messageDate
   ? messageDate.toLocaleTimeString(
-      language === 'es' ? 'es-DO' : 'en-US',
+      text.chatScreen.timeLocale,
       {
         hour: '2-digit',
         minute: '2-digit',
@@ -219,10 +218,8 @@ if (unreadReceivedMessages.length > 0) {
       );
 
       setChatError(
-        language === 'es'
-          ? 'No se pudieron cargar los mensajes.'
-          : 'Messages could not be loaded.'
-      );
+  text.chatScreen.messagesLoadError
+);
     }
   );
 
@@ -242,10 +239,8 @@ if (unreadReceivedMessages.length > 0) {
 
   if (!currentUser || !connectionId) {
     setChatError(
-      language === 'es'
-        ? 'No se pudo identificar esta conversación.'
-        : 'This conversation could not be identified.'
-    );
+  text.chatScreen.identificationError
+);
     return;
   }
 
@@ -276,10 +271,8 @@ if (unreadReceivedMessages.length > 0) {
     );
 
     setChatError(
-      language === 'es'
-        ? 'No se pudo enviar el mensaje. Revisa tu conexión e inténtalo nuevamente.'
-        : 'The message could not be sent. Check your connection and try again.'
-    );
+  text.chatScreen.sendError
+);
   } finally {
     setIsSending(false);
   }

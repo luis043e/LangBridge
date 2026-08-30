@@ -4,6 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect } from 'react';
 
 import { auth } from '../firebaseConfig';
+import { isAppLanguage } from '../translations';
 
 export default function IndexScreen() {
   const router = useRouter();
@@ -21,8 +22,9 @@ export default function IndexScreen() {
         const savedLanguage =
           await AsyncStorage.getItem('appLanguage');
 
-        const language =
-          savedLanguage === 'es' ? 'es' : 'en';
+        const language = isAppLanguage(savedLanguage)
+  ? savedLanguage
+  : 'en';
 
         if (currentUser) {
           router.replace({
@@ -34,18 +36,15 @@ export default function IndexScreen() {
           return;
         }
 
-        if (
-          savedLanguage === 'en' ||
-          savedLanguage === 'es'
-        ) {
-          router.replace({
-            pathname: '/welcome',
-            params: {
-              lang: savedLanguage,
-            },
-          });
-          return;
-        }
+        if (isAppLanguage(savedLanguage)) {
+  router.replace({
+    pathname: '/welcome',
+    params: {
+      lang: savedLanguage,
+    },
+  });
+  return;
+}
 
         router.replace('/choose-language');
       }

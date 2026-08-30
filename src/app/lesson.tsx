@@ -2,16 +2,18 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-``
 
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 export default function LessonScreen() {
   const router = useRouter();
@@ -19,6 +21,9 @@ export default function LessonScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+
+    const text = translations[language];
+    
     const [selectedAnswer, setSelectedAnswer] =
   useState<string | null>(null);
 
@@ -56,22 +61,16 @@ export default function LessonScreen() {
         </View>
 
         <Text style={styles.exerciseNumber}>
-          {language === 'es'
-            ? 'EJERCICIO 1 DE 3'
-            : 'EXERCISE 1 OF 3'}
+          {text.lessonScreen.exerciseProgress}
         </Text>
 
         <Text style={styles.title}>
-          {language === 'es'
-            ? 'Elige la traducción correcta'
-            : 'Choose the correct translation'}
+          {text.lessonScreen.title}
         </Text>
 
         <View style={styles.questionCard}>
           <Text style={styles.questionLabel}>
-            {language === 'es'
-              ? '¿Cómo se dice “Hola” en inglés?'
-              : 'How do you say “Hola” in English?'}
+            {text.lessonScreen.question}
           </Text>
         </View>
 
@@ -123,12 +122,8 @@ export default function LessonScreen() {
 >
   <Text style={styles.checkButtonText}>
     {isChecked
-      ? language === 'es'
-        ? 'Respuesta comprobada'
-        : 'Answer checked'
-      : language === 'es'
-        ? 'Comprobar'
-        : 'Check'}
+  ? text.lessonScreen.answerChecked
+  : text.lessonScreen.check}
   </Text>
 </TouchableOpacity>
       </ScrollView>

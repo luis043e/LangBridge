@@ -22,49 +22,49 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useLanguage } from '../contexts/language-context';
 import { auth, db } from '../firebaseConfig';
+import { translations } from '../translations';
 type TabItem = {
   route:
     | '/home'
     | '/explore'
     | '/conversations'
     | '/settings';
-icon: keyof typeof Ionicons.glyphMap;
-labelEs: string;
-labelEn: string;
-iconColor: string;
-iconBackground: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  labelKey:
+    | 'home'
+    | 'explore'
+    | 'conversations'
+    | 'settings';
+  iconColor: string;
+  iconBackground: string;
 };
 
 const tabItems: TabItem[] = [
   {
     route: '/home',
     icon: 'home',
-    labelEs: 'Inicio',
-    labelEn: 'Home',
+    labelKey: 'home',
     iconColor: '#22D3EE',
     iconBackground: '#123B5D',
   },
   {
     route: '/explore',
     icon: 'search',
-    labelEs: 'Explorar',
-    labelEn: 'Explore',
+    labelKey: 'explore',
     iconColor: '#A78BFA',
     iconBackground: '#30245C',
   },
   {
     route: '/conversations',
     icon: 'chatbubbles',
-    labelEs: 'Chats',
-    labelEn: 'Chats',
+    labelKey: 'conversations',
     iconColor: '#34D399',
     iconBackground: '#123F3A',
   },
   {
     route: '/settings',
     icon: 'person',
-    labelEs: 'Perfil',
-    labelEn: 'Profile',
+    labelKey: 'settings',
     iconColor: '#F472B6',
     iconBackground: '#4A2146',
   },
@@ -79,7 +79,8 @@ export default function AppTabs() {
   }>();
 
   const { language } = useLanguage();
-  
+  const text = translations[language];
+
   const [unreadMessagesTotal, setUnreadMessagesTotal] =
   useState(0);
 
@@ -282,9 +283,7 @@ unreadMessagesTotal > 0 ? (
     isActive && styles.activeLabel,
   ]}
 >
-              {language === 'es'
-                ? tab.labelEs
-                : tab.labelEn}
+              {text.tabs[tab.labelKey]}
             </Text>
           </TouchableOpacity>
         );

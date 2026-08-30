@@ -8,7 +8,10 @@ import {
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -16,6 +19,8 @@ export default function LearnScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+  
+  const text = translations[language];
 
   const goBack = () => {
     router.back();
@@ -32,25 +37,23 @@ export default function LearnScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.backButtonText}>
-            {language === 'es' ? '‹ Atrás' : '‹ Back'}
+            {text.learnScreen.back}
           </Text>
         </TouchableOpacity>
 
         <Text style={styles.title}>
-          {language === 'es' ? 'Aprender' : 'Learn'}
+          {text.learnScreen.title}
         </Text>
 
         <Text style={styles.subtitle}>
-          {language === 'es'
-            ? 'Avanza con lecciones breves y práctica diaria.'
-            : 'Advance with short lessons and daily practice.'}
+          {text.learnScreen.subtitle}
         </Text>
 <View style={styles.statsRow}>
   <View style={styles.statCard}>
     <Text style={styles.statIcon}>🔥</Text>
     <Text style={styles.statValue}>0</Text>
     <Text style={styles.statLabel}>
-      {language === 'es' ? 'Racha' : 'Streak'}
+      {text.learnScreen.streak}
     </Text>
   </View>
 
@@ -58,7 +61,7 @@ export default function LearnScreen() {
     <Text style={styles.statIcon}>⭐</Text>
     <Text style={styles.statValue}>0</Text>
     <Text style={styles.statLabel}>
-      {language === 'es' ? 'Puntos' : 'Points'}
+      {text.learnScreen.points}
     </Text>
   </View>
 
@@ -66,7 +69,7 @@ export default function LearnScreen() {
     <Text style={styles.statIcon}>💙</Text>
     <Text style={styles.statValue}>5</Text>
     <Text style={styles.statLabel}>
-      {language === 'es' ? 'Vidas' : 'Lives'}
+      {text.learnScreen.lives}
     </Text>
   </View>
 </View>
@@ -74,15 +77,11 @@ export default function LearnScreen() {
   <View style={styles.dailyProgressHeader}>
     <View>
       <Text style={styles.dailyProgressTitle}>
-        {language === 'es'
-          ? 'Meta diaria'
-          : 'Daily goal'}
+        {text.learnScreen.dailyGoal}
       </Text>
 
       <Text style={styles.dailyProgressDescription}>
-        {language === 'es'
-          ? 'Completa una lección hoy'
-          : 'Complete one lesson today'}
+        {text.learnScreen.dailyGoalDescription}
       </Text>
     </View>
 
@@ -103,15 +102,11 @@ export default function LearnScreen() {
 
     <View style={styles.unitInformation}>
       <Text style={styles.unitTitle}>
-        {language === 'es'
-          ? 'Unidad 1: Primeros pasos'
-          : 'Unit 1: First steps'}
+        {text.learnScreen.unitOneTitle}
       </Text>
 
       <Text style={styles.unitDescription}>
-        {language === 'es'
-          ? 'Aprende saludos y expresiones esenciales.'
-          : 'Learn greetings and essential expressions.'}
+        {text.learnScreen.unitOneDescription}
       </Text>
     </View>
   </View>
@@ -144,9 +139,7 @@ export default function LearnScreen() {
   </View>
 
   <Text style={styles.lessonStatus}>
-    {language === 'es'
-      ? 'Lección 1 disponible'
-      : 'Lesson 1 available'}
+    {text.learnScreen.lessonOneAvailable}
   </Text>
 </View>
 </View>

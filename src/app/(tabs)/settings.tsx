@@ -18,6 +18,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../../contexts/language-context';
 import { auth } from '../../firebaseConfig';
+import { translations } from '../../translations';
 export default function SettingsScreen() {
   const router = useRouter();
 
@@ -26,15 +27,14 @@ export default function SettingsScreen() {
   }>();
 
   const { language } = useLanguage();
+  const text = translations[language];
 
   const currentUser = auth.currentUser;
 
 const getCurrentDisplayName = () =>
   auth.currentUser?.displayName?.trim() ||
   auth.currentUser?.email?.split('@')[0] ||
-  (language === 'es'
-    ? 'Usuario de LangBridge'
-    : 'LangBridge user');
+  text.settingsScreen.defaultUserName
 
 const [displayName, setDisplayName] =
   useState(getCurrentDisplayName);
@@ -55,9 +55,7 @@ useFocusEffect(
 
   const email =
     currentUser?.email ||
-    (language === 'es'
-      ? 'Correo no disponible'
-      : 'Email unavailable');
+    text.settingsScreen.emailUnavailable
 
   const initials = displayName
     .split(' ')
@@ -68,27 +66,17 @@ useFocusEffect(
 
   const handleSignOut = () => {
     Alert.alert(
-      language === 'es'
-        ? 'Cerrar sesión'
-        : 'Sign out',
-      language === 'es'
-        ? '¿Estás seguro de que deseas cerrar tu sesión?'
-        : 'Are you sure you want to sign out?',
+  text.settingsScreen.signOutTitle,
+  text.settingsScreen.signOutConfirmation,
       [
         {
-          text:
-            language === 'es'
-              ? 'Cancelar'
-              : 'Cancel',
-          style: 'cancel',
-        },
+  text: text.settingsScreen.cancel,
+  style: 'cancel',
+},
         {
-          text:
-            language === 'es'
-              ? 'Cerrar sesión'
-              : 'Sign out',
-          style: 'destructive',
-          onPress: async () => {
+  text: text.settingsScreen.signOut,
+  style: 'destructive',
+  onPress: async () => {
             try {
               await signOut(auth);
 
@@ -103,13 +91,9 @@ useFocusEffect(
               );
 
               Alert.alert(
-                language === 'es'
-                  ? 'No se pudo cerrar la sesión'
-                  : 'Sign out failed',
-                language === 'es'
-                  ? 'Inténtalo nuevamente.'
-                  : 'Please try again.'
-              );
+  text.settingsScreen.signOutErrorTitle,
+  text.settingsScreen.tryAgain
+);
             }
           },
         },
@@ -135,22 +119,16 @@ useFocusEffect(
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.settingsScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Perfil y configuración'
-              : 'Profile and settings'}
+            {text.settingsScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Administra tu cuenta y tus preferencias.'
-              : 'Manage your account and preferences.'}
+            {text.settingsScreen.subtitle}
           </Text>
           <View style={styles.profileCard}>
           <View style={styles.avatar}>
@@ -176,9 +154,7 @@ useFocusEffect(
           </View>
 
           <Text style={styles.sectionTitle}>
-            {language === 'es'
-              ? 'Cuenta'
-              : 'Account'}
+            {text.settingsScreen.accountSection}
           </Text>
 
           <View style={styles.settingsCard}>
@@ -200,15 +176,11 @@ useFocusEffect(
 
               <View style={styles.settingInformation}>
                 <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Editar perfil'
-                    : 'Edit profile'}
+                  {text.settingsScreen.editProfile}
                 </Text>
 
                 <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Nombre, ubicación e información personal.'
-                    : 'Name, location, and personal information.'}
+                  {text.settingsScreen.editProfileDescription}
                 </Text>
               </View>
               
@@ -237,15 +209,11 @@ useFocusEffect(
 
   <View style={styles.settingInformation}>
     <Text style={styles.settingTitle}>
-      {language === 'es'
-        ? 'Ver mi perfil público'
-        : 'View my public profile'}
+      {text.settingsScreen.viewPublicProfile}
     </Text>
 
     <Text style={styles.settingDescription}>
-      {language === 'es'
-        ? 'Comprueba cómo otras personas ven tu perfil.'
-        : 'Preview how other people see your profile.'}
+      {text.settingsScreen.viewPublicProfileDescription}
     </Text>
   </View>
 
@@ -270,10 +238,8 @@ useFocusEffect(
   activeOpacity={0.85}
   accessibilityRole="button"
   accessibilityLabel={
-    language === 'es'
-      ? 'Cambiar idioma de la interfaz'
-      : 'Change interface language'
-  }
+  text.settingsScreen.changeInterfaceLanguage
+}
 >
   <View style={styles.settingIcon}>
     <Text style={styles.settingIconText}>
@@ -283,15 +249,11 @@ useFocusEffect(
 
   <View style={styles.settingInformation}>
     <Text style={styles.settingTitle}>
-      {language === 'es'
-        ? 'Idioma de la interfaz'
-        : 'Interface language'}
+      {text.settingsScreen.interfaceLanguage}
     </Text>
 
     <Text style={styles.settingDescription}>
-      {language === 'es'
-        ? 'Cambia el idioma de los textos y menús de LangBridge.'
-        : 'Change the language of LangBridge text and menus.'}
+      {text.settingsScreen.interfaceLanguageDescription}
     </Text>
   </View>
 
@@ -322,15 +284,11 @@ useFocusEffect(
 
   <View style={styles.settingInformation}>
     <Text style={styles.settingTitle}>
-      {language === 'es'
-        ? 'Idiomas y nivel'
-        : 'Languages and level'}
+      {text.settingsScreen.languagesAndLevel}
     </Text>
 
     <Text style={styles.settingDescription}>
-      {language === 'es'
-        ? 'Actualiza tu perfil lingüístico.'
-        : 'Update your language profile.'}
+      {text.settingsScreen.languagesAndLevelDescription}
     </Text>
   </View>
 
@@ -361,15 +319,11 @@ useFocusEffect(
 
   <View style={styles.settingInformation}>
     <Text style={styles.settingTitle}>
-      {language === 'es'
-        ? 'Privacidad y seguridad'
-        : 'Privacy and security'}
+      {text.settingsScreen.privacyAndSecurity}
     </Text>
 
     <Text style={styles.settingDescription}>
-      {language === 'es'
-        ? 'Bloqueos, reportes y controles de cuenta.'
-        : 'Blocks, reports, and account controls.'}
+      {text.settingsScreen.privacyAndSecurityDescription}
     </Text>
   </View>
 
@@ -384,9 +338,7 @@ useFocusEffect(
             activeOpacity={0.85}
           >
             <Text style={styles.signOutButtonText}>
-              {language === 'es'
-                ? 'Cerrar sesión'
-                : 'Sign out'}
+              {text.settingsScreen.signOut}
             </Text>
           </TouchableOpacity>
 

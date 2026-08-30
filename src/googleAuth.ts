@@ -1,20 +1,23 @@
 import {
-    GoogleSignin,
-    isSuccessResponse,
+  GoogleSignin,
+  isSuccessResponse,
 } from '@react-native-google-signin/google-signin';
 import {
-    GoogleAuthProvider,
-    signInWithCredential,
+  GoogleAuthProvider,
+  signInWithCredential,
 } from 'firebase/auth';
 import {
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
 } from 'firebase/firestore';
 
 import { auth, db } from './firebaseConfig';
-import { type AppLanguage } from './translations';
+import {
+  translations,
+  type AppLanguage,
+} from './translations';
 
 GoogleSignin.configure({
   webClientId:
@@ -27,12 +30,12 @@ export async function signInWithGoogle(
   const webClientId =
     process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
+  const text = translations[language];
+
   if (!webClientId) {
     throw new Error(
-      language === 'es'
-        ? 'Falta configurar el Web Client ID de Google.'
-        : 'The Google Web Client ID is not configured.'
-    );
+  text.googleAuth.missingWebClientId
+);
   }
 
   await GoogleSignin.hasPlayServices({
@@ -51,10 +54,8 @@ export async function signInWithGoogle(
 
   if (!idToken) {
     throw new Error(
-      language === 'es'
-        ? 'Google no devolvió un token válido.'
-        : 'Google did not return a valid token.'
-    );
+  text.googleAuth.invalidIdToken
+);
   }
 
   const googleCredential =

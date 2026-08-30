@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth } from '../firebaseConfig';
 import {
+  getLanguageDescription,
   isActiveLanguage,
   languageCatalog,
   type LanguageCatalogOption,
@@ -139,13 +140,9 @@ router.replace({
     );
 
     Alert.alert(
-      selectedLanguage === 'es'
-        ? 'No se pudo guardar el idioma'
-        : 'Language could not be saved',
-      selectedLanguage === 'es'
-        ? 'Revisa tu conexión e inténtalo nuevamente.'
-        : 'Check your connection and try again.'
-    );
+  text.chooseLanguage.saveErrorTitle,
+  text.chooseLanguage.saveErrorMessage
+);
   } finally {
     setIsContinuing(false);
   }
@@ -176,9 +173,7 @@ if (isLoadingLanguage) {
             textAlign: 'center',
           }}
         >
-          {selectedLanguage === 'es'
-            ? 'Cargando tu idioma...'
-            : 'Loading your language...'}
+          {text.chooseLanguage.loadingLanguage}
         </Text>
       </View>
     </SafeAreaView>
@@ -211,9 +206,7 @@ if (isLoadingLanguage) {
             </Text>
 
             <Text style={styles.title}>
-              {selectedLanguage === 'es'
-                ? 'Elige tu idioma'
-                : 'Choose your language'}
+              {text.chooseLanguage.title}
             </Text>
 
             <Text style={styles.subtitle}>
@@ -222,9 +215,7 @@ if (isLoadingLanguage) {
           </View>
 
           <Text style={styles.fieldLabel}>
-            {selectedLanguage === 'es'
-              ? 'Idioma de la interfaz'
-              : 'Interface language'}
+            {text.chooseLanguage.interfaceLanguage}
           </Text>
 
           <TouchableOpacity
@@ -256,9 +247,10 @@ if (isLoadingLanguage) {
                   style={styles.languageDescription}
                   numberOfLines={2}
                 >
-                  {selectedLanguage === 'es'
-                    ? selectedOption.descriptionEs
-                    : selectedOption.descriptionEn}
+                  {getLanguageDescription(
+  selectedOption,
+  selectedLanguage
+)}
                 </Text>
               </View>
             </View>
@@ -335,9 +327,10 @@ if (isLoadingLanguage) {
                           }
                           numberOfLines={2}
                         >
-                          {selectedLanguage === 'es'
-                            ? option.descriptionEs
-                            : option.descriptionEn}
+                          {getLanguageDescription(
+  option,
+  selectedLanguage
+)}
                         </Text>
                       </View>
 
@@ -363,9 +356,7 @@ if (isLoadingLanguage) {
                                 styles.comingSoonText
                               }
                             >
-                              {selectedLanguage === 'es'
-                                ? 'PRONTO'
-                                : 'SOON'}
+                              {text.chooseLanguage.comingSoon}
                             </Text>
                           </View>
                         ) : null}
@@ -399,10 +390,8 @@ if (isLoadingLanguage) {
           >
             <Text style={styles.primaryButtonText}>
               {isContinuing
-                ? selectedLanguage === 'es'
-                  ? 'Continuando...'
-                  : 'Continuing...'
-                : text.chooseLanguage.continue}
+  ? text.chooseLanguage.continuing
+  : text.chooseLanguage.continue}
             </Text>
 
             <Text style={styles.primaryButtonArrow}>
@@ -411,9 +400,7 @@ if (isLoadingLanguage) {
           </TouchableOpacity>
 
           <Text style={styles.footerText}>
-            {selectedLanguage === 'es'
-              ? 'Podrás cambiar este idioma más adelante.'
-              : 'You can change this language later.'}
+            {text.chooseLanguage.changeLater}
           </Text>
         </ScrollView>
       </View>

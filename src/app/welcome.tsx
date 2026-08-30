@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
+  getLanguageDescription,
   isActiveLanguage,
   languageCatalog,
 } from '../language-catalog';
@@ -100,20 +101,20 @@ const handleLanguageChange = async (
   disabled={isSavingLanguage}
   accessibilityRole="button"
   accessibilityLabel={
-    language === 'es'
-      ? 'Cambiar idioma de la interfaz'
-      : 'Change interface language'
-  }
+  text.chooseLanguage.changeInterfaceLanguage
+}
   accessibilityState={{
     expanded: isLanguageListOpen,
     disabled: isSavingLanguage,
   }}
 >
   <Text style={styles.languageButtonText}>
-    {language === 'es'
-      ? `🌐 Español ${isLanguageListOpen ? '▲' : '▼'}`
-      : `🌐 English ${isLanguageListOpen ? '▲' : '▼'}`}
-  </Text>
+  🌐{' '}
+  {languageCatalog.find(
+    (option) => option.code === language
+  )?.nativeName ?? 'English'}{' '}
+  {isLanguageListOpen ? '▲' : '▼'}
+</Text>
 </TouchableOpacity>
 {isLanguageListOpen && (
   <View style={styles.languageDropdown}>
@@ -181,9 +182,10 @@ const handleLanguageChange = async (
                 }
                 numberOfLines={2}
               >
-                {language === 'es'
-                  ? option.descriptionEs
-                  : option.descriptionEn}
+                {getLanguageDescription(
+  option,
+  language
+)}
               </Text>
             </View>
 
@@ -198,9 +200,7 @@ const handleLanguageChange = async (
                 <Text
                   style={styles.comingSoonText}
                 >
-                  {language === 'es'
-                    ? 'PRONTO'
-                    : 'SOON'}
+                  {text.chooseLanguage.comingSoon}
                 </Text>
               </View>
             ) : null}

@@ -40,16 +40,11 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const showAlert = (
-    spanishTitle: string,
-    englishTitle: string,
-    spanishMessage: string,
-    englishMessage: string
-  ) => {
-    Alert.alert(
-      language === 'es' ? spanishTitle : englishTitle,
-      language === 'es' ? spanishMessage : englishMessage
-    );
-  };
+  title: string,
+  message: string
+) => {
+  Alert.alert(title, message);
+};
 
   const handleRegister = async () => {
     const cleanName = fullName.trim();
@@ -57,51 +52,41 @@ export default function RegisterScreen() {
 
     if (!cleanName || !cleanEmail || !password || !confirmPassword) {
       showAlert(
-        'Campos incompletos',
-        'Incomplete fields',
-        'Completa todos los campos para crear tu cuenta.',
-        'Complete all fields to create your account.'
-      );
+  text.registerScreen.incompleteFieldsTitle,
+  text.registerScreen.incompleteFieldsMessage
+);
       return;
     }
 
     if (cleanName.length < 2) {
       showAlert(
-        'Nombre no válido',
-        'Invalid name',
-        'Escribe tu nombre completo.',
-        'Enter your full name.'
-      );
+  text.registerScreen.invalidNameTitle,
+  text.registerScreen.invalidNameMessage
+);
       return;
     }
 
     if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       showAlert(
-        'Correo no válido',
-        'Invalid email',
-        'Escribe una dirección de correo electrónico válida.',
-        'Enter a valid email address.'
-      );
+  text.registerScreen.invalidEmailTitle,
+  text.registerScreen.invalidEmailMessage
+);
       return;
     }
 
     if (password.length < 6) {
       showAlert(
-        'Contraseña muy corta',
-        'Password too short',
-        'La contraseña debe tener por lo menos 6 caracteres.',
-        'The password must contain at least 6 characters.'
-      );
+  text.registerScreen.shortPasswordTitle,
+  text.registerScreen.shortPasswordMessage
+);
       return;
     }
 
     if (password !== confirmPassword) {
       showAlert(
-        'Las contraseñas no coinciden',
-        'Passwords do not match',
-        'Escribe la misma contraseña en ambos campos.',
-        'Enter the same password in both fields.'
-      );
+  text.registerScreen.passwordsDoNotMatchTitle,
+  text.registerScreen.passwordsDoNotMatchMessage
+);
       return;
     }
 
@@ -119,13 +104,11 @@ export default function RegisterScreen() {
       });
 
       Alert.alert(
-        language === 'es' ? 'Cuenta creada' : 'Account created',
-        language === 'es'
-          ? 'Tu cuenta de LangBridge fue creada correctamente.'
-          : 'Your LangBridge account was created successfully.',
+  text.registerScreen.accountCreatedTitle,
+  text.registerScreen.accountCreatedMessage,
         [
           {
-            text: language === 'es' ? 'Continuar' : 'Continue',
+            text: text.registerScreen.continue,
             onPress: () =>
               router.replace({
                 pathname: '/language-profile',
@@ -152,12 +135,29 @@ export default function RegisterScreen() {
         messageEn = 'Check your Internet connection and try again.';
       }
 
-      showAlert(
-        'Error de registro',
-        'Registration error',
-        messageEs,
-        messageEn
-      );
+      let errorMessage =
+  text.registerScreen.genericRegistrationError;
+
+if (error?.code === 'auth/email-already-in-use') {
+  errorMessage =
+    text.registerScreen.emailAlreadyRegistered;
+} else if (error?.code === 'auth/invalid-email') {
+  errorMessage =
+    text.registerScreen.invalidEmailMessage;
+} else if (error?.code === 'auth/weak-password') {
+  errorMessage =
+    text.registerScreen.weakPassword;
+} else if (
+  error?.code === 'auth/network-request-failed'
+) {
+  errorMessage =
+    text.registerScreen.networkError;
+}
+
+showAlert(
+  text.registerScreen.registrationErrorTitle,
+  errorMessage
+);
     } finally {
       setIsLoading(false);
     }
@@ -207,15 +207,11 @@ const handleGoogleSignIn = async () => {
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudo continuar con Google'
-        : 'Could not continue with Google',
-      error instanceof Error
-        ? error.message
-        : language === 'es'
-          ? 'Inténtalo nuevamente.'
-          : 'Please try again.'
-    );
+  text.registerScreen.googleErrorTitle,
+  error instanceof Error
+    ? error.message
+    : text.registerScreen.tryAgain
+);
   } finally {
     setIsLoading(false);
   }
@@ -247,7 +243,7 @@ const handleGoogleSignIn = async () => {
             disabled={isLoading}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es' ? '‹ Atrás' : '‹ Back'}
+             {text.registerScreen.back}
             </Text>
           </TouchableOpacity>
 
@@ -365,7 +361,7 @@ const handleGoogleSignIn = async () => {
   <View style={styles.googleDividerLine} />
 
   <Text style={styles.googleDividerText}>
-    {language === 'es' ? 'o' : 'or'}
+    {text.registerScreen.or}
   </Text>
 
   <View style={styles.googleDividerLine} />
@@ -387,9 +383,7 @@ const handleGoogleSignIn = async () => {
   </View>
 
   <Text style={styles.googleButtonText}>
-    {language === 'es'
-      ? 'Continuar con Google'
-      : 'Continue with Google'}
+    {text.registerScreen.continueWithGoogle}
   </Text>
 </TouchableOpacity>
             <Text style={styles.terms}>

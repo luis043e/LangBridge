@@ -39,37 +39,28 @@ export default function LoginScreen() {
   const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const showAlert = (
-    spanishTitle: string,
-    englishTitle: string,
-    spanishMessage: string,
-    englishMessage: string
-  ) => {
-    Alert.alert(
-      language === 'es' ? spanishTitle : englishTitle,
-      language === 'es' ? spanishMessage : englishMessage
-    );
-  };
+  title: string,
+  message: string
+) => {
+  Alert.alert(title, message);
+};
 
   const handleLogin = async () => {
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanEmail || !password) {
       showAlert(
-        'Campos incompletos',
-        'Incomplete fields',
-        'Escribe tu correo electrónico y contraseña.',
-        'Enter your email address and password.'
-      );
+  text.loginScreen.incompleteFieldsTitle,
+  text.loginScreen.incompleteFieldsMessage
+);
       return;
     }
 
     if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       showAlert(
-        'Correo no válido',
-        'Invalid email',
-        'Escribe una dirección de correo electrónico válida.',
-        'Enter a valid email address.'
-      );
+  text.loginScreen.invalidEmailTitle,
+  text.loginScreen.invalidEmailMessage
+);
       return;
     }
 
@@ -88,49 +79,38 @@ export default function LoginScreen() {
   error?.code,
   error?.message
 );
-      let messageEs =
-        'No fue posible iniciar sesión. Verifica tus datos e inténtalo nuevamente.';
+      let errorMessage =
+  text.loginScreen.genericLoginError;
 
-      let messageEn =
-        'Unable to log in. Check your information and try again.';
+if (
+  error?.code === 'auth/invalid-credential' ||
+  error?.code === 'auth/wrong-password' ||
+  error?.code === 'auth/user-not-found'
+) {
+  errorMessage =
+    text.loginScreen.invalidCredentials;
+} else if (error?.code === 'auth/invalid-email') {
+  errorMessage =
+    text.loginScreen.invalidEmailMessage;
+} else if (
+  error?.code === 'auth/too-many-requests'
+) {
+  errorMessage =
+    text.loginScreen.tooManyLoginAttempts;
+} else if (error?.code === 'auth/user-disabled') {
+  errorMessage =
+    text.loginScreen.userDisabled;
+} else if (
+  error?.code === 'auth/network-request-failed'
+) {
+  errorMessage =
+    text.loginScreen.networkError;
+}
 
-      if (
-        error?.code === 'auth/invalid-credential' ||
-        error?.code === 'auth/wrong-password' ||
-        error?.code === 'auth/user-not-found'
-      ) {
-        messageEs =
-          'El correo electrónico o la contraseña son incorrectos.';
-        messageEn =
-          'The email address or password is incorrect.';
-      } else if (error?.code === 'auth/invalid-email') {
-        messageEs =
-          'La dirección de correo electrónico no es válida.';
-        messageEn =
-          'The email address is not valid.';
-      } else if (error?.code === 'auth/too-many-requests') {
-        messageEs =
-          'Se realizaron demasiados intentos. Espera unos minutos e inténtalo nuevamente.';
-        messageEn =
-          'Too many attempts were made. Wait a few minutes and try again.';
-      } else if (error?.code === 'auth/user-disabled') {
-        messageEs =
-          'Esta cuenta ha sido deshabilitada.';
-        messageEn =
-          'This account has been disabled.';
-      } else if (error?.code === 'auth/network-request-failed') {
-        messageEs =
-          'Revisa tu conexión a Internet e inténtalo nuevamente.';
-        messageEn =
-          'Check your Internet connection and try again.';
-      }
-
-      showAlert(
-        'Error al iniciar sesión',
-        'Login error',
-        messageEs,
-        messageEn
-      );
+showAlert(
+  text.loginScreen.loginErrorTitle,
+  errorMessage
+);
     } finally {
       setIsLoading(false);
     }
@@ -141,21 +121,17 @@ export default function LoginScreen() {
 
     if (!cleanEmail) {
       showAlert(
-        'Correo requerido',
-        'Email required',
-        'Escribe primero tu dirección de correo electrónico.',
-        'Enter your email address first.'
-      );
+  text.loginScreen.emailRequiredTitle,
+  text.loginScreen.emailRequiredMessage
+);
       return;
     }
 
     if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       showAlert(
-        'Correo no válido',
-        'Invalid email',
-        'Escribe una dirección de correo electrónico válida.',
-        'Enter a valid email address.'
-      );
+  text.loginScreen.invalidEmailTitle,
+  text.loginScreen.invalidEmailMessage
+);
       return;
     }
 
@@ -165,40 +141,32 @@ export default function LoginScreen() {
       await sendPasswordResetEmail(auth, cleanEmail);
 
       showAlert(
-        'Correo enviado',
-        'Email sent',
-        'Revisa tu bandeja de entrada para restablecer tu contraseña.',
-        'Check your inbox for instructions to reset your password.'
-      );
+  text.loginScreen.resetEmailSentTitle,
+  text.loginScreen.resetEmailSentMessage
+);
     } catch (error: any) {
-      let messageEs =
-        'No se pudo enviar el correo de recuperación. Verifica la dirección e inténtalo nuevamente.';
+      let errorMessage =
+  text.loginScreen.genericResetError;
 
-      let messageEn =
-        'The password reset email could not be sent. Check the address and try again.';
-
-      if (error?.code === 'auth/invalid-email') {
-        messageEs =
-          'La dirección de correo electrónico no es válida.';
-        messageEn =
-          'The email address is not valid.';
-      } else if (error?.code === 'auth/too-many-requests') {
-        messageEs =
-          'Se realizaron demasiadas solicitudes. Espera unos minutos e inténtalo nuevamente.';
-        messageEn =
-          'Too many requests were made. Wait a few minutes and try again.';
-      } else if (error?.code === 'auth/network-request-failed') {
-  messageEs =
-    'Revisa tu conexión a Internet e inténtalo nuevamente.';
-  messageEn =
-    'Check your Internet connection and try again.';
+if (error?.code === 'auth/invalid-email') {
+  errorMessage =
+    text.loginScreen.invalidEmailMessage;
+} else if (
+  error?.code === 'auth/too-many-requests'
+) {
+  errorMessage =
+    text.loginScreen.tooManyResetRequests;
+} else if (
+  error?.code === 'auth/network-request-failed'
+) {
+  errorMessage =
+    text.loginScreen.networkError;
 }
-      showAlert(
-        'Error de recuperación',
-        'Reset error',
-        messageEs,
-        messageEn
-      );
+
+showAlert(
+  text.loginScreen.resetErrorTitle,
+  errorMessage
+);
     } finally {
       setIsResettingPassword(false);
     }
@@ -248,15 +216,11 @@ const handleGoogleSignIn = async () => {
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudo continuar con Google'
-        : 'Could not continue with Google',
-      error instanceof Error
-        ? error.message
-        : language === 'es'
-          ? 'Inténtalo nuevamente.'
-          : 'Please try again.'
-    );
+  text.loginScreen.googleErrorTitle,
+  error instanceof Error
+    ? error.message
+    : text.loginScreen.tryAgain
+);
   } finally {
     setIsLoading(false);
   }
@@ -291,7 +255,7 @@ const handleGoogleSignIn = async () => {
     disabled={isBusy}
   >
     <Text style={styles.backButtonText}>
-      {language === 'es' ? '‹ Atrás' : '‹ Back'}
+      {text.loginScreen.back}
     </Text>
   </TouchableOpacity>
 
@@ -396,7 +360,7 @@ const handleGoogleSignIn = async () => {
   <View style={styles.googleDividerLine} />
 
   <Text style={styles.googleDividerText}>
-    {language === 'es' ? 'o' : 'or'}
+    {text.loginScreen.or}
   </Text>
 
   <View style={styles.googleDividerLine} />
@@ -418,9 +382,7 @@ const handleGoogleSignIn = async () => {
   </View>
 
   <Text style={styles.googleButtonText}>
-    {language === 'es'
-      ? 'Continuar con Google'
-      : 'Continue with Google'}
+    {text.loginScreen.continueWithGoogle}
   </Text>
 </TouchableOpacity>
             <TouchableOpacity
