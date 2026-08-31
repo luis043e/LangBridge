@@ -274,6 +274,140 @@ chatScreen: {
   messagePlaceholder:
     'Write a message...',
 },
+connectionsScreen: {
+  loginRequired:
+    'You must log in again.',
+  defaultUserName:
+    'LangBridge user',
+  loadError:
+    'Your connections could not be loaded.',
+  back: '‹ Back',
+  title: 'My connections',
+  subtitle:
+    'People you can practice languages with.',
+  loading:
+    'Loading connections...',
+  emptyTitle:
+    'No connections yet',
+  emptyDescription:
+    'Accepted requests will appear here.',
+  acceptedConnection:
+    'Accepted connection',
+},
+requestsScreen: {
+  loginRequired:
+    'You must log in again.',
+  defaultUserName:
+    'LangBridge user',
+  loadError:
+    'Requests could not be loaded.',
+  acceptedTitle:
+    'Request accepted',
+  rejectedTitle:
+    'Request rejected',
+  acceptedMessage:
+    'This person is now one of your connections.',
+  rejectedMessage:
+    'The request was rejected successfully.',
+  responseErrorTitle:
+    'Response failed',
+  responseErrorMessage:
+    'The request could not be updated. Check your connection and try again.',
+  back: '‹ Back',
+  title:
+    'Received requests',
+  subtitle:
+    'People who want to connect with you to practice languages.',
+  loading:
+    'Loading requests...',
+  loadErrorTitle:
+    'Requests could not be loaded',
+  emptyTitle:
+    'No pending requests',
+  emptyDescription:
+    'New requests will appear here.',
+  wantsToConnect:
+    'Wants to connect with you.',
+  pending: 'PENDING',
+  processing:
+    'Processing...',
+  accept: 'Accept',
+  reject: 'Reject',
+},
+blockedUsersScreen: {
+  defaultUserName:
+    'LangBridge user',
+  loadErrorTitle:
+    'Could not load',
+  connectionError:
+    'Check your connection and try again.',
+  unblockTitle:
+    'Unblock user',
+  unblockConfirmation:
+    'Do you want to unblock {userName}?',
+  cancel: 'Cancel',
+  unblock: 'Unblock',
+  unblockSuccessTitle:
+    'User unblocked',
+  unblockSuccessMessage:
+    '{userName} was unblocked.',
+  unblockErrorTitle:
+    'Could not unblock',
+  back: '‹ Back',
+  title:
+    'Blocked users',
+  subtitle:
+    'Manage the accounts you blocked on LangBridge.',
+  loading:
+    'Loading blocked users...',
+  emptyTitle:
+    'You have no blocked users',
+  emptyDescription:
+    'Accounts you block will appear here.',
+},
+reportProblemScreen: {
+  sessionUnavailableTitle:
+    'Session unavailable',
+  sessionUnavailableMessage:
+    'Please log in again to submit the report.',
+  selectCategoryTitle:
+    'Select a category',
+  selectCategoryMessage:
+    'Choose the type of problem you want to report.',
+  addMoreInformationTitle:
+    'Add more information',
+  addMoreInformationMessage:
+    'The description must contain at least 10 characters.',
+  reportSubmittedTitle:
+    'Report submitted',
+  reportSubmittedMessage:
+    'Thank you. We will review the information you submitted.',
+  submitErrorTitle:
+    'Could not submit',
+  connectionError:
+    'Check your connection and try again.',
+  back: '‹ Back',
+  title: 'Report a problem',
+  subtitle:
+    'Tell us what happened so we can help.',
+  problemType:
+    'Problem type',
+  describeProblem:
+    'Describe the problem',
+  descriptionPlaceholder:
+    'Explain what happened in as much detail as possible...',
+  privateReportNotice:
+  'Your report will be submitted privately for review.',
+submitting: 'Submitting...',
+submitReport: 'Submit report',
+categories: {
+  technical: 'Technical problem',
+  account: 'Account problem',
+  user: 'Report behavior',
+  privacy: 'Privacy or security',
+  other: 'Other problem',
+},
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -525,6 +659,140 @@ chatScreen: {
   sent: 'Enviado',
   messagePlaceholder:
     'Escribe un mensaje...',
+},
+connectionsScreen: {
+  loginRequired:
+    'Debes iniciar sesión nuevamente.',
+  defaultUserName:
+    'Usuario de LangBridge',
+  loadError:
+    'No se pudieron cargar tus conexiones.',
+  back: '‹ Atrás',
+  title: 'Mis conexiones',
+  subtitle:
+    'Personas con quienes puedes practicar idiomas.',
+  loading:
+    'Cargando conexiones...',
+  emptyTitle:
+    'Todavía no tienes conexiones',
+  emptyDescription:
+    'Las solicitudes aceptadas aparecerán aquí.',
+  acceptedConnection:
+    'Conexión aceptada',
+},
+requestsScreen: {
+  loginRequired:
+    'Debes iniciar sesión nuevamente.',
+  defaultUserName:
+    'Usuario de LangBridge',
+  loadError:
+    'No se pudieron cargar las solicitudes.',
+  acceptedTitle:
+    'Solicitud aceptada',
+  rejectedTitle:
+    'Solicitud rechazada',
+  acceptedMessage:
+    'Ahora esta persona forma parte de tus conexiones.',
+  rejectedMessage:
+    'La solicitud fue rechazada correctamente.',
+  responseErrorTitle:
+    'No se pudo responder',
+  responseErrorMessage:
+    'No pudimos actualizar la solicitud. Revisa tu conexión e inténtalo nuevamente.',
+  back: '‹ Atrás',
+  title:
+    'Solicitudes recibidas',
+  subtitle:
+    'Personas que desean conectar contigo para practicar idiomas.',
+  loading:
+    'Cargando solicitudes...',
+  loadErrorTitle:
+    'No pudimos cargar las solicitudes',
+  emptyTitle:
+    'No tienes solicitudes pendientes',
+  emptyDescription:
+    'Las nuevas solicitudes aparecerán aquí.',
+  wantsToConnect:
+    'Quiere conectar contigo.',
+  pending: 'PENDIENTE',
+  processing:
+    'Procesando...',
+  accept: 'Aceptar',
+  reject: 'Rechazar',
+},
+blockedUsersScreen: {
+  defaultUserName:
+    'Usuario de LangBridge',
+  loadErrorTitle:
+    'No se pudieron cargar',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  unblockTitle:
+    'Desbloquear usuario',
+  unblockConfirmation:
+    '¿Quieres desbloquear a {userName}?',
+  cancel: 'Cancelar',
+  unblock: 'Desbloquear',
+  unblockSuccessTitle:
+    'Usuario desbloqueado',
+  unblockSuccessMessage:
+    '{userName} fue desbloqueado.',
+  unblockErrorTitle:
+    'No se pudo desbloquear',
+  back: '‹ Atrás',
+  title:
+    'Usuarios bloqueados',
+  subtitle:
+    'Administra las cuentas que bloqueaste en LangBridge.',
+  loading:
+    'Cargando usuarios bloqueados...',
+  emptyTitle:
+    'No tienes usuarios bloqueados',
+  emptyDescription:
+    'Las cuentas que bloquees aparecerán aquí.',
+},
+reportProblemScreen: {
+  sessionUnavailableTitle:
+    'Sesión no disponible',
+  sessionUnavailableMessage:
+    'Inicia sesión nuevamente para enviar el reporte.',
+  selectCategoryTitle:
+    'Selecciona una categoría',
+  selectCategoryMessage:
+    'Indica qué tipo de problema deseas reportar.',
+  addMoreInformationTitle:
+    'Agrega más información',
+  addMoreInformationMessage:
+    'La descripción debe tener al menos 10 caracteres.',
+  reportSubmittedTitle:
+    'Reporte enviado',
+  reportSubmittedMessage:
+    'Gracias. Revisaremos la información que enviaste.',
+  submitErrorTitle:
+    'No se pudo enviar',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  back: '‹ Atrás',
+  title: 'Reportar un problema',
+  subtitle:
+    'Cuéntanos qué ocurrió para poder ayudarte.',
+  problemType:
+    'Tipo de problema',
+  describeProblem:
+    'Describe el problema',
+  descriptionPlaceholder:
+    'Explica qué ocurrió con el mayor detalle posible...',
+  privateReportNotice:
+  'Tu reporte se enviará de forma privada para su revisión.',
+submitting: 'Enviando...',
+submitReport: 'Enviar reporte',
+categories: {
+  technical: 'Problema técnico',
+  account: 'Problema con mi cuenta',
+  user: 'Reportar comportamiento',
+  privacy: 'Privacidad o seguridad',
+  other: 'Otro problema',
+},
 },
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',

@@ -1,25 +1,28 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    arrayRemove,
-    doc,
-    getDoc,
-    updateDoc,
+  arrayRemove,
+  doc,
+  getDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type BlockedUser = {
   id: string;
@@ -37,7 +40,9 @@ export default function BlockedUsersScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
-
+  
+  const text = translations[language];
+    
   const [blockedUsers, setBlockedUsers] =
     useState<BlockedUser[]>([]);
 
@@ -97,10 +102,8 @@ export default function BlockedUsersScreen() {
 
           const displayName =
             userData.fullName?.trim() ||
-            userData.email?.split('@')[0] ||
-            (language === 'es'
-              ? 'Usuario de LangBridge'
-              : 'LangBridge user');
+userData.email?.split('@')[0] ||
+text.blockedUsersScreen.defaultUserName
 
           const initials = displayName
             .split(' ')
@@ -133,13 +136,9 @@ export default function BlockedUsersScreen() {
       );
 
       Alert.alert(
-        language === 'es'
-          ? 'No se pudieron cargar'
-          : 'Could not load',
-        language === 'es'
-          ? 'Revisa tu conexión e inténtalo nuevamente.'
-          : 'Check your connection and try again.'
-      );
+  text.blockedUsersScreen.loadErrorTitle,
+  text.blockedUsersScreen.connectionError
+);
     } finally {
       setIsLoading(false);
     }
@@ -151,25 +150,17 @@ export default function BlockedUsersScreen() {
 
   const handleUnblock = (blockedUser: BlockedUser) => {
     Alert.alert(
-      language === 'es'
-        ? 'Desbloquear usuario'
-        : 'Unblock user',
-      language === 'es'
-        ? `¿Quieres desbloquear a ${blockedUser.name}?`
-        : `Do you want to unblock ${blockedUser.name}?`,
+  text.blockedUsersScreen.unblockTitle,
+  text.blockedUsersScreen.unblockConfirmation.replace(
+    '{userName}',
+    blockedUser.name
+  ),
       [
         {
-          text:
-            language === 'es'
-              ? 'Cancelar'
-              : 'Cancel',
-          style: 'cancel',
+          text: text.blockedUsersScreen.cancel,
         },
         {
-          text:
-            language === 'es'
-              ? 'Desbloquear'
-              : 'Unblock',
+          text: text.blockedUsersScreen.unblock,
           onPress: async () => {
             const currentUser = auth.currentUser;
 
@@ -198,13 +189,12 @@ export default function BlockedUsersScreen() {
               );
 
               Alert.alert(
-                language === 'es'
-                  ? 'Usuario desbloqueado'
-                  : 'User unblocked',
-                language === 'es'
-                  ? `${blockedUser.name} fue desbloqueado.`
-                  : `${blockedUser.name} was unblocked.`
-              );
+  text.blockedUsersScreen.unblockSuccessTitle,
+  text.blockedUsersScreen.unblockSuccessMessage.replace(
+    '{userName}',
+    blockedUser.name
+  )
+);
             } catch (error) {
               console.error(
                 'Error unblocking user:',
@@ -212,13 +202,9 @@ export default function BlockedUsersScreen() {
               );
 
               Alert.alert(
-                language === 'es'
-                  ? 'No se pudo desbloquear'
-                  : 'Could not unblock',
-                language === 'es'
-                  ? 'Revisa tu conexión e inténtalo nuevamente.'
-                  : 'Check your connection and try again.'
-              );
+  text.blockedUsersScreen.unblockErrorTitle,
+  text.blockedUsersScreen.connectionError
+);
             }
           },
         },
@@ -241,22 +227,16 @@ export default function BlockedUsersScreen() {
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.blockedUsersScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Usuarios bloqueados'
-              : 'Blocked users'}
+            {text.blockedUsersScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Administra las cuentas que bloqueaste en LangBridge.'
-              : 'Manage the accounts you blocked on LangBridge.'}
+            {text.blockedUsersScreen.subtitle}
           </Text>
 
           {isLoading ? (
@@ -267,9 +247,7 @@ export default function BlockedUsersScreen() {
               />
 
               <Text style={styles.emptyText}>
-                {language === 'es'
-                  ? 'Cargando usuarios bloqueados...'
-                  : 'Loading blocked users...'}
+                {text.blockedUsersScreen.loading}
               </Text>
             </View>
           ) : blockedUsers.length === 0 ? (
@@ -277,15 +255,11 @@ export default function BlockedUsersScreen() {
               <Text style={styles.emptyIcon}>🛡️</Text>
 
               <Text style={styles.emptyTitle}>
-                {language === 'es'
-                  ? 'No tienes usuarios bloqueados'
-                  : 'You have no blocked users'}
+                {text.blockedUsersScreen.emptyTitle}
               </Text>
 
               <Text style={styles.emptyText}>
-                {language === 'es'
-                  ? 'Las cuentas que bloquees aparecerán aquí.'
-                  : 'Accounts you block will appear here.'}
+                {text.blockedUsersScreen.emptyDescription}
               </Text>
             </View>
           ) : (
@@ -320,9 +294,7 @@ export default function BlockedUsersScreen() {
                   activeOpacity={0.85}
                 >
                   <Text style={styles.unblockButtonText}>
-                    {language === 'es'
-                      ? 'Desbloquear'
-                      : 'Unblock'}
+                    {text.blockedUsersScreen.unblock}
                   </Text>
                 </TouchableOpacity>
               </View>

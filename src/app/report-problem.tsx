@@ -1,24 +1,27 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    addDoc,
-    collection,
-    serverTimestamp,
+  addDoc,
+  collection,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type ReportCategory =
   | 'technical'
@@ -29,38 +32,37 @@ type ReportCategory =
 
 const reportCategories: {
   id: ReportCategory;
-  labelEs: string;
-  labelEn: string;
+  labelKey:
+    | 'technical'
+    | 'account'
+    | 'user'
+    | 'privacy'
+    | 'other';
   icon: string;
 }[] = [
   {
     id: 'technical',
-    labelEs: 'Problema técnico',
-    labelEn: 'Technical problem',
+    labelKey: 'technical',
     icon: '🛠️',
   },
   {
     id: 'account',
-    labelEs: 'Problema con mi cuenta',
-    labelEn: 'Account problem',
+    labelKey: 'account',
     icon: '👤',
   },
   {
     id: 'user',
-    labelEs: 'Reportar comportamiento',
-    labelEn: 'Report behavior',
+    labelKey: 'user',
     icon: '⚠️',
   },
   {
     id: 'privacy',
-    labelEs: 'Privacidad o seguridad',
-    labelEn: 'Privacy or security',
+    labelKey: 'privacy',
     icon: '🔒',
   },
   {
     id: 'other',
-    labelEs: 'Otro problema',
-    labelEn: 'Other problem',
+    labelKey: 'other',
     icon: '📝',
   },
 ];
@@ -74,7 +76,9 @@ export default function ReportProblemScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
-
+  
+  const text = translations[language];
+    
   const [selectedCategory, setSelectedCategory] =
     useState<ReportCategory | null>(null);
 
@@ -87,37 +91,25 @@ export default function ReportProblemScreen() {
 
     if (!currentUser) {
       Alert.alert(
-        language === 'es'
-          ? 'Sesión no disponible'
-          : 'Session unavailable',
-        language === 'es'
-          ? 'Inicia sesión nuevamente para enviar el reporte.'
-          : 'Please log in again to submit the report.'
-      );
+  text.reportProblemScreen.sessionUnavailableTitle,
+  text.reportProblemScreen.sessionUnavailableMessage
+);
       return;
     }
 
     if (!selectedCategory) {
       Alert.alert(
-        language === 'es'
-          ? 'Selecciona una categoría'
-          : 'Select a category',
-        language === 'es'
-          ? 'Indica qué tipo de problema deseas reportar.'
-          : 'Choose the type of problem you want to report.'
-      );
+  text.reportProblemScreen.selectCategoryTitle,
+  text.reportProblemScreen.selectCategoryMessage
+);
       return;
     }
 
     if (cleanDescription.length < 10) {
       Alert.alert(
-        language === 'es'
-          ? 'Agrega más información'
-          : 'Add more information',
-        language === 'es'
-          ? 'La descripción debe tener al menos 10 caracteres.'
-          : 'The description must contain at least 10 characters.'
-      );
+  text.reportProblemScreen.addMoreInformationTitle,
+  text.reportProblemScreen.addMoreInformationMessage
+);
       return;
     }
 
@@ -135,12 +127,8 @@ export default function ReportProblemScreen() {
       });
 
       Alert.alert(
-        language === 'es'
-          ? 'Reporte enviado'
-          : 'Report submitted',
-        language === 'es'
-          ? 'Gracias. Revisaremos la información que enviaste.'
-          : 'Thank you. We will review the information you submitted.',
+  text.reportProblemScreen.reportSubmittedTitle,
+  text.reportProblemScreen.reportSubmittedMessage,
         [
           {
             text: 'OK',
@@ -152,13 +140,9 @@ export default function ReportProblemScreen() {
       console.error('Error submitting report:', error);
 
       Alert.alert(
-        language === 'es'
-          ? 'No se pudo enviar'
-          : 'Could not submit',
-        language === 'es'
-          ? 'Revisa tu conexión e inténtalo nuevamente.'
-          : 'Check your connection and try again.'
-      );
+  text.reportProblemScreen.submitErrorTitle,
+  text.reportProblemScreen.connectionError
+);
     } finally {
       setIsSubmitting(false);
     }
@@ -179,9 +163,7 @@ export default function ReportProblemScreen() {
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.reportProblemScreen.back}
             </Text>
           </TouchableOpacity>
 
@@ -194,23 +176,17 @@ export default function ReportProblemScreen() {
 
             <View style={styles.headerInformation}>
               <Text style={styles.title}>
-                {language === 'es'
-                  ? 'Reportar un problema'
-                  : 'Report a problem'}
+                {text.reportProblemScreen.title}
               </Text>
 
               <Text style={styles.subtitle}>
-                {language === 'es'
-                  ? 'Cuéntanos qué ocurrió para poder ayudarte.'
-                  : 'Tell us what happened so we can help.'}
+                {text.reportProblemScreen.subtitle}
               </Text>
             </View>
           </View>
 
           <Text style={styles.sectionLabel}>
-            {language === 'es'
-              ? 'Tipo de problema'
-              : 'Problem type'}
+            {text.reportProblemScreen.problemType}
           </Text>
 
           <View style={styles.categoriesContainer}>
@@ -242,9 +218,9 @@ export default function ReportProblemScreen() {
                         styles.selectedCategoryText,
                     ]}
                   >
-                    {language === 'es'
-                      ? category.labelEs
-                      : category.labelEn}
+                    {text.reportProblemScreen.categories[
+  category.labelKey
+]}
                   </Text>
 
                   {isSelected && (
@@ -258,9 +234,7 @@ export default function ReportProblemScreen() {
           </View>
 
           <Text style={styles.sectionLabel}>
-            {language === 'es'
-              ? 'Describe el problema'
-              : 'Describe the problem'}
+            {text.reportProblemScreen.describeProblem}
           </Text>
 
           <TextInput
@@ -268,10 +242,8 @@ export default function ReportProblemScreen() {
             value={description}
             onChangeText={setDescription}
             placeholder={
-              language === 'es'
-                ? 'Explica qué ocurrió con el mayor detalle posible...'
-                : 'Explain what happened in as much detail as possible...'
-            }
+  text.reportProblemScreen.descriptionPlaceholder
+}
             placeholderTextColor="#64748B"
             multiline
             textAlignVertical="top"
@@ -288,9 +260,7 @@ export default function ReportProblemScreen() {
             </Text>
 
             <Text style={styles.informationText}>
-              {language === 'es'
-                ? 'Tu reporte se enviará de forma privada para su revisión.'
-                : 'Your report will be submitted privately for review.'}
+              {text.reportProblemScreen.privateReportNotice}
             </Text>
           </View>
 
@@ -306,12 +276,8 @@ export default function ReportProblemScreen() {
           >
             <Text style={styles.submitButtonText}>
               {isSubmitting
-                ? language === 'es'
-                  ? 'Enviando...'
-                  : 'Submitting...'
-                : language === 'es'
-                  ? 'Enviar reporte'
-                  : 'Submit report'}
+  ? text.reportProblemScreen.submitting
+  : text.reportProblemScreen.submitReport}
             </Text>
           </TouchableOpacity>
         </ScrollView>

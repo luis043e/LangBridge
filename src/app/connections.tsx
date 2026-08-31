@@ -1,24 +1,27 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    collection,
-    getDocs,
-    query,
-    where,
+  collection,
+  getDocs,
+  query,
+  where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type Connection = {
   id: string;
@@ -35,7 +38,9 @@ export default function ConnectionsScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
-
+  
+  const text = translations[language];
+    
   const [connections, setConnections] =
   useState<Connection[]>([]);
 
@@ -50,10 +55,8 @@ const [loadError, setLoadError] =
 
     if (!currentUser) {
       setLoadError(
-        language === 'es'
-          ? 'Debes iniciar sesión nuevamente.'
-          : 'You must log in again.'
-      );
+  text.connectionsScreen.loginRequired
+);
 
       setIsLoading(false);
       return;
@@ -97,9 +100,7 @@ const [loadError, setLoadError] =
               partnerId: data.recipientId || '',
               partnerName:
                 data.recipientName ||
-                (language === 'es'
-                  ? 'Usuario de LangBridge'
-                  : 'LangBridge user'),
+text.connectionsScreen.defaultUserName
             };
           }),
 
@@ -114,14 +115,12 @@ const [loadError, setLoadError] =
             const data = requestDocument.data();
 
             return {
-              id: requestDocument.id,
-              partnerId: data.senderId || '',
-              partnerName:
-                data.senderName ||
-                (language === 'es'
-                  ? 'Usuario de LangBridge'
-                  : 'LangBridge user'),
-            };
+  id: requestDocument.id,
+  partnerId: data.senderId || '',
+  partnerName:
+    data.senderName ||
+    text.connectionsScreen.defaultUserName,
+};
           }),
       ];
 
@@ -146,10 +145,8 @@ const [loadError, setLoadError] =
       );
 
       setLoadError(
-        language === 'es'
-          ? 'No se pudieron cargar tus conexiones.'
-          : 'Your connections could not be loaded.'
-      );
+  text.connectionsScreen.loadError
+);
     } finally {
       setIsLoading(false);
     }
@@ -173,22 +170,16 @@ const [loadError, setLoadError] =
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.connectionsScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Mis conexiones'
-              : 'My connections'}
+            {text.connectionsScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Personas con quienes puedes practicar idiomas.'
-              : 'People you can practice languages with.'}
+            {text.connectionsScreen.subtitle}
           </Text>
 
           {isLoading ? (
@@ -199,9 +190,7 @@ const [loadError, setLoadError] =
               />
 
               <Text style={styles.stateTitle}>
-                {language === 'es'
-                  ? 'Cargando conexiones...'
-                  : 'Loading connections...'}
+                {text.connectionsScreen.loading}
               </Text>
             </View>
           ) : connections.length === 0 ? (
@@ -209,15 +198,11 @@ const [loadError, setLoadError] =
               <Text style={styles.stateIcon}>🤝</Text>
 
               <Text style={styles.stateTitle}>
-                {language === 'es'
-                  ? 'Todavía no tienes conexiones'
-                  : 'No connections yet'}
+                {text.connectionsScreen.emptyTitle}
               </Text>
 
               <Text style={styles.stateText}>
-                {language === 'es'
-                  ? 'Las solicitudes aceptadas aparecerán aquí.'
-                  : 'Accepted requests will appear here.'}
+                {text.connectionsScreen.emptyDescription}
               </Text>
             </View>
           ) : (
@@ -257,9 +242,7 @@ const [loadError, setLoadError] =
                   </Text>
 
                   <Text style={styles.connectionDescription}>
-                    {language === 'es'
-                      ? 'Conexión aceptada'
-                      : 'Accepted connection'}
+                    {text.connectionsScreen.acceptedConnection}
                   </Text>
                 </View>
 

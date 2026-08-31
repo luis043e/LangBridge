@@ -1,28 +1,31 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    collection,
-    doc,
-    getDocs,
-    query,
-    serverTimestamp,
-    updateDoc,
-    where,
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type ConnectionRequest = {
   id: string;
@@ -42,7 +45,9 @@ export default function RequestsScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
-
+  
+  const text = translations[language];
+    
   const [requests, setRequests] =
     useState<ConnectionRequest[]>([]);
 
@@ -61,10 +66,8 @@ export default function RequestsScreen() {
 
       if (!currentUser) {
         setLoadError(
-          language === 'es'
-            ? 'Debes iniciar sesión nuevamente.'
-            : 'You must log in again.'
-        );
+  text.requestsScreen.loginRequired
+);
 
         setIsLoading(false);
         return;
@@ -100,10 +103,8 @@ export default function RequestsScreen() {
                 recipientId:
                   data.recipientId || '',
                 senderName:
-                  data.senderName ||
-                  (language === 'es'
-                    ? 'Usuario de LangBridge'
-                    : 'LangBridge user'),
+  data.senderName ||
+  text.requestsScreen.defaultUserName,
                 recipientName:
                   data.recipientName || '',
                 status:
@@ -122,10 +123,8 @@ export default function RequestsScreen() {
         );
 
         setLoadError(
-          language === 'es'
-            ? 'No se pudieron cargar las solicitudes.'
-            : 'Requests could not be loaded.'
-        );
+  text.requestsScreen.loadError
+);
       } finally {
         setIsLoading(false);
       }
@@ -162,21 +161,13 @@ const handleRequestResponse = async (
     );
 
     Alert.alert(
-      newStatus === 'accepted'
-        ? language === 'es'
-          ? 'Solicitud aceptada'
-          : 'Request accepted'
-        : language === 'es'
-          ? 'Solicitud rechazada'
-          : 'Request rejected',
-      newStatus === 'accepted'
-        ? language === 'es'
-          ? 'Ahora esta persona forma parte de tus conexiones.'
-          : 'This person is now one of your connections.'
-        : language === 'es'
-          ? 'La solicitud fue rechazada correctamente.'
-          : 'The request was rejected successfully.'
-    );
+  newStatus === 'accepted'
+    ? text.requestsScreen.acceptedTitle
+    : text.requestsScreen.rejectedTitle,
+  newStatus === 'accepted'
+    ? text.requestsScreen.acceptedMessage
+    : text.requestsScreen.rejectedMessage
+);
   } catch (error) {
     console.error(
       'Error updating connection request:',
@@ -184,14 +175,11 @@ const handleRequestResponse = async (
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudo responder'
-        : 'Response failed',
-      language === 'es'
-        ? 'No pudimos actualizar la solicitud. Revisa tu conexión e inténtalo nuevamente.'
-        : 'The request could not be updated. Check your connection and try again.'
-    );
+  text.requestsScreen.responseErrorTitle,
+  text.requestsScreen.responseErrorMessage
+  );
   } finally {
+    
     setProcessingRequestId(null);
   }
 };
@@ -211,22 +199,16 @@ const handleRequestResponse = async (
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
+              {text.requestsScreen.back}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
-            {language === 'es'
-              ? 'Solicitudes recibidas'
-              : 'Received requests'}
+            {text.requestsScreen.title}
           </Text>
 
           <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Personas que desean conectar contigo para practicar idiomas.'
-              : 'People who want to connect with you to practice languages.'}
+            {text.requestsScreen.subtitle}
           </Text>
 
           {isLoading ? (
@@ -237,9 +219,7 @@ const handleRequestResponse = async (
               />
 
               <Text style={styles.stateTitle}>
-                {language === 'es'
-                  ? 'Cargando solicitudes...'
-                  : 'Loading requests...'}
+                {text.requestsScreen.loading}
               </Text>
             </View>
           ) : loadError ? (
@@ -249,9 +229,7 @@ const handleRequestResponse = async (
               </Text>
 
               <Text style={styles.stateTitle}>
-                {language === 'es'
-                  ? 'No pudimos cargar las solicitudes'
-                  : 'Requests could not be loaded'}
+                {text.requestsScreen.loadErrorTitle}
               </Text>
 
               <Text style={styles.stateText}>
@@ -265,15 +243,13 @@ const handleRequestResponse = async (
               </Text>
 
               <Text style={styles.stateTitle}>
-                {language === 'es'
-                  ? 'No tienes solicitudes pendientes'
-                  : 'No pending requests'}
+                <Text style={styles.stateTitle}>
+  {text.requestsScreen.emptyTitle}
+</Text>
               </Text>
 
               <Text style={styles.stateText}>
-                {language === 'es'
-                  ? 'Las nuevas solicitudes aparecerán aquí.'
-                  : 'New requests will appear here.'}
+                {text.requestsScreen.emptyDescription}
               </Text>
             </View>
           ) : (
@@ -303,16 +279,12 @@ const handleRequestResponse = async (
                   </Text>
 
                   <Text style={styles.requestDescription}>
-                    {language === 'es'
-                      ? 'Quiere conectar contigo.'
-                      : 'Wants to connect with you.'}
+                    {text.requestsScreen.wantsToConnect}
                   </Text>
 
                   <View style={styles.pendingBadge}>
                     <Text style={styles.pendingBadgeText}>
-                      {language === 'es'
-                        ? 'PENDIENTE'
-                        : 'PENDING'}
+                      {text.requestsScreen.pending}
                     </Text>
                   </View>
                   <View style={styles.requestActions}>
@@ -330,12 +302,8 @@ const handleRequestResponse = async (
   >
     <Text style={styles.acceptButtonText}>
       {processingRequestId === request.id
-        ? language === 'es'
-          ? 'Procesando...'
-          : 'Processing...'
-        : language === 'es'
-          ? 'Aceptar'
-          : 'Accept'}
+  ? text.requestsScreen.processing
+  : text.requestsScreen.accept}
     </Text>
   </TouchableOpacity>
 
@@ -352,9 +320,7 @@ const handleRequestResponse = async (
     disabled={processingRequestId !== null}
   >
     <Text style={styles.rejectButtonText}>
-      {language === 'es'
-        ? 'Rechazar'
-        : 'Reject'}
+      {text.requestsScreen.reject}
     </Text>
   </TouchableOpacity>
 </View>

@@ -294,7 +294,9 @@ if (unreadReceivedMessages.length > 0) {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => {
+  router.replace('/conversations');
+}}
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
@@ -324,9 +326,7 @@ if (unreadReceivedMessages.length > 0) {
             </Text>
 
             <Text style={styles.statusText}>
-              {language === 'es'
-                ? 'Conexión de idiomas'
-                : 'Language connection'}
+              {text.chatScreen.connectionStatus}
             </Text>
           </View>
         </View>
@@ -350,15 +350,14 @@ if (unreadReceivedMessages.length > 0) {
               </Text>
 
               <Text style={styles.emptyTitle}>
-                {language === 'es'
-                  ? 'Comienza la conversación'
-                  : 'Start the conversation'}
+                {text.chatScreen.emptyTitle}
               </Text>
 
               <Text style={styles.emptyText}>
-                {language === 'es'
-                  ? `Envía un mensaje a ${partnerName} para comenzar a practicar.`
-                  : `Send a message to ${partnerName} to start practicing.`}
+                {text.chatScreen.emptyDescription.replace(
+  '{partnerName}',
+  partnerName
+)}
               </Text>
             </View>
           ) : (
@@ -389,12 +388,8 @@ if (unreadReceivedMessages.length > 0) {
     {message.isOwn
       ? ` · ${
           message.readAt
-            ? language === 'es'
-              ? 'Visto'
-              : 'Seen'
-            : language === 'es'
-              ? 'Enviado'
-              : 'Sent'
+  ? text.chatScreen.seen
+  : text.chatScreen.sent
         }`
       : ''}
   </Text>
@@ -408,10 +403,8 @@ if (unreadReceivedMessages.length > 0) {
   <TextInput
     style={styles.messageInput}
     placeholder={
-      language === 'es'
-        ? 'Escribe un mensaje...'
-        : 'Write a message...'
-    }
+  text.chatScreen.messagePlaceholder
+}
     placeholderTextColor="#64748B"
     value={messageText}
     onChangeText={setMessageText}
