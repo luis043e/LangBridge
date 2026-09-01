@@ -408,6 +408,62 @@ categories: {
   other: 'Other problem',
 },
 },
+
+deleteAccountScreen: {
+  requiredConfirmation: 'DELETE',
+  sessionUnavailableTitle:
+    'Session unavailable',
+  sessionUnavailableMessage:
+    'Please log in again to continue.',
+  incorrectConfirmationTitle:
+    'Incorrect confirmation',
+  incorrectConfirmationMessage:
+    'Type DELETE to confirm the request.',
+  confirmRequestTitle:
+    'Confirm request',
+  confirmRequestMessage:
+    'Your profile will be hidden and an account deletion request will be created.',
+  cancel: 'Cancel',
+  continue: 'Continue',
+  requestSubmittedTitle:
+    'Request submitted',
+  requestSubmittedMessage:
+    'Your profile was hidden and the request was submitted.',
+  submitErrorTitle:
+    'Could not submit',
+  connectionError:
+    'Check your connection and try again.',
+  back: '‹ Back',
+  title: 'Delete account',
+  subtitle:
+    'Request the permanent deletion of your LangBridge account.',
+  warningTitle:
+    'Before continuing',
+  warningText:
+    'This request will immediately hide your profile while the deletion is processed.',
+  consequencesTitle:
+    'Deletion may affect:',
+  profileConsequence:
+    '• Your profile and preferences.',
+  connectionsConsequence:
+    '• Your requests and connections.',
+  conversationsConsequence:
+    '• Your conversations and messages.',
+  accessConsequence:
+    '• Your future access to LangBridge.',
+  confirmationLabel:
+    'To confirm, type DELETE',
+  helperText:
+    'The word must be typed exactly as shown above.',
+  processing:
+    'Processing request...',
+  requestDeletion:
+    'Request deletion',
+  cancelAndKeepAccount:
+    'Cancel and keep my account',
+  securityNote:
+    'For security, permanent deletion will require additional identity verification.',
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -794,6 +850,63 @@ categories: {
   other: 'Otro problema',
 },
 },
+
+deleteAccountScreen: {
+  requiredConfirmation: 'ELIMINAR',
+  sessionUnavailableTitle:
+    'Sesión no disponible',
+  sessionUnavailableMessage:
+    'Inicia sesión nuevamente para continuar.',
+  incorrectConfirmationTitle:
+    'Confirmación incorrecta',
+  incorrectConfirmationMessage:
+    'Escribe ELIMINAR para confirmar la solicitud.',
+  confirmRequestTitle:
+    'Confirmar solicitud',
+  confirmRequestMessage:
+    'Tu perfil se ocultará y se registrará una solicitud de eliminación.',
+  cancel: 'Cancelar',
+  continue: 'Continuar',
+  requestSubmittedTitle:
+    'Solicitud registrada',
+  requestSubmittedMessage:
+    'Tu perfil fue ocultado y la solicitud quedó registrada.',
+  submitErrorTitle:
+    'No se pudo registrar',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  back: '‹ Atrás',
+  title: 'Eliminar cuenta',
+  subtitle:
+    'Solicita la eliminación permanente de tu cuenta de LangBridge.',
+  warningTitle:
+    'Antes de continuar',
+  warningText:
+    'Esta solicitud ocultará inmediatamente tu perfil mientras se procesa la eliminación.',
+  consequencesTitle:
+    'La eliminación puede afectar:',
+  profileConsequence:
+    '• Tu perfil y preferencias.',
+  connectionsConsequence:
+    '• Tus solicitudes y conexiones.',
+  conversationsConsequence:
+    '• Tus conversaciones y mensajes.',
+  accessConsequence:
+    '• Tu acceso futuro a LangBridge.',
+  confirmationLabel:
+    'Para confirmar, escribe ELIMINAR',
+  helperText:
+    'La palabra debe escribirse exactamente como aparece arriba.',
+  processing:
+    'Procesando solicitud...',
+  requestDeletion:
+    'Solicitar eliminación',
+  cancelAndKeepAccount:
+    'Cancelar y conservar mi cuenta',
+  securityNote:
+    'Por seguridad, la eliminación definitiva requerirá una verificación adicional de identidad.',
+},
+
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',
   emailUnavailable: 'Correo no disponible',

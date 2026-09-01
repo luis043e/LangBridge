@@ -1,26 +1,29 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-    addDoc,
-    collection,
-    doc,
-    serverTimestamp,
-    setDoc,
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
 } from 'firebase/firestore';
 import { useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 export default function DeleteAccountScreen() {
   const router = useRouter();
@@ -31,6 +34,7 @@ export default function DeleteAccountScreen() {
 
   const language: AppLanguage =
     params.lang === 'es' ? 'es' : 'en';
+  const text = translations[language];
 
   const [confirmationText, setConfirmationText] =
     useState('');
@@ -39,7 +43,7 @@ export default function DeleteAccountScreen() {
     useState(false);
 
   const requiredConfirmation =
-    language === 'es' ? 'ELIMINAR' : 'DELETE';
+  text.deleteAccountScreen.requiredConfirmation;
 
   const canSubmit =
     confirmationText.trim().toUpperCase() ===
@@ -50,50 +54,32 @@ export default function DeleteAccountScreen() {
 
     if (!currentUser) {
       Alert.alert(
-        language === 'es'
-          ? 'Sesión no disponible'
-          : 'Session unavailable',
-        language === 'es'
-          ? 'Inicia sesión nuevamente para continuar.'
-          : 'Please log in again to continue.'
-      );
+  text.deleteAccountScreen.sessionUnavailableTitle,
+  text.deleteAccountScreen.sessionUnavailableMessage
+);
       return;
     }
 
     if (!canSubmit) {
       Alert.alert(
-        language === 'es'
-          ? 'Confirmación incorrecta'
-          : 'Incorrect confirmation',
-        language === 'es'
-          ? 'Escribe ELIMINAR para confirmar la solicitud.'
-          : 'Type DELETE to confirm the request.'
-      );
+  text.deleteAccountScreen.incorrectConfirmationTitle,
+  text.deleteAccountScreen.incorrectConfirmationMessage
+);
       return;
     }
 
     Alert.alert(
-      language === 'es'
-        ? 'Confirmar solicitud'
-        : 'Confirm request',
-      language === 'es'
-        ? 'Tu perfil se ocultará y se registrará una solicitud de eliminación.'
-        : 'Your profile will be hidden and an account deletion request will be created.',
-      [
-        {
-          text:
-            language === 'es'
-              ? 'Cancelar'
-              : 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text:
-            language === 'es'
-              ? 'Continuar'
-              : 'Continue',
-          style: 'destructive',
-          onPress: async () => {
+  text.deleteAccountScreen.confirmRequestTitle,
+  text.deleteAccountScreen.confirmRequestMessage,
+  [
+    {
+      text: text.deleteAccountScreen.cancel,
+      style: 'cancel',
+    },
+    {
+      text: text.deleteAccountScreen.continue,
+      style: 'destructive',
+      onPress: async () => {
             try {
               setIsSubmitting(true);
 
@@ -122,13 +108,9 @@ export default function DeleteAccountScreen() {
               );
 
               Alert.alert(
-                language === 'es'
-                  ? 'Solicitud registrada'
-                  : 'Request submitted',
-                language === 'es'
-                  ? 'Tu perfil fue ocultado y la solicitud quedó registrada.'
-                  : 'Your profile was hidden and the request was submitted.',
-                [
+  text.deleteAccountScreen.requestSubmittedTitle,
+  text.deleteAccountScreen.requestSubmittedMessage,
+  [
                   {
                     text: 'OK',
                     onPress: () => router.back(),
@@ -142,13 +124,9 @@ export default function DeleteAccountScreen() {
               );
 
               Alert.alert(
-                language === 'es'
-                  ? 'No se pudo registrar'
-                  : 'Could not submit',
-                language === 'es'
-                  ? 'Revisa tu conexión e inténtalo nuevamente.'
-                  : 'Check your connection and try again.'
-              );
+  text.deleteAccountScreen.submitErrorTitle,
+  text.deleteAccountScreen.connectionError
+);
             } finally {
               setIsSubmitting(false);
             }
@@ -168,147 +146,115 @@ export default function DeleteAccountScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
-            </Text>
-          </TouchableOpacity>
+  style={styles.backButton}
+  onPress={() => router.back()}
+  activeOpacity={0.8}
+>
+  <Text style={styles.backButtonText}>
+    {text.deleteAccountScreen.back}
+  </Text>
+</TouchableOpacity>
 
-          <View style={styles.header}>
-            <View style={styles.headerIcon}>
-              <Text style={styles.headerIconText}>
-                🗑️
-              </Text>
-            </View>
+<View style={styles.header}>
+  <View style={styles.headerIcon}>
+    <Text style={styles.headerIconText}>
+      🗑️
+    </Text>
+  </View>
 
-            <View style={styles.headerInformation}>
-              <Text style={styles.title}>
-                {language === 'es'
-                  ? 'Eliminar cuenta'
-                  : 'Delete account'}
-              </Text>
+  <View style={styles.headerInformation}>
+    <Text style={styles.title}>
+      {text.deleteAccountScreen.title}
+    </Text>
 
-              <Text style={styles.subtitle}>
-                {language === 'es'
-                  ? 'Solicita la eliminación permanente de tu cuenta de LangBridge.'
-                  : 'Request the permanent deletion of your LangBridge account.'}
-              </Text>
-            </View>
-          </View>
+    <Text style={styles.subtitle}>
+      {text.deleteAccountScreen.subtitle}
+    </Text>
+  </View>
+</View>
 
           <View style={styles.warningCard}>
-            <Text style={styles.warningTitle}>
-              {language === 'es'
-                ? 'Antes de continuar'
-                : 'Before continuing'}
-            </Text>
+  <Text style={styles.warningTitle}>
+    {text.deleteAccountScreen.warningTitle}
+  </Text>
 
-            <Text style={styles.warningText}>
-              {language === 'es'
-                ? 'Esta solicitud ocultará inmediatamente tu perfil mientras se procesa la eliminación.'
-                : 'This request will immediately hide your profile while the deletion is processed.'}
-            </Text>
-          </View>
+  <Text style={styles.warningText}>
+    {text.deleteAccountScreen.warningText}
+  </Text>
+</View>
 
           <View style={styles.consequencesCard}>
-            <Text style={styles.consequencesTitle}>
-              {language === 'es'
-                ? 'La eliminación puede afectar:'
-                : 'Deletion may affect:'}
-            </Text>
+  <Text style={styles.consequencesTitle}>
+    {text.deleteAccountScreen.consequencesTitle}
+  </Text>
 
-            <Text style={styles.consequenceItem}>
-              {language === 'es'
-                ? '• Tu perfil y preferencias.'
-                : '• Your profile and preferences.'}
-            </Text>
+  <Text style={styles.consequenceItem}>
+    {text.deleteAccountScreen.profileConsequence}
+  </Text>
 
-            <Text style={styles.consequenceItem}>
-              {language === 'es'
-                ? '• Tus solicitudes y conexiones.'
-                : '• Your requests and connections.'}
-            </Text>
+  <Text style={styles.consequenceItem}>
+    {text.deleteAccountScreen.connectionsConsequence}
+  </Text>
 
-            <Text style={styles.consequenceItem}>
-              {language === 'es'
-                ? '• Tus conversaciones y mensajes.'
-                : '• Your conversations and messages.'}
-            </Text>
+  <Text style={styles.consequenceItem}>
+    {text.deleteAccountScreen.conversationsConsequence}
+  </Text>
 
-            <Text style={styles.consequenceItem}>
-              {language === 'es'
-                ? '• Tu acceso futuro a LangBridge.'
-                : '• Your future access to LangBridge.'}
-            </Text>
-          </View>
+  <Text style={styles.consequenceItem}>
+    {text.deleteAccountScreen.accessConsequence}
+  </Text>
+</View>
 
           <Text style={styles.confirmationLabel}>
-            {language === 'es'
-              ? 'Para confirmar, escribe ELIMINAR'
-              : 'To confirm, type DELETE'}
-          </Text>
+  {text.deleteAccountScreen.confirmationLabel}
+</Text>
 
-          <TextInput
-            style={styles.confirmationInput}
-            value={confirmationText}
-            onChangeText={setConfirmationText}
-            placeholder={requiredConfirmation}
-            placeholderTextColor="#64748B"
-            autoCapitalize="characters"
-            autoCorrect={false}
-            maxLength={8}
-          />
+<TextInput
+  style={styles.confirmationInput}
+  value={confirmationText}
+  onChangeText={setConfirmationText}
+  placeholder={requiredConfirmation}
+  placeholderTextColor="#64748B"
+  autoCapitalize="characters"
+  autoCorrect={false}
+  maxLength={8}
+/>
 
-          <Text style={styles.helperText}>
-            {language === 'es'
-              ? 'La palabra debe escribirse exactamente como aparece arriba.'
-              : 'The word must be typed exactly as shown above.'}
-          </Text>
+<Text style={styles.helperText}>
+  {text.deleteAccountScreen.helperText}
+</Text>
 
           <TouchableOpacity
-            style={[
-              styles.deleteButton,
-              (!canSubmit || isSubmitting) &&
-                styles.disabledDeleteButton,
-            ]}
-            onPress={handleDeleteRequest}
-            activeOpacity={0.85}
-            disabled={!canSubmit || isSubmitting}
-          >
-            <Text style={styles.deleteButtonText}>
-              {isSubmitting
-                ? language === 'es'
-                  ? 'Procesando solicitud...'
-                  : 'Processing request...'
-                : language === 'es'
-                  ? 'Solicitar eliminación'
-                  : 'Request deletion'}
-            </Text>
-          </TouchableOpacity>
+  style={[
+    styles.deleteButton,
+    (!canSubmit || isSubmitting) &&
+      styles.disabledDeleteButton,
+  ]}
+  onPress={handleDeleteRequest}
+  activeOpacity={0.85}
+  disabled={!canSubmit || isSubmitting}
+>
+  <Text style={styles.deleteButtonText}>
+    {isSubmitting
+      ? text.deleteAccountScreen.processing
+      : text.deleteAccountScreen.requestDeletion}
+  </Text>
+</TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => router.back()}
-            activeOpacity={0.85}
-            disabled={isSubmitting}
-          >
-            <Text style={styles.cancelButtonText}>
-              {language === 'es'
-                ? 'Cancelar y conservar mi cuenta'
-                : 'Cancel and keep my account'}
-            </Text>
-          </TouchableOpacity>
+<TouchableOpacity
+  style={styles.cancelButton}
+  onPress={() => router.back()}
+  activeOpacity={0.85}
+  disabled={isSubmitting}
+>
+  <Text style={styles.cancelButtonText}>
+    {text.deleteAccountScreen.cancelAndKeepAccount}
+  </Text>
+</TouchableOpacity>
 
           <Text style={styles.securityNote}>
-            {language === 'es'
-              ? 'Por seguridad, la eliminación definitiva requerirá una verificación adicional de identidad.'
-              : 'For security, permanent deletion will require additional identity verification.'}
-          </Text>
+  {text.deleteAccountScreen.securityNote}
+</Text>
         </ScrollView>
       </View>
     </SafeAreaView>
