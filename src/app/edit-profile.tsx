@@ -29,7 +29,10 @@ import {
   getCountryOptions,
 } from '../countries';
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -39,9 +42,11 @@ export default function EditProfileScreen() {
   }>();
 
   const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  params.lang === 'es' ? 'es' : 'en';
 
-  const currentUser = auth.currentUser;
+const text = translations[language];
+
+const currentUser = auth.currentUser;
 
   const [fullName, setFullName] = useState(
     currentUser?.displayName || ''
@@ -148,41 +153,27 @@ setGooglePhotoURL(
 }, []);
 const handleUseGooglePhoto = () => {
   if (!googlePhotoURL) {
-    Alert.alert(
-      language === 'es'
-        ? 'Foto no disponible'
-        : 'Photo unavailable',
-      language === 'es'
-        ? 'Esta cuenta no tiene una foto de Google disponible.'
-        : 'This account does not have a Google photo available.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.editProfileScreen.photoUnavailableTitle,
+    text.editProfileScreen.photoUnavailableMessage
+  );
+  return;
+}
 
   setPhotoURL(googlePhotoURL);
 };
 
 const handleRemovePhoto = () => {
   Alert.alert(
-    language === 'es'
-      ? 'Eliminar foto'
-      : 'Remove photo',
-    language === 'es'
-      ? 'Se mostrarán las iniciales de tu nombre.'
-      : 'Your name initials will be displayed.',
+    text.editProfileScreen.removePhotoTitle,
+    text.editProfileScreen.removePhotoMessage,
     [
       {
-        text:
-          language === 'es'
-            ? 'Cancelar'
-            : 'Cancel',
+        text: text.editProfileScreen.cancel,
         style: 'cancel',
       },
       {
-        text:
-          language === 'es'
-            ? 'Eliminar'
-            : 'Remove',
+        text: text.editProfileScreen.remove,
         style: 'destructive',
         onPress: () => setPhotoURL(''),
       },
@@ -199,36 +190,24 @@ const handleSaveProfile = async () => {
   const cleanBio = bio.trim();
 
   if (!user) {
-    Alert.alert(
-      language === 'es'
-        ? 'Sesión requerida'
-        : 'Login required',
-      language === 'es'
-        ? 'Debes iniciar sesión nuevamente para actualizar tu perfil.'
-        : 'You must log in again to update your profile.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.editProfileScreen.loginRequiredTitle,
+    text.editProfileScreen.loginRequiredMessage
+  );
+  return;
+}
 
   if (!cleanName) {
-    Alert.alert(
-      language === 'es'
-        ? 'Nombre requerido'
-        : 'Name required',
-      language === 'es'
-        ? 'Escribe tu nombre completo para continuar.'
-        : 'Enter your full name to continue.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.editProfileScreen.nameRequiredTitle,
+    text.editProfileScreen.nameRequiredMessage
+  );
+  return;
+}
 if (!countryCode) {
   Alert.alert(
-    language === 'es'
-      ? 'País requerido'
-      : 'Country required',
-    language === 'es'
-      ? 'Selecciona tu país para continuar.'
-      : 'Select your country to continue.'
+    text.editProfileScreen.countryRequiredTitle,
+    text.editProfileScreen.countryRequiredMessage
   );
   return;
 }
@@ -258,13 +237,9 @@ countryName:
 );
 
     Alert.alert(
-      language === 'es'
-        ? 'Perfil actualizado'
-        : 'Profile updated',
-      language === 'es'
-        ? 'Tus cambios fueron guardados correctamente.'
-        : 'Your changes were saved successfully.'
-    );
+  text.editProfileScreen.profileUpdatedTitle,
+  text.editProfileScreen.profileUpdatedMessage
+);
   } catch (error) {
     console.error(
       'Error saving profile:',
@@ -272,13 +247,9 @@ countryName:
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudo guardar'
-        : 'Save failed',
-      language === 'es'
-        ? 'Revisa tu conexión e inténtalo nuevamente.'
-        : 'Check your connection and try again.'
-    );
+  text.editProfileScreen.saveFailedTitle,
+  text.editProfileScreen.connectionError
+);
   } finally {
     setIsSaving(false);
   }
@@ -301,38 +272,31 @@ countryName:
           keyboardShouldPersistTaps="handled"
         >
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
-            </Text>
-          </TouchableOpacity>
-          {isLoading ? (
+  style={styles.backButton}
+  onPress={() => router.back()}
+  activeOpacity={0.8}
+>
+  <Text style={styles.backButtonText}>
+    {text.editProfileScreen.back}
+  </Text>
+</TouchableOpacity>
+
+{isLoading ? (
   <ActivityIndicator
     color="#22D3EE"
     size="large"
   />
 ) : null}
 
-          <Text style={styles.title}>
-            {language === 'es'
-              ? 'Editar perfil'
-              : 'Edit profile'}
-          </Text>
+<Text style={styles.title}>
+  {text.editProfileScreen.title}
+</Text>
 
-          <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Actualiza la información que verán tus compañeros.'
-              : 'Update the information your partners will see.'}
-          </Text>
+<Text style={styles.subtitle}>
+  {text.editProfileScreen.subtitle}
+</Text>
 <Text style={styles.photoSectionTitle}>
-  {language === 'es'
-    ? 'Foto de perfil'
-    : 'Profile photo'}
+  {text.editProfileScreen.profilePhoto}
 </Text>
 
 <View style={styles.photoSection}>
@@ -356,81 +320,66 @@ countryName:
       </Text>
     )}
   </View>
+
   <View style={styles.photoActions}>
-  <TouchableOpacity
-    style={styles.changePhotoButton}
-    onPress={() =>
-      Alert.alert(
-        language === 'es'
-          ? 'Cambiar foto'
-          : 'Change photo',
-        language === 'es'
-          ? 'Conectaremos la galería del teléfono en el siguiente paso.'
-          : 'We will connect the phone gallery in the next step.'
-      )
-    }
-    activeOpacity={0.85}
-  >
-    <Text style={styles.changePhotoButtonText}>
-      {language === 'es'
-        ? 'Cambiar foto'
-        : 'Change photo'}
-    </Text>
-  </TouchableOpacity>
-
-  {!!googlePhotoURL && (
     <TouchableOpacity
-      style={styles.secondaryPhotoButton}
-      onPress={handleUseGooglePhoto}
+      style={styles.changePhotoButton}
+      onPress={() =>
+        Alert.alert(
+          text.editProfileScreen.changePhoto,
+          text.editProfileScreen.changePhotoMessage
+        )
+      }
       activeOpacity={0.85}
     >
-      <Text style={styles.secondaryPhotoButtonText}>
-        {language === 'es'
-          ? 'Usar foto de Google'
-          : 'Use Google photo'}
+      <Text style={styles.changePhotoButtonText}>
+        {text.editProfileScreen.changePhoto}
       </Text>
     </TouchableOpacity>
-  )}
 
-  {!!photoURL && (
-    <TouchableOpacity
-      style={styles.removePhotoButton}
-      onPress={handleRemovePhoto}
-      activeOpacity={0.85}
-    >
-      <Text style={styles.removePhotoButtonText}>
-        {language === 'es'
-          ? 'Eliminar foto'
-          : 'Remove photo'}
-      </Text>
-    </TouchableOpacity>
-  )}
-</View>
+    {!!googlePhotoURL && (
+      <TouchableOpacity
+        style={styles.secondaryPhotoButton}
+        onPress={handleUseGooglePhoto}
+        activeOpacity={0.85}
+      >
+        <Text style={styles.secondaryPhotoButtonText}>
+          {text.editProfileScreen.useGooglePhoto}
+        </Text>
+      </TouchableOpacity>
+    )}
+
+    {!!photoURL && (
+      <TouchableOpacity
+        style={styles.removePhotoButton}
+        onPress={handleRemovePhoto}
+        activeOpacity={0.85}
+      >
+        <Text style={styles.removePhotoButtonText}>
+          {text.editProfileScreen.removePhoto}
+        </Text>
+      </TouchableOpacity>
+    )}
+  </View>
 </View>
           <Text style={styles.label}>
-            {language === 'es'
-              ? 'Nombre completo'
-              : 'Full name'}
-          </Text>
+  {text.editProfileScreen.fullName}
+</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder={
-              language === 'es'
-                ? 'Escribe tu nombre'
-                : 'Enter your name'
-            }
-            placeholderTextColor="#64748B"
-            value={fullName}
-            onChangeText={setFullName}
-            autoCapitalize="words"
-            maxLength={60}
-          />
+<TextInput
+  style={styles.input}
+  placeholder={
+    text.editProfileScreen.fullNamePlaceholder
+  }
+  placeholderTextColor="#64748B"
+  value={fullName}
+  onChangeText={setFullName}
+  autoCapitalize="words"
+  maxLength={60}
+/>
 
           <Text style={styles.label}>
-  {language === 'es'
-    ? 'País'
-    : 'Country'}
+  {text.editProfileScreen.country}
 </Text>
 
 <TouchableOpacity
@@ -463,16 +412,12 @@ countryName:
         numberOfLines={1}
       >
         {selectedCountry?.name ||
-          (language === 'es'
-            ? 'Selecciona tu país'
-            : 'Select your country')}
+  text.editProfileScreen.selectCountry}
       </Text>
 
       <Text style={styles.countryHelper}>
-        {language === 'es'
-          ? 'Solo mostraremos tu país públicamente.'
-          : 'Only your country will be shown publicly.'}
-      </Text>
+  {text.editProfileScreen.countryPrivacyHelper}
+</Text>
     </View>
   </View>
 
@@ -490,10 +435,8 @@ countryName:
       value={countrySearch}
       onChangeText={setCountrySearch}
       placeholder={
-        language === 'es'
-          ? 'Buscar país...'
-          : 'Search country...'
-      }
+  text.editProfileScreen.searchCountry
+}
       placeholderTextColor="#64748B"
       autoCapitalize="none"
       autoCorrect={false}
@@ -564,20 +507,16 @@ countryName:
           </Text>
 
           <Text style={styles.noCountryResultsText}>
-            {language === 'es'
-              ? 'No encontramos ese país.'
-              : 'We could not find that country.'}
-          </Text>
+  {text.editProfileScreen.noCountryResults}
+</Text>
         </View>
       )}
     </ScrollView>
   </View>
 )}
           <Text style={styles.label}>
-            {language === 'es'
-              ? 'Acerca de mí'
-              : 'About me'}
-          </Text>
+  {text.editProfileScreen.aboutMe}
+</Text>
 
           <TextInput
             style={[
@@ -585,10 +524,8 @@ countryName:
               styles.bioInput,
             ]}
             placeholder={
-              language === 'es'
-                ? 'Cuéntales qué te interesa practicar.'
-                : 'Tell others what you want to practice.'
-            }
+  text.editProfileScreen.bioPlaceholder
+}
             placeholderTextColor="#64748B"
             value={bio}
             onChangeText={setBio}
@@ -611,14 +548,10 @@ countryName:
   disabled={isSaving || isLoading}
 >
   <Text style={styles.saveButtonText}>
-    {isSaving
-      ? language === 'es'
-        ? 'Guardando...'
-        : 'Saving...'
-      : language === 'es'
-        ? 'Guardar cambios'
-        : 'Save changes'}
-  </Text>
+  {isSaving
+    ? text.editProfileScreen.saving
+    : text.editProfileScreen.saveChanges}
+</Text>
 </TouchableOpacity>
 
         </ScrollView>

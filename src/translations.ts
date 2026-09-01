@@ -534,6 +534,78 @@ privacySecurityScreen: {
   deleteAccountDescription:
     'Permanently delete your account and data.',
 },
+editProfileScreen: {
+  photoUnavailableTitle:
+    'Photo unavailable',
+  photoUnavailableMessage:
+    'This account does not have a Google photo available.',
+  removePhotoTitle:
+    'Remove photo',
+  removePhotoMessage:
+    'Your name initials will be displayed.',
+  cancel:
+    'Cancel',
+  remove:
+    'Remove',
+  loginRequiredTitle:
+    'Login required',
+  loginRequiredMessage:
+    'You must log in again to update your profile.',
+  nameRequiredTitle:
+    'Name required',
+  nameRequiredMessage:
+    'Enter your full name to continue.',
+  countryRequiredTitle:
+    'Country required',
+  countryRequiredMessage:
+    'Select your country to continue.',
+  profileUpdatedTitle:
+    'Profile updated',
+  profileUpdatedMessage:
+    'Your changes were saved successfully.',
+  saveFailedTitle:
+    'Save failed',
+  connectionError:
+    'Check your connection and try again.',
+  back:
+    '‹ Back',
+  title:
+    'Edit profile',
+  subtitle:
+    'Update the information your partners will see.',
+  profilePhoto:
+    'Profile photo',
+  changePhoto:
+    'Change photo',
+  changePhotoMessage:
+    'We will connect the phone gallery in the next step.',
+  useGooglePhoto:
+    'Use Google photo',
+  removePhoto:
+    'Remove photo',
+  fullName:
+    'Full name',
+  fullNamePlaceholder:
+    'Enter your name',
+  country:
+    'Country',
+  selectCountry:
+    'Select your country',
+  countryPrivacyHelper:
+    'Only your country will be shown publicly.',
+  searchCountry:
+    'Search country...',
+  noCountryResults:
+    'We could not find that country.',
+  aboutMe:
+    'About me',
+  bioPlaceholder:
+    'Tell others what you want to practice.',
+  saving:
+    'Saving...',
+  saveChanges:
+    'Save changes',
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -1045,6 +1117,78 @@ privacySecurityScreen: {
     'Eliminar cuenta',
   deleteAccountDescription:
     'Elimina permanentemente tu cuenta y tus datos.',
+},
+editProfileScreen: {
+  photoUnavailableTitle:
+    'Foto no disponible',
+  photoUnavailableMessage:
+    'Esta cuenta no tiene una foto de Google disponible.',
+  removePhotoTitle:
+    'Eliminar foto',
+  removePhotoMessage:
+    'Se mostrarán las iniciales de tu nombre.',
+  cancel:
+    'Cancelar',
+  remove:
+    'Eliminar',
+  loginRequiredTitle:
+    'Sesión requerida',
+  loginRequiredMessage:
+    'Debes iniciar sesión nuevamente para actualizar tu perfil.',
+  nameRequiredTitle:
+    'Nombre requerido',
+  nameRequiredMessage:
+    'Escribe tu nombre completo para continuar.',
+  countryRequiredTitle:
+    'País requerido',
+  countryRequiredMessage:
+    'Selecciona tu país para continuar.',
+  profileUpdatedTitle:
+    'Perfil actualizado',
+  profileUpdatedMessage:
+    'Tus cambios fueron guardados correctamente.',
+  saveFailedTitle:
+    'No se pudo guardar',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  back:
+    '‹ Atrás',
+  title:
+    'Editar perfil',
+  subtitle:
+    'Actualiza la información que verán tus compañeros.',
+  profilePhoto:
+    'Foto de perfil',
+  changePhoto:
+    'Cambiar foto',
+  changePhotoMessage:
+    'Conectaremos la galería del teléfono en el siguiente paso.',
+  useGooglePhoto:
+    'Usar foto de Google',
+  removePhoto:
+    'Eliminar foto',
+  fullName:
+    'Nombre completo',
+  fullNamePlaceholder:
+    'Escribe tu nombre',
+  country:
+    'País',
+  selectCountry:
+    'Selecciona tu país',
+  countryPrivacyHelper:
+    'Solo mostraremos tu país públicamente.',
+  searchCountry:
+    'Buscar país...',
+  noCountryResults:
+    'No encontramos ese país.',
+  aboutMe:
+    'Acerca de mí',
+  bioPlaceholder:
+    'Cuéntales qué te interesa practicar.',
+  saving:
+    'Guardando...',
+  saveChanges:
+    'Guardar cambios',
 },
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',
