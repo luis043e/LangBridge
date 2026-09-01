@@ -606,6 +606,81 @@ editProfileScreen: {
   saveChanges:
     'Save changes',
 },
+languageSettingsScreen: {
+  languageNames: {
+    es: 'Spanish',
+    en: 'English',
+    fr: 'French',
+    pt: 'Portuguese',
+    de: 'German',
+    it: 'Italian',
+    nl: 'Dutch',
+    ru: 'Russian',
+    uk: 'Ukrainian',
+    pl: 'Polish',
+    tr: 'Turkish',
+    ar: 'Arabic',
+    hi: 'Hindi',
+    bn: 'Bengali',
+    zh: 'Mandarin Chinese',
+    ja: 'Japanese',
+    ko: 'Korean',
+    id: 'Indonesian',
+    vi: 'Vietnamese',
+    el: 'Greek',
+  },
+  levelNames: {
+    a1: 'A1 · Beginner',
+    a2: 'A2 · Elementary',
+    b1: 'B1 · Intermediate',
+    b2: 'B2 · Upper intermediate',
+    c1: 'C1 · Advanced',
+    c2: 'C2 · Proficiency',
+  },
+  selectNativeLanguage:
+    'Select your native language',
+  selectLearningLanguage:
+    'Select the language you want to learn',
+  selectLevel:
+    'Select your level',
+  differentLanguagesTitle:
+    'Select different languages',
+  differentLanguagesMessage:
+    'Your native language and learning language must be different.',
+  sessionUnavailableTitle:
+    'Session unavailable',
+  sessionUnavailableMessage:
+    'Please log in again to save your changes.',
+  changesSavedTitle:
+    'Changes saved',
+  changesSavedMessage:
+    'Your languages and level were updated successfully.',
+  saveErrorTitle:
+    'Changes could not be saved',
+  connectionError:
+    'Check your connection and try again.',
+  back:
+    '‹ Back',
+  title:
+    'Languages and level',
+  subtitle:
+    'Set the languages you speak and want to learn.',
+  nativeLanguage:
+    'Native language',
+  learningLanguage:
+    'I want to learn',
+  currentLevel:
+    'My current level',
+  loading:
+    'Loading...',
+  saving:
+    'Saving...',
+  saveChanges:
+    'Save changes',
+  close:
+    'Close',
+},
+
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -1189,6 +1264,80 @@ editProfileScreen: {
     'Guardando...',
   saveChanges:
     'Guardar cambios',
+},
+languageSettingsScreen: {
+  languageNames: {
+    es: 'Español',
+    en: 'Inglés',
+    fr: 'Francés',
+    pt: 'Portugués',
+    de: 'Alemán',
+    it: 'Italiano',
+    nl: 'Neerlandés',
+    ru: 'Ruso',
+    uk: 'Ucraniano',
+    pl: 'Polaco',
+    tr: 'Turco',
+    ar: 'Árabe',
+    hi: 'Hindi',
+    bn: 'Bengalí',
+    zh: 'Chino mandarín',
+    ja: 'Japonés',
+    ko: 'Coreano',
+    id: 'Indonesio',
+    vi: 'Vietnamita',
+    el: 'Griego',
+  },
+  levelNames: {
+    a1: 'A1 · Principiante',
+    a2: 'A2 · Básico',
+    b1: 'B1 · Intermedio',
+    b2: 'B2 · Intermedio alto',
+    c1: 'C1 · Avanzado',
+    c2: 'C2 · Dominio',
+  },
+  selectNativeLanguage:
+    'Selecciona tu idioma nativo',
+  selectLearningLanguage:
+    'Selecciona el idioma que quieres aprender',
+  selectLevel:
+    'Selecciona tu nivel',
+  differentLanguagesTitle:
+    'Selecciona idiomas diferentes',
+  differentLanguagesMessage:
+    'El idioma nativo y el idioma que quieres aprender deben ser diferentes.',
+  sessionUnavailableTitle:
+    'Sesión no disponible',
+  sessionUnavailableMessage:
+    'Inicia sesión nuevamente para guardar los cambios.',
+  changesSavedTitle:
+    'Cambios guardados',
+  changesSavedMessage:
+    'Tus idiomas y nivel se actualizaron correctamente.',
+  saveErrorTitle:
+    'No se pudieron guardar los cambios',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  back:
+    '‹ Atrás',
+  title:
+    'Idiomas y nivel',
+  subtitle:
+    'Configura los idiomas que hablas y deseas aprender.',
+  nativeLanguage:
+    'Idioma nativo',
+  learningLanguage:
+    'Quiero aprender',
+  currentLevel:
+    'Mi nivel actual',
+  loading:
+    'Cargando...',
+  saving:
+    'Guardando...',
+  saveChanges:
+    'Guardar cambios',
+  close:
+    'Cerrar',
 },
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',

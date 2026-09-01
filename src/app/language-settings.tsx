@@ -14,7 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth, db } from '../firebaseConfig';
 
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 type SelectorType =
   | 'native'
   | 'learning'
@@ -84,9 +87,11 @@ export default function LanguageSettingsScreen() {
   }>();
 
   const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  params.lang === 'es' ? 'es' : 'en';
 
-  const [nativeLanguage, setNativeLanguage] =
+const text = translations[language];
+
+const [nativeLanguage, setNativeLanguage] =
   useState('es');
 
 const [learningLanguage, setLearningLanguage] =
@@ -155,49 +160,26 @@ useEffect(() => {
   loadLanguageSettings();
 }, []);
   const getLanguageName = (code: string) => {
+  const languageNames:
+    Record<string, string> =
+      text.languageSettingsScreen.languageNames;
 
-    const languageNames: Record<string, string> = {
-      es: language === 'es' ? 'Español' : 'Spanish',
-      en: language === 'es' ? 'Inglés' : 'English',
-      fr: language === 'es' ? 'Francés' : 'French',
-      pt: language === 'es' ? 'Portugués' : 'Portuguese',
-      de: language === 'es' ? 'Alemán' : 'German',
-      it: language === 'es' ? 'Italiano' : 'Italian',
-    };
+  return languageNames[code] || code;
+};
 
-    return languageNames[code] || code;
-  };
+const getLevelName = (code: string) => {
+  const levelNames:
+    Record<string, string> =
+      text.languageSettingsScreen.levelNames;
 
-      const getLevelName = (code: string) => {
-    const levelNames: Record<string, string> = {
-      a1:
-        language === 'es'
-          ? 'A1 · Principiante'
-          : 'A1 · Beginner',
-      a2:
-        language === 'es'
-          ? 'A2 · Básico'
-          : 'A2 · Elementary',
-      b1:
-        language === 'es'
-          ? 'B1 · Intermedio'
-          : 'B1 · Intermediate',
-      b2:
-        language === 'es'
-          ? 'B2 · Intermedio alto'
-          : 'B2 · Upper intermediate',
-      c1:
-        language === 'es'
-          ? 'C1 · Avanzado'
-          : 'C1 · Advanced',
-      c2:
-        language === 'es'
-          ? 'C2 · Dominio'
-          : 'C2 · Proficiency',
-    };
+  return levelNames[code] || code;
+};
 
-    return levelNames[code] || code;
-  };
+const getOptionName = (code: string) => {
+  return activeSelector === 'level'
+    ? getLevelName(code)
+    : getLanguageName(code);
+};
 
   const activeOptions =
     activeSelector === 'level'
@@ -205,17 +187,11 @@ useEffect(() => {
       : languageOptions;
 
   const selectorTitle =
-    activeSelector === 'native'
-      ? language === 'es'
-        ? 'Selecciona tu idioma nativo'
-        : 'Select your native language'
-      : activeSelector === 'learning'
-        ? language === 'es'
-          ? 'Selecciona el idioma que quieres aprender'
-          : 'Select the language you want to learn'
-        : language === 'es'
-          ? 'Selecciona tu nivel'
-          : 'Select your level';
+  activeSelector === 'native'
+    ? text.languageSettingsScreen.selectNativeLanguage
+    : activeSelector === 'learning'
+      ? text.languageSettingsScreen.selectLearningLanguage
+      : text.languageSettingsScreen.selectLevel;
 
   const selectedCode =
     activeSelector === 'native'
@@ -252,31 +228,21 @@ const handleSaveChanges = async () => {
     return;
   }
 
-  if (nativeLanguage === learningLanguage) {
-    Alert.alert(
-      language === 'es'
-        ? 'Selecciona idiomas diferentes'
-        : 'Select different languages',
-      language === 'es'
-        ? 'El idioma nativo y el idioma que quieres aprender deben ser diferentes.'
-        : 'Your native language and learning language must be different.'
-    );
-    return;
-  }
-
-  const currentUser = auth.currentUser;
-
+ if (nativeLanguage === learningLanguage) {
+  Alert.alert(
+    text.languageSettingsScreen.differentLanguagesTitle,
+    text.languageSettingsScreen.differentLanguagesMessage
+  );
+  return;
+}
+const currentUser = auth.currentUser;
   if (!currentUser) {
-    Alert.alert(
-      language === 'es'
-        ? 'Sesión no disponible'
-        : 'Session unavailable',
-      language === 'es'
-        ? 'Inicia sesión nuevamente para guardar los cambios.'
-        : 'Please log in again to save your changes.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.languageSettingsScreen.sessionUnavailableTitle,
+    text.languageSettingsScreen.sessionUnavailableMessage
+  );
+  return;
+}
 
   try {
     setIsSaving(true);
@@ -300,13 +266,9 @@ const handleSaveChanges = async () => {
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'Cambios guardados'
-        : 'Changes saved',
-      language === 'es'
-        ? 'Tus idiomas y nivel se actualizaron correctamente.'
-        : 'Your languages and level were updated successfully.'
-    );
+  text.languageSettingsScreen.changesSavedTitle,
+  text.languageSettingsScreen.changesSavedMessage
+);
   } catch (error) {
     console.error(
       'Error saving language settings:',
@@ -314,13 +276,9 @@ const handleSaveChanges = async () => {
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudieron guardar los cambios'
-        : 'Changes could not be saved',
-      language === 'es'
-        ? 'Revisa tu conexión e inténtalo nuevamente.'
-        : 'Check your connection and try again.'
-    );
+  text.languageSettingsScreen.saveErrorTitle,
+  text.languageSettingsScreen.connectionError
+);
   } finally {
     setIsSaving(false);
   }
@@ -335,34 +293,26 @@ const handleSaveChanges = async () => {
           showsVerticalScrollIndicator={false}
         >
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
-            </Text>
-          </TouchableOpacity>
+  style={styles.backButton}
+  onPress={() => router.back()}
+  activeOpacity={0.8}
+>
+  <Text style={styles.backButtonText}>
+    {text.languageSettingsScreen.back}
+  </Text>
+</TouchableOpacity>
 
-          <Text style={styles.title}>
-            {language === 'es'
-              ? 'Idiomas y nivel'
-              : 'Languages and level'}
-          </Text>
+<Text style={styles.title}>
+  {text.languageSettingsScreen.title}
+</Text>
 
-          <Text style={styles.subtitle}>
-            {language === 'es'
-              ? 'Configura los idiomas que hablas y deseas aprender.'
-              : 'Set the languages you speak and want to learn.'}
-          </Text>
+<Text style={styles.subtitle}>
+  {text.languageSettingsScreen.subtitle}
+</Text>
 
           <View style={styles.formCard}>
             <Text style={styles.label}>
-              {language === 'es'
-                ? 'Idioma nativo'
-                : 'Native language'}
+  {text.languageSettingsScreen.nativeLanguage}
             </Text>
 
             <TouchableOpacity
@@ -406,10 +356,7 @@ const handleSaveChanges = async () => {
         const isDisabled =
           option.code === learningLanguage;
 
-        const optionName =
-          language === 'es'
-            ? option.nameEs
-            : option.nameEn;
+        const optionName = getOptionName(option.code);
 
         return (
           <TouchableOpacity
@@ -470,10 +417,8 @@ const handleSaveChanges = async () => {
   </View>
 )}
             <Text style={styles.label}>
-              {language === 'es'
-                ? 'Quiero aprender'
-                : 'I want to learn'}
-            </Text>
+  {text.languageSettingsScreen.learningLanguage}
+</Text>
 
             <TouchableOpacity
   style={styles.selectorButton}
@@ -518,10 +463,7 @@ const handleSaveChanges = async () => {
         const isDisabled =
           option.code === nativeLanguage;
 
-        const optionName =
-          language === 'es'
-            ? option.nameEs
-            : option.nameEn;
+        const optionName = getOptionName(option.code);
 
         return (
           <TouchableOpacity
@@ -582,10 +524,8 @@ const handleSaveChanges = async () => {
   </View>
 )}
             <Text style={styles.label}>
-              {language === 'es'
-                ? 'Mi nivel actual'
-                : 'My current level'}
-            </Text>
+  {text.languageSettingsScreen.currentLevel}
+</Text>
 
             <TouchableOpacity
   style={styles.selectorButton}
@@ -625,10 +565,7 @@ const handleSaveChanges = async () => {
         const isSelected =
           option.code === level;
 
-        const optionName =
-          language === 'es'
-            ? option.nameEs
-            : option.nameEn;
+        const optionName = getOptionName(option.code);
 
         return (
           <TouchableOpacity
@@ -700,18 +637,12 @@ const handleSaveChanges = async () => {
   disabled={isLoading || isSaving}
 >
             <Text style={styles.saveButtonText}>
-              {isLoading
-  ? language === 'es'
-    ? 'Cargando...'
-    : 'Loading...'
-  : isSaving
-    ? language === 'es'
-      ? 'Guardando...'
-      : 'Saving...'
-    : language === 'es'
-      ? 'Guardar cambios'
-      : 'Save changes'}
-            </Text>
+  {isLoading
+    ? text.languageSettingsScreen.loading
+    : isSaving
+      ? text.languageSettingsScreen.saving
+      : text.languageSettingsScreen.saveChanges}
+</Text>
           </TouchableOpacity>
         </ScrollView>
         <Modal
@@ -739,15 +670,14 @@ const handleSaveChanges = async () => {
       }}
     >
       <Text
-        style={{
-          color: '#FFFFFF',
-          fontSize: 19,
-          fontWeight: 'bold',
-          marginBottom: 14,
-        }}
-      >
-        {selectorTitle}
-      </Text>
+  style={{
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: 'bold',
+  }}
+>
+  {text.languageSettingsScreen.close}
+</Text>
 
             <ScrollView
         style={{
@@ -766,10 +696,7 @@ const handleSaveChanges = async () => {
                 ? option.code === nativeLanguage
                 : false;
 
-          const optionName =
-            language === 'es'
-              ? option.nameEs
-              : option.nameEn;
+          const optionName = getOptionName(option.code);
 
           return (
             <TouchableOpacity
@@ -848,7 +775,7 @@ const handleSaveChanges = async () => {
             fontWeight: 'bold',
           }}
         >
-          {language === 'es' ? 'Cerrar' : 'Close'}
+          {text.languageSettingsScreen.close}
         </Text>
       </TouchableOpacity>
     </View>
