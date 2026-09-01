@@ -14,7 +14,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 export default function PrivacySecurityScreen() {
   const router = useRouter();
@@ -24,10 +27,12 @@ export default function PrivacySecurityScreen() {
   }>();
 
   const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  params.lang === 'es' ? 'es' : 'en';
 
-  const [isProfileVisible, setIsProfileVisible] =
-    useState(true);
+const text = translations[language];
+
+const [isProfileVisible, setIsProfileVisible] =
+  useState(true);
   useEffect(() => {
   let isMounted = true;
 
@@ -75,38 +80,27 @@ const handleChangePassword = async () => {
   const userEmail = currentUser?.email;
 
   if (!userEmail) {
-    Alert.alert(
-      language === 'es'
-        ? 'Correo no disponible'
-        : 'Email unavailable',
-      language === 'es'
-        ? 'No encontramos un correo asociado a esta cuenta.'
-        : 'No email address was found for this account.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.privacySecurityScreen.emailUnavailableTitle,
+    text.privacySecurityScreen.emailUnavailableMessage
+  );
+  return;
+}
 
   Alert.alert(
-    language === 'es'
-      ? 'Cambiar contraseña'
-      : 'Change password',
-    language === 'es'
-      ? `Enviaremos un enlace de cambio de contraseña a ${userEmail}.`
-      : `We will send a password change link to ${userEmail}.`,
-    [
+  text.privacySecurityScreen.changePasswordTitle,
+  text.privacySecurityScreen.changePasswordMessage.replace(
+    '{email}',
+    userEmail
+  ),
+  [
       {
-        text:
-          language === 'es'
-            ? 'Cancelar'
-            : 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text:
-          language === 'es'
-            ? 'Enviar correo'
-            : 'Send email',
-        onPress: async () => {
+  text: text.privacySecurityScreen.cancel,
+  style: 'cancel',
+},
+{
+  text: text.privacySecurityScreen.sendEmail,
+  onPress: async () => {
           try {
             await sendPasswordResetEmail(
               auth,
@@ -114,13 +108,9 @@ const handleChangePassword = async () => {
             );
 
             Alert.alert(
-              language === 'es'
-                ? 'Correo enviado'
-                : 'Email sent',
-              language === 'es'
-                ? 'Revisa tu bandeja de entrada y la carpeta de correo no deseado.'
-                : 'Check your inbox and spam folder.'
-            );
+  text.privacySecurityScreen.emailSentTitle,
+  text.privacySecurityScreen.emailSentMessage
+);
           } catch (error) {
             console.error(
               'Error sending password reset email:',
@@ -128,13 +118,9 @@ const handleChangePassword = async () => {
             );
 
             Alert.alert(
-              language === 'es'
-                ? 'No se pudo enviar'
-                : 'Could not send',
-              language === 'es'
-                ? 'Revisa tu conexión e inténtalo nuevamente.'
-                : 'Check your connection and try again.'
-            );
+  text.privacySecurityScreen.sendErrorTitle,
+  text.privacySecurityScreen.connectionError
+);
           }
         },
       },
@@ -142,15 +128,11 @@ const handleChangePassword = async () => {
   );
 };
   const showComingSoon = () => {
-    Alert.alert(
-      language === 'es'
-        ? 'Función en desarrollo'
-        : 'Feature in development',
-      language === 'es'
-        ? 'Esta opción estará disponible próximamente.'
-        : 'This option will be available soon.'
-    );
-  };
+  Alert.alert(
+    text.privacySecurityScreen.comingSoonTitle,
+    text.privacySecurityScreen.comingSoonMessage
+  );
+};
 
   const handleVisibilityChange = async (
   newValue: boolean
@@ -158,16 +140,12 @@ const handleChangePassword = async () => {
   const currentUser = auth.currentUser;
 
   if (!currentUser) {
-    Alert.alert(
-      language === 'es'
-        ? 'Sesión no disponible'
-        : 'Session unavailable',
-      language === 'es'
-        ? 'Inicia sesión nuevamente para cambiar esta opción.'
-        : 'Please log in again to change this option.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.privacySecurityScreen.sessionUnavailableTitle,
+    text.privacySecurityScreen.sessionUnavailableMessage
+  );
+  return;
+}
 
   const previousValue = isProfileVisible;
 
@@ -191,17 +169,11 @@ const handleChangePassword = async () => {
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'Visibilidad actualizada'
-        : 'Visibility updated',
-      newValue
-        ? language === 'es'
-          ? 'Otras personas podrán encontrar tu perfil.'
-          : 'Other people will be able to find your profile.'
-        : language === 'es'
-          ? 'Tu perfil dejará de aparecer en las búsquedas.'
-          : 'Your profile will no longer appear in searches.'
-    );
+  text.privacySecurityScreen.visibilityUpdatedTitle,
+  newValue
+    ? text.privacySecurityScreen.profileVisibleMessage
+    : text.privacySecurityScreen.profileHiddenMessage
+);
   } catch (error) {
     console.error(
       'Error saving privacy settings:',
@@ -211,13 +183,9 @@ const handleChangePassword = async () => {
     setIsProfileVisible(previousValue);
 
     Alert.alert(
-      language === 'es'
-        ? 'No se pudo guardar'
-        : 'Could not save',
-      language === 'es'
-        ? 'Revisa tu conexión e inténtalo nuevamente.'
-        : 'Check your connection and try again.'
-    );
+  text.privacySecurityScreen.saveErrorTitle,
+  text.privacySecurityScreen.connectionError
+);
   }
 };
   return (
@@ -233,44 +201,36 @@ const handleChangePassword = async () => {
           showsVerticalScrollIndicator={false}
         >
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.backButtonText}>
-              {language === 'es'
-                ? '‹ Atrás'
-                : '‹ Back'}
-            </Text>
-          </TouchableOpacity>
+  style={styles.backButton}
+  onPress={() => router.back()}
+  activeOpacity={0.8}
+>
+  <Text style={styles.backButtonText}>
+    {text.privacySecurityScreen.back}
+  </Text>
+</TouchableOpacity>
 
-          <View style={styles.header}>
-            <View style={styles.headerIcon}>
-              <Text style={styles.headerIconText}>
-                🔒
-              </Text>
-            </View>
+<View style={styles.header}>
+  <View style={styles.headerIcon}>
+    <Text style={styles.headerIconText}>
+      🔒
+    </Text>
+  </View>
 
-            <View style={styles.headerInformation}>
-              <Text style={styles.title}>
-                {language === 'es'
-                  ? 'Privacidad y seguridad'
-                  : 'Privacy and security'}
-              </Text>
+  <View style={styles.headerInformation}>
+    <Text style={styles.title}>
+      {text.privacySecurityScreen.title}
+    </Text>
 
-              <Text style={styles.subtitle}>
-                {language === 'es'
-                  ? 'Administra la seguridad y privacidad de tu cuenta.'
-                  : 'Manage your account security and privacy.'}
-              </Text>
-            </View>
-          </View>
+    <Text style={styles.subtitle}>
+      {text.privacySecurityScreen.subtitle}
+    </Text>
+  </View>
+</View>
 
           <Text style={styles.sectionTitle}>
-            {language === 'es'
-              ? 'Seguridad de la cuenta'
-              : 'Account security'}
-          </Text>
+  {text.privacySecurityScreen.accountSecurityTitle}
+</Text>
 
           <View style={styles.card}>
             <TouchableOpacity
@@ -286,16 +246,13 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Cambiar contraseña'
-                    : 'Change password'}
-                </Text>
+  {text.privacySecurityScreen.changePassword}
+</Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Actualiza la contraseña de acceso.'
-                    : 'Update your account password.'}
-                </Text>
+<Text style={styles.settingDescription}>
+  {text.privacySecurityScreen.changePasswordDescription}
+</Text>
+
               </View>
 
               <Text style={styles.arrow}>›</Text>
@@ -323,16 +280,12 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Usuarios bloqueados'
-                    : 'Blocked users'}
-                </Text>
+  {text.privacySecurityScreen.blockedUsers}
+</Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Administra las cuentas que bloqueaste.'
-                    : 'Manage the accounts you blocked.'}
-                </Text>
+<Text style={styles.settingDescription}>
+  {text.privacySecurityScreen.blockedUsersDescription}
+</Text>
               </View>
 
               <Text style={styles.arrow}>›</Text>
@@ -340,10 +293,8 @@ const handleChangePassword = async () => {
           </View>
 
           <Text style={styles.sectionTitle}>
-            {language === 'es'
-              ? 'Privacidad del perfil'
-              : 'Profile privacy'}
-          </Text>
+  {text.privacySecurityScreen.profilePrivacyTitle}
+</Text>
 
           <View style={styles.card}>
             <View style={styles.settingRow}>
@@ -355,16 +306,12 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Perfil visible'
-                    : 'Visible profile'}
-                </Text>
+  {text.privacySecurityScreen.visibleProfile}
+</Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Permite que otras personas encuentren tu perfil.'
-                    : 'Allow other people to find your profile.'}
-                </Text>
+<Text style={styles.settingDescription}>
+  {text.privacySecurityScreen.visibleProfileDescription}
+</Text>
               </View>
 
               <Switch
@@ -384,10 +331,8 @@ const handleChangePassword = async () => {
           </View>
 
           <Text style={styles.sectionTitle}>
-            {language === 'es'
-              ? 'Ayuda y control'
-              : 'Help and control'}
-          </Text>
+  {text.privacySecurityScreen.helpAndControlTitle}
+</Text>
 
           <View style={styles.card}>
             <TouchableOpacity
@@ -410,16 +355,12 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.settingTitle}>
-                  {language === 'es'
-                    ? 'Reportar un problema'
-                    : 'Report a problem'}
-                </Text>
+  {text.privacySecurityScreen.reportProblem}
+</Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Reporta comportamientos inapropiados o fallos.'
-                    : 'Report inappropriate behavior or application issues.'}
-                </Text>
+<Text style={styles.settingDescription}>
+  {text.privacySecurityScreen.reportProblemDescription}
+</Text>
               </View>
 
               <Text style={styles.arrow}>›</Text>
@@ -447,16 +388,12 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.dangerTitle}>
-                  {language === 'es'
-                    ? 'Eliminar cuenta'
-                    : 'Delete account'}
-                </Text>
+  {text.privacySecurityScreen.deleteAccount}
+</Text>
 
-                <Text style={styles.settingDescription}>
-                  {language === 'es'
-                    ? 'Elimina permanentemente tu cuenta y tus datos.'
-                    : 'Permanently delete your account and data.'}
-                </Text>
+<Text style={styles.settingDescription}>
+  {text.privacySecurityScreen.deleteAccountDescription}
+</Text>
               </View>
 
               <Text style={styles.dangerArrow}>

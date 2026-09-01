@@ -464,6 +464,76 @@ deleteAccountScreen: {
   securityNote:
     'For security, permanent deletion will require additional identity verification.',
 },
+privacySecurityScreen: {
+  emailUnavailableTitle:
+    'Email unavailable',
+  emailUnavailableMessage:
+    'No email address was found for this account.',
+  changePasswordTitle:
+    'Change password',
+  changePasswordMessage:
+    'We will send a password change link to {email}.',
+  cancel:
+    'Cancel',
+  sendEmail:
+    'Send email',
+  emailSentTitle:
+    'Email sent',
+  emailSentMessage:
+    'Check your inbox and spam folder.',
+  sendErrorTitle:
+    'Could not send',
+  connectionError:
+    'Check your connection and try again.',
+  comingSoonTitle:
+    'Feature in development',
+  comingSoonMessage:
+    'This option will be available soon.',
+  sessionUnavailableTitle:
+    'Session unavailable',
+  sessionUnavailableMessage:
+    'Please log in again to change this option.',
+  visibilityUpdatedTitle:
+    'Visibility updated',
+  profileVisibleMessage:
+    'Other people will be able to find your profile.',
+  profileHiddenMessage:
+    'Your profile will no longer appear in searches.',
+  saveErrorTitle:
+    'Could not save',
+  back:
+    '‹ Back',
+  title:
+    'Privacy and security',
+  subtitle:
+    'Manage your account security and privacy.',
+  accountSecurityTitle:
+    'Account security',
+  changePassword:
+    'Change password',
+  changePasswordDescription:
+    'Update your account password.',
+  blockedUsers:
+    'Blocked users',
+  blockedUsersDescription:
+    'Manage the accounts you blocked.',
+  profilePrivacyTitle:
+    'Profile privacy',
+  visibleProfile:
+    'Visible profile',
+  visibleProfileDescription:
+    'Allow other people to find your profile.',
+  helpAndControlTitle:
+    'Help and control',
+  reportProblem:
+    'Report a problem',
+  reportProblemDescription:
+    'Report inappropriate behavior or application issues.',
+  deleteAccount:
+    'Delete account',
+  deleteAccountDescription:
+    'Permanently delete your account and data.',
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -906,7 +976,76 @@ deleteAccountScreen: {
   securityNote:
     'Por seguridad, la eliminación definitiva requerirá una verificación adicional de identidad.',
 },
-
+privacySecurityScreen: {
+  emailUnavailableTitle:
+    'Correo no disponible',
+  emailUnavailableMessage:
+    'No encontramos un correo asociado a esta cuenta.',
+  changePasswordTitle:
+    'Cambiar contraseña',
+  changePasswordMessage:
+    'Enviaremos un enlace de cambio de contraseña a {email}.',
+  cancel:
+    'Cancelar',
+  sendEmail:
+    'Enviar correo',
+  emailSentTitle:
+    'Correo enviado',
+  emailSentMessage:
+    'Revisa tu bandeja de entrada y la carpeta de correo no deseado.',
+  sendErrorTitle:
+    'No se pudo enviar',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  comingSoonTitle:
+    'Función en desarrollo',
+  comingSoonMessage:
+    'Esta opción estará disponible próximamente.',
+  sessionUnavailableTitle:
+    'Sesión no disponible',
+  sessionUnavailableMessage:
+    'Inicia sesión nuevamente para cambiar esta opción.',
+  visibilityUpdatedTitle:
+    'Visibilidad actualizada',
+  profileVisibleMessage:
+    'Otras personas podrán encontrar tu perfil.',
+  profileHiddenMessage:
+    'Tu perfil dejará de aparecer en las búsquedas.',
+  saveErrorTitle:
+    'No se pudo guardar',
+  back:
+    '‹ Atrás',
+  title:
+    'Privacidad y seguridad',
+  subtitle:
+    'Administra la seguridad y privacidad de tu cuenta.',
+  accountSecurityTitle:
+    'Seguridad de la cuenta',
+  changePassword:
+    'Cambiar contraseña',
+  changePasswordDescription:
+    'Actualiza la contraseña de acceso.',
+  blockedUsers:
+    'Usuarios bloqueados',
+  blockedUsersDescription:
+    'Administra las cuentas que bloqueaste.',
+  profilePrivacyTitle:
+    'Privacidad del perfil',
+  visibleProfile:
+    'Perfil visible',
+  visibleProfileDescription:
+    'Permite que otras personas encuentren tu perfil.',
+  helpAndControlTitle:
+    'Ayuda y control',
+  reportProblem:
+    'Reportar un problema',
+  reportProblemDescription:
+    'Reporta comportamientos inapropiados o fallos.',
+  deleteAccount:
+    'Eliminar cuenta',
+  deleteAccountDescription:
+    'Elimina permanentemente tu cuenta y tus datos.',
+},
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',
   emailUnavailable: 'Correo no disponible',
