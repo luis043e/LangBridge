@@ -18,7 +18,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
+
 type LanguageOption = {
   code: string;
   es: string;
@@ -116,10 +120,13 @@ export default function LanguageProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ lang?: string }>();
 
-  const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
+  const language: AppLanguage =
+  params.lang === 'es' ? 'es' : 'en';
 
-  const [nativeLanguage, setNativeLanguage] =
-    useState<LanguageOption | null>(null);
+const text = translations[language];
+
+const [nativeLanguage, setNativeLanguage] =
+  useState<LanguageOption | null>(null);
 const [isNativeLanguageOpen, setIsNativeLanguageOpen] =
   useState(false);
   const [learningLanguage, setLearningLanguage] =
@@ -239,17 +246,21 @@ const savedLevel = levelOptions.find(
 }, [loadingAttempt]);
 
   const getLanguageName = (option: LanguageOption) => {
-    return language === 'es' ? option.es : option.en;
-  };
+  const languageNames: Record<string, string> =
+    text.languageProfileScreen.languageNames;
 
-  const getLevelName = (option?: LevelOption) => {
+  return languageNames[option.code] || option.code;
+};
+
+const getLevelName = (option?: LevelOption) => {
   if (!option) {
-    return language === 'es'
-      ? 'Selecciona tu nivel actual'
-      : 'Select your current level';
+    return text.languageProfileScreen.selectCurrentLevel;
   }
 
-  return language === 'es' ? option.es : option.en;
+  const levelNames: Record<string, string> =
+    text.languageProfileScreen.levelNames;
+
+  return levelNames[option.id] || option.code;
 };
 
   const showNativeLanguageSelector = () => {
@@ -267,74 +278,46 @@ const savedLevel = levelOptions.find(
   }
 
   if (!nativeLanguage) {
-    Alert.alert(
-  isEditingProfile
-    ? language === 'es'
-      ? 'Cambios guardados'
-      : 'Changes saved'
-    : language === 'es'
-      ? 'Perfil guardado'
-      : 'Profile saved',
-  isEditingProfile
-    ? language === 'es'
-      ? 'Tu perfil lingüístico fue actualizado correctamente.'
-      : 'Your language profile was updated successfully.'
-    : language === 'es'
-      ? 'Tu perfil lingüístico fue guardado correctamente.'
-      : 'Your language profile was saved successfully.',
-    );
-    return;
-  }
+  Alert.alert(
+    text.languageProfileScreen.nativeLanguageRequiredTitle,
+    text.languageProfileScreen.nativeLanguageRequiredMessage
+  );
+  return;
+}
 
-  if (!learningLanguage) {
-    Alert.alert(
-      language === 'es'
-        ? 'Idioma de aprendizaje requerido'
-        : 'Learning language required',
-      language === 'es'
-        ? 'Selecciona el idioma que quieres aprender.'
-        : 'Select the language you want to learn.'
-    );
-    return;
-  }
+ if (!learningLanguage) {
+  Alert.alert(
+    text.languageProfileScreen.learningLanguageRequiredTitle,
+    text.languageProfileScreen.learningLanguageRequiredMessage
+  );
+  return;
+}
 
   if (nativeLanguage.code === learningLanguage.code) {
-    Alert.alert(
-      language === 'es'
-        ? 'Selecciona idiomas diferentes'
-        : 'Select different languages',
-      language === 'es'
-        ? 'El idioma nativo y el idioma que quieres aprender deben ser diferentes.'
-        : 'Your native language and learning language must be different.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.languageProfileScreen.differentLanguagesTitle,
+    text.languageProfileScreen.differentLanguagesMessage
+  );
+  return;
+}
 
-  if (!selectedLevel) {
-    Alert.alert(
-      language === 'es'
-        ? 'Nivel requerido'
-        : 'Level required',
-      language === 'es'
-        ? 'Selecciona tu nivel actual para continuar.'
-        : 'Select your current level to continue.'
-    );
-    return;
-  }
+ if (!selectedLevel) {
+  Alert.alert(
+    text.languageProfileScreen.levelRequiredTitle,
+    text.languageProfileScreen.levelRequiredMessage
+  );
+  return;
+}
 
   const currentUser = auth.currentUser;
 
   if (!currentUser) {
-    Alert.alert(
-      language === 'es'
-        ? 'Sesión requerida'
-        : 'Login required',
-      language === 'es'
-        ? 'Debes iniciar sesión nuevamente para guardar tu perfil.'
-        : 'You must log in again to save your profile.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.languageProfileScreen.loginRequiredTitle,
+    text.languageProfileScreen.loginRequiredMessage
+  );
+  return;
+}
 
   try {
     setIsSaving(true);
@@ -369,31 +352,29 @@ email:
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'Perfil guardado'
-        : 'Profile saved',
-      language === 'es'
-        ? 'Tu perfil lingüístico fue guardado correctamente.'
-        : 'Your language profile was saved successfully.',
-      [
-        {
-          text:
-            language === 'es'
-              ? 'Continuar'
-              : 'Continue',
-          onPress: () =>
-            router.replace({
-              pathname: '/home',
-              params: {
-                lang: language,
-                nativeLanguage: nativeLanguage.code,
-                learningLanguage: learningLanguage.code,
-                level: selectedLevel,
-              },
-            }),
-        },
-      ]
-    );
+  isEditingProfile
+    ? text.languageProfileScreen.changesSavedTitle
+    : text.languageProfileScreen.profileSavedTitle,
+  isEditingProfile
+    ? text.languageProfileScreen.changesSavedMessage
+    : text.languageProfileScreen.profileSavedMessage,
+  [
+    {
+      text: text.languageProfileScreen.continue,
+      onPress: () =>
+        router.replace({
+          pathname: '/home',
+          params: {
+            lang: language,
+            nativeLanguage: nativeLanguage.code,
+            learningLanguage: learningLanguage.code,
+            level: selectedLevel,
+          },
+        }),
+    },
+  ]
+);
+
   } catch (error) {
     console.error(
       'Error saving language profile:',
@@ -401,13 +382,9 @@ email:
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'Error al guardar'
-        : 'Save error',
-      language === 'es'
-        ? 'No se pudo guardar tu perfil. Revisa tu conexión e inténtalo nuevamente.'
-        : 'Your profile could not be saved. Check your connection and try again.'
-    );
+  text.languageProfileScreen.saveErrorTitle,
+  text.languageProfileScreen.saveErrorMessage
+);
   } finally {
     setIsSaving(false);
   }
@@ -444,18 +421,16 @@ if (isLoadingProfile) {
         />
 
         <Text
-          style={{
-            color: '#E2E8F0',
-            fontSize: 16,
-            fontWeight: '600',
-            marginTop: 16,
-            textAlign: 'center',
-          }}
-        >
-          {language === 'es'
-            ? 'Cargando tu perfil lingüístico...'
-            : 'Loading your language profile...'}
-        </Text>
+  style={{
+    color: '#E2E8F0',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 16,
+    textAlign: 'center',
+  }}
+>
+  {text.languageProfileScreen.loadingProfile}
+</Text>
       </View>
     </SafeAreaView>
   );
@@ -483,9 +458,7 @@ if (hasLoadingError) {
             textAlign: 'center',
           }}
         >
-          {language === 'es'
-            ? 'No pudimos cargar tu perfil'
-            : 'We could not load your profile'}
+          {text.languageProfileScreen.loadErrorTitle}
         </Text>
 
         <Text
@@ -497,9 +470,7 @@ if (hasLoadingError) {
             textAlign: 'center',
           }}
         >
-          {language === 'es'
-            ? 'Revisa tu conexión e inténtalo nuevamente.'
-            : 'Check your connection and try again.'}
+          {text.languageProfileScreen.loadErrorMessage}
         </Text>
 
         <TouchableOpacity
@@ -514,9 +485,7 @@ if (hasLoadingError) {
           activeOpacity={0.85}
         >
           <Text style={styles.primaryButtonText}>
-            {language === 'es'
-              ? 'Reintentar'
-              : 'Try again'}
+            {text.languageProfileScreen.tryAgain}
           </Text>
         </TouchableOpacity>
 
@@ -530,10 +499,8 @@ if (hasLoadingError) {
           activeOpacity={0.8}
         >
           <Text style={styles.backButtonText}>
-            {language === 'es'
-              ? 'Volver'
-              : 'Go back'}
-          </Text>
+  {text.languageProfileScreen.goBack}
+</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -554,41 +521,29 @@ if (hasLoadingError) {
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es' ? '‹ Atrás' : '‹ Back'}
+              {text.languageProfileScreen.back}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.formContainer}>
             <Text style={styles.step}>
-              {language === 'es'
-                ? 'PASO 1 DE 3'
-                : 'STEP 1 OF 3'}
+              {text.languageProfileScreen.step}
             </Text>
 
             <Text style={styles.title}>
   {isEditingProfile
-    ? language === 'es'
-      ? 'Edita tu perfil lingüístico'
-      : 'Edit your language profile'
-    : language === 'es'
-      ? 'Crea tu perfil lingüístico'
-      : 'Build your language profile'}
+  ? text.languageProfileScreen.editTitle
+  : text.languageProfileScreen.createTitle}
 </Text>
 
             <Text style={styles.subtitle}>
-  {isEditingProfile
-    ? language === 'es'
-      ? 'Actualiza tus idiomas y tu nivel cuando lo necesites.'
-      : 'Update your languages and level whenever you need to.'
-    : language === 'es'
-      ? 'Cuéntanos qué idioma hablas y cuál quieres aprender.'
-      : 'Tell us about the language you speak and want to learn.'}
+ {isEditingProfile
+  ? text.languageProfileScreen.editSubtitle
+  : text.languageProfileScreen.createSubtitle}
 </Text>
 
             <Text style={styles.label}>
-              {language === 'es'
-                ? '¿Cuál es tu idioma nativo?'
-                : 'What is your native language?'}
+              {text.languageProfileScreen.nativeLanguageQuestion}
             </Text>
 
             <TouchableOpacity
@@ -606,41 +561,35 @@ if (hasLoadingError) {
                 ]}
               >
                 {nativeLanguage
-                  ? getLanguageName(nativeLanguage)
-                  : language === 'es'
-                    ? 'Selecciona tu idioma nativo'
-                    : 'Select your native language'}
+  ? getLanguageName(nativeLanguage)
+  : text.languageProfileScreen.selectNativeLanguage}
               </Text>
 
               <Text style={styles.arrow}>⌄</Text>
             </TouchableOpacity>
 
-            <Text style={styles.label}>
-              {language === 'es'
-                ? '¿Qué idioma quieres aprender?'
-                : 'What language do you want to learn?'}
-            </Text>
+           <Text style={styles.label}>
+  {text.languageProfileScreen.learningLanguageQuestion}
+</Text>
 
-            <TouchableOpacity
-              style={[
-                styles.selector,
-                learningLanguage && styles.selectedSelector,
-              ]}
-              onPress={showLearningLanguageSelector}
-              activeOpacity={0.85}
-            >
-              <Text
-                style={[
-                  styles.selectorText,
-                  learningLanguage && styles.selectedSelectorText,
-                ]}
-              >
-                {learningLanguage
-                  ? getLanguageName(learningLanguage)
-                  : language === 'es'
-                    ? 'Selecciona un idioma para aprender'
-                    : 'Select a learning language'}
-              </Text>
+<TouchableOpacity
+  style={[
+    styles.selector,
+    learningLanguage && styles.selectedSelector,
+  ]}
+  onPress={showLearningLanguageSelector}
+  activeOpacity={0.85}
+>
+  <Text
+    style={[
+      styles.selectorText,
+      learningLanguage && styles.selectedSelectorText,
+    ]}
+  >
+    {learningLanguage
+      ? getLanguageName(learningLanguage)
+      : text.languageProfileScreen.selectLearningLanguage}
+  </Text>
 
               <Text style={styles.arrow}>⌄</Text>
             </TouchableOpacity>
@@ -811,10 +760,8 @@ if (hasLoadingError) {
   </View>
 )}
             <Text style={styles.label}>
-              {language === 'es'
-                ? '¿Cuál es tu nivel actual?'
-                : 'What is your current level?'}
-            </Text>
+  {text.languageProfileScreen.currentLevelQuestion}
+</Text>
 
             <TouchableOpacity
   style={[
@@ -833,14 +780,12 @@ if (hasLoadingError) {
     ]}
   >
     {selectedLevel
-      ? getLevelName(
-          levelOptions.find(
-            (option) => option.id === selectedLevel
-          )!
-        )
-      : language === 'es'
-        ? 'Selecciona tu nivel actual'
-        : 'Select your current level'}
+  ? getLevelName(
+      levelOptions.find(
+        (option) => option.id === selectedLevel
+      )!
+    )
+  : text.languageProfileScreen.selectCurrentLevel}
   </Text>
 
   <Text style={styles.arrow}>
@@ -928,18 +873,14 @@ if (hasLoadingError) {
 )}
 
             <View style={styles.infoCard}>
-              <Text style={styles.infoTitle}>
-                {language === 'es'
-                  ? '¿Por qué necesitamos esta información?'
-                  : 'Why do we need this?'}
-              </Text>
+  <Text style={styles.infoTitle}>
+    {text.languageProfileScreen.informationTitle}
+  </Text>
 
-              <Text style={styles.infoText}>
-                {language === 'es'
-                  ? 'LangBridge utiliza tus idiomas y tu nivel para recomendarte compañeros compatibles que puedan ayudarte a alcanzar tus objetivos.'
-                  : 'LangBridge uses your languages and level to recommend compatible partners who can help you reach your goals.'}
-              </Text>
-            </View>
+  <Text style={styles.infoText}>
+    {text.languageProfileScreen.informationText}
+  </Text>
+</View>
 
             <TouchableOpacity
   style={[
@@ -958,20 +899,14 @@ if (hasLoadingError) {
       />
 
       <Text style={styles.savingText}>
-        {language === 'es'
-          ? 'Guardando...'
-          : 'Saving...'}
-      </Text>
+  {text.languageProfileScreen.saving}
+</Text>
     </View>
   ) : (
     <Text style={styles.primaryButtonText}>
   {isEditingProfile
-    ? language === 'es'
-      ? 'Guardar cambios'
-      : 'Save changes'
-    : language === 'es'
-      ? 'Continuar'
-      : 'Continue'}
+    ? text.languageProfileScreen.saveChanges
+    : text.languageProfileScreen.continue}
 </Text>
   )}
 </TouchableOpacity>

@@ -680,7 +680,100 @@ languageSettingsScreen: {
   close:
     'Close',
 },
-
+languageProfileScreen: {
+  languageNames: {
+    es: 'Spanish',
+    en: 'English',
+    fr: 'French',
+    pt: 'Portuguese',
+    de: 'German',
+    it: 'Italian',
+  },
+  levelNames: {
+    a1: 'A1 · Beginner',
+    a2: 'A2 · Elementary',
+    b1: 'B1 · Intermediate',
+    b2: 'B2 · Upper intermediate',
+    c1: 'C1 · Advanced',
+    c2: 'C2 · Proficiency',
+  },
+  selectCurrentLevel:
+    'Select your current level',
+  nativeLanguageRequiredTitle:
+    'Native language required',
+  nativeLanguageRequiredMessage:
+    'Select your native language to continue.',
+  learningLanguageRequiredTitle:
+    'Learning language required',
+  learningLanguageRequiredMessage:
+    'Select the language you want to learn.',
+  differentLanguagesTitle:
+    'Select different languages',
+  differentLanguagesMessage:
+    'Your native language and learning language must be different.',
+  levelRequiredTitle:
+    'Level required',
+  levelRequiredMessage:
+    'Select your current level to continue.',
+  loginRequiredTitle:
+    'Login required',
+  loginRequiredMessage:
+    'You must log in again to save your profile.',
+  profileSavedTitle:
+    'Profile saved',
+  profileSavedMessage:
+    'Your language profile was saved successfully.',
+  changesSavedTitle:
+    'Changes saved',
+  changesSavedMessage:
+    'Your language profile was updated successfully.',
+  continue:
+    'Continue',
+  saveErrorTitle:
+    'Save error',
+  saveErrorMessage:
+    'Your profile could not be saved. Check your connection and try again.',
+  loadingProfile:
+    'Loading your language profile...',
+  loadErrorTitle:
+    'We could not load your profile',
+  loadErrorMessage:
+    'Check your connection and try again.',
+  tryAgain:
+    'Try again',
+  goBack:
+    'Go back',
+  back:
+    '‹ Back',
+  step:
+    'STEP 1 OF 3',
+  createTitle:
+    'Build your language profile',
+  editTitle:
+    'Edit your language profile',
+  createSubtitle:
+    'Tell us about the language you speak and want to learn.',
+  editSubtitle:
+    'Update your languages and level whenever you need to.',
+  nativeLanguageQuestion:
+    'What is your native language?',
+  selectNativeLanguage:
+    'Select your native language',
+  learningLanguageQuestion:
+    'What language do you want to learn?',
+  selectLearningLanguage:
+    'Select a learning language',
+  currentLevelQuestion:
+    'What is your current level?',
+  informationTitle:
+    'Why do we need this?',
+  informationText:
+    'LangBridge uses your languages and level to recommend compatible partners who can help you reach your goals.',
+  saving:
+    'Saving...',
+  saveChanges:
+    'Save changes',
+},
     loginScreen: {
   title: 'Welcome back',
   subtitle:
@@ -1338,6 +1431,100 @@ languageSettingsScreen: {
     'Guardar cambios',
   close:
     'Cerrar',
+},
+languageProfileScreen: {
+  languageNames: {
+    es: 'Español',
+    en: 'Inglés',
+    fr: 'Francés',
+    pt: 'Portugués',
+    de: 'Alemán',
+    it: 'Italiano',
+  },
+  levelNames: {
+    a1: 'A1 · Principiante',
+    a2: 'A2 · Básico',
+    b1: 'B1 · Intermedio',
+    b2: 'B2 · Intermedio alto',
+    c1: 'C1 · Avanzado',
+    c2: 'C2 · Dominio',
+  },
+  selectCurrentLevel:
+    'Selecciona tu nivel actual',
+  nativeLanguageRequiredTitle:
+    'Idioma nativo requerido',
+  nativeLanguageRequiredMessage:
+    'Selecciona tu idioma nativo para continuar.',
+  learningLanguageRequiredTitle:
+    'Idioma de aprendizaje requerido',
+  learningLanguageRequiredMessage:
+    'Selecciona el idioma que quieres aprender.',
+  differentLanguagesTitle:
+    'Selecciona idiomas diferentes',
+  differentLanguagesMessage:
+    'El idioma nativo y el idioma que quieres aprender deben ser diferentes.',
+  levelRequiredTitle:
+    'Nivel requerido',
+  levelRequiredMessage:
+    'Selecciona tu nivel actual para continuar.',
+  loginRequiredTitle:
+    'Sesión requerida',
+  loginRequiredMessage:
+    'Debes iniciar sesión nuevamente para guardar tu perfil.',
+  profileSavedTitle:
+    'Perfil guardado',
+  profileSavedMessage:
+    'Tu perfil lingüístico fue guardado correctamente.',
+  changesSavedTitle:
+    'Cambios guardados',
+  changesSavedMessage:
+    'Tu perfil lingüístico fue actualizado correctamente.',
+  continue:
+    'Continuar',
+  saveErrorTitle:
+    'Error al guardar',
+  saveErrorMessage:
+    'No se pudo guardar tu perfil. Revisa tu conexión e inténtalo nuevamente.',
+  loadingProfile:
+    'Cargando tu perfil lingüístico...',
+  loadErrorTitle:
+    'No pudimos cargar tu perfil',
+  loadErrorMessage:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  tryAgain:
+    'Reintentar',
+  goBack:
+    'Volver',
+  back:
+    '‹ Atrás',
+  step:
+    'PASO 1 DE 3',
+  createTitle:
+    'Crea tu perfil lingüístico',
+  editTitle:
+    'Edita tu perfil lingüístico',
+  createSubtitle:
+    'Cuéntanos qué idioma hablas y cuál quieres aprender.',
+  editSubtitle:
+    'Actualiza tus idiomas y tu nivel cuando lo necesites.',
+  nativeLanguageQuestion:
+    '¿Cuál es tu idioma nativo?',
+  selectNativeLanguage:
+    'Selecciona tu idioma nativo',
+  learningLanguageQuestion:
+    '¿Qué idioma quieres aprender?',
+  selectLearningLanguage:
+    'Selecciona un idioma para aprender',
+  currentLevelQuestion:
+    '¿Cuál es tu nivel actual?',
+  informationTitle:
+    '¿Por qué necesitamos esta información?',
+  informationText:
+    'LangBridge utiliza tus idiomas y tu nivel para recomendarte compañeros compatibles que puedan ayudarte a alcanzar tus objetivos.',
+  saving:
+    'Guardando...',
+  saveChanges:
+    'Guardar cambios',
 },
 settingsScreen: {
   defaultUserName: 'Usuario de LangBridge',
