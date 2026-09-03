@@ -606,6 +606,139 @@ editProfileScreen: {
   saveChanges:
     'Save changes',
 },
+partnerProfileScreen: {
+  languageNames: {
+    es: 'Spanish',
+    en: 'English',
+    fr: 'French',
+    pt: 'Portuguese',
+    de: 'German',
+    it: 'Italian',
+  },
+  levelNames: {
+    a1: 'A1 · Beginner',
+    a2: 'A2 · Elementary',
+    b1: 'B1 · Intermediate',
+    b2: 'B2 · Upper intermediate',
+    c1: 'C1 · Advanced',
+    c2: 'C2 · Proficiency',
+    beginner: 'A1 · Beginner',
+    intermediate: 'B1 · Intermediate',
+    advanced: 'C1 · Advanced',
+  },
+  notSpecified:
+    'Not specified',
+  levelNotSpecified:
+    'Level not specified',
+  defaultUserName:
+    'LangBridge user',
+  locationNotProvided:
+    'Location not provided',
+  countryNotProvided:
+    'Country not provided',
+  blockUnavailableTitle:
+    'Could not block',
+  blockUnavailableMessage:
+    'The required user information could not be found.',
+  invalidBlockActionTitle:
+    'Invalid action',
+  invalidBlockActionMessage:
+    'You cannot block your own profile.',
+  blockUserTitle:
+    'Block user',
+  blockConfirmationMessage:
+    'Do you want to block {name}? This person will no longer appear in Explore.',
+  cancel:
+    'Cancel',
+  block:
+    'Block',
+  userBlockedTitle:
+    'User blocked',
+  userBlockedMessage:
+    '{name} was blocked successfully.',
+  blockErrorTitle:
+    'Could not block',
+  connectionError:
+    'Check your connection and try again.',
+  loginRequiredTitle:
+    'Login required',
+  loginRequiredMessage:
+    'You must log in again to send a request.',
+  profileUnavailableTitle:
+    'Profile unavailable',
+  profileUnavailableMessage:
+    'This partner could not be identified.',
+  invalidRequestTitle:
+    'Invalid request',
+  invalidRequestMessage:
+    'You cannot send a request to yourself.',
+  interactionUnavailableTitle:
+    'Interaction unavailable',
+  interactionUnavailableMessage:
+    'A request cannot be sent to this profile.',
+  existingConnectionTitle:
+    'Existing connection',
+  existingConnectionMessage:
+    'You are already connected with {name}.',
+  requestAlreadySentTitle:
+    'Request already sent',
+  requestAlreadySentMessage:
+    'You already sent a request to {name}.',
+  requestReceivedTitle:
+    'Request received',
+  requestReceivedMessage:
+    '{name} already sent you a request. Review it in Requests.',
+  requestUnavailableTitle:
+    'Request unavailable',
+  rejectedRequestMessage:
+    'This relationship has a rejected request and cannot be reopened automatically.',
+  requestSentTitle:
+    'Request sent',
+  requestSentMessage:
+    'Your connection request was sent to {name}.',
+  sendErrorTitle:
+    'Send error',
+  sendErrorMessage:
+    'The request could not be sent. Check your connection and try again.',
+  back:
+    '‹ Back',
+  online:
+    'Online',
+  offline:
+    'Offline',
+  aboutMe:
+    'About me',
+  languageProfile:
+    'Language profile',
+  nativeLanguage:
+    'Native language',
+  learning:
+    'Learning',
+  currentLevel:
+    'Current level',
+  matchTitle:
+    'Practice and learn together',
+  matchDescription:
+    'Send a request to start a language exchange connection.',
+  sending:
+    'Sending...',
+  checkingConnection:
+    'Checking connection...',
+  sendRequest:
+    'Send request',
+  requestSent:
+    'Request sent',
+  viewReceivedRequest:
+    'View received request',
+  openConversation:
+    'Open conversation',
+  requestUnavailable:
+    'Request unavailable',
+  interactionUnavailable:
+    'Interaction unavailable',
+  blockUser:
+    'Block user',
+},
 languageSettingsScreen: {
   languageNames: {
     es: 'Spanish',
@@ -1357,6 +1490,139 @@ editProfileScreen: {
     'Guardando...',
   saveChanges:
     'Guardar cambios',
+},
+partnerProfileScreen: {
+  languageNames: {
+    es: 'Español',
+    en: 'Inglés',
+    fr: 'Francés',
+    pt: 'Portugués',
+    de: 'Alemán',
+    it: 'Italiano',
+  },
+  levelNames: {
+    a1: 'A1 · Principiante',
+    a2: 'A2 · Básico',
+    b1: 'B1 · Intermedio',
+    b2: 'B2 · Intermedio alto',
+    c1: 'C1 · Avanzado',
+    c2: 'C2 · Dominio',
+    beginner: 'A1 · Principiante',
+    intermediate: 'B1 · Intermedio',
+    advanced: 'C1 · Avanzado',
+  },
+  notSpecified:
+    'No especificado',
+  levelNotSpecified:
+    'Nivel no especificado',
+  defaultUserName:
+    'Usuario de LangBridge',
+  locationNotProvided:
+    'Ubicación no indicada',
+  countryNotProvided:
+    'País no indicado',
+  blockUnavailableTitle:
+    'No se pudo bloquear',
+  blockUnavailableMessage:
+    'No encontramos la información necesaria del usuario.',
+  invalidBlockActionTitle:
+    'Acción no válida',
+  invalidBlockActionMessage:
+    'No puedes bloquear tu propio perfil.',
+  blockUserTitle:
+    'Bloquear usuario',
+  blockConfirmationMessage:
+    '¿Quieres bloquear a {name}? Esta persona dejará de aparecer en Explorar.',
+  cancel:
+    'Cancelar',
+  block:
+    'Bloquear',
+  userBlockedTitle:
+    'Usuario bloqueado',
+  userBlockedMessage:
+    '{name} fue bloqueado correctamente.',
+  blockErrorTitle:
+    'No se pudo bloquear',
+  connectionError:
+    'Revisa tu conexión e inténtalo nuevamente.',
+  loginRequiredTitle:
+    'Sesión requerida',
+  loginRequiredMessage:
+    'Debes iniciar sesión nuevamente para enviar una solicitud.',
+  profileUnavailableTitle:
+    'Perfil no disponible',
+  profileUnavailableMessage:
+    'No se pudo identificar a este compañero.',
+  invalidRequestTitle:
+    'Solicitud no válida',
+  invalidRequestMessage:
+    'No puedes enviarte una solicitud a ti mismo.',
+  interactionUnavailableTitle:
+    'Interacción no disponible',
+  interactionUnavailableMessage:
+    'No es posible enviar una solicitud a este perfil.',
+  existingConnectionTitle:
+    'Conexión existente',
+  existingConnectionMessage:
+    'Ya estás conectado con {name}.',
+  requestAlreadySentTitle:
+    'Solicitud ya enviada',
+  requestAlreadySentMessage:
+    'Ya enviaste una solicitud a {name}.',
+  requestReceivedTitle:
+    'Solicitud recibida',
+  requestReceivedMessage:
+    '{name} ya te envió una solicitud. Revísala en Solicitudes.',
+  requestUnavailableTitle:
+    'Solicitud no disponible',
+  rejectedRequestMessage:
+    'Esta relación tiene una solicitud rechazada y no puede reabrirse automáticamente.',
+  requestSentTitle:
+    'Solicitud enviada',
+  requestSentMessage:
+    'Tu solicitud de conexión fue enviada a {name}.',
+  sendErrorTitle:
+    'Error al enviar',
+  sendErrorMessage:
+    'No se pudo enviar la solicitud. Revisa tu conexión e inténtalo nuevamente.',
+  back:
+    '‹ Atrás',
+  online:
+    'En línea',
+  offline:
+    'Desconectado',
+  aboutMe:
+    'Acerca de mí',
+  languageProfile:
+    'Perfil lingüístico',
+  nativeLanguage:
+    'Idioma nativo',
+  learning:
+    'Está aprendiendo',
+  currentLevel:
+    'Nivel actual',
+  matchTitle:
+    'Practiquen y aprendan juntos',
+  matchDescription:
+    'Envía una solicitud para comenzar una conexión de intercambio lingüístico.',
+  sending:
+    'Enviando...',
+  checkingConnection:
+    'Comprobando relación...',
+  sendRequest:
+    'Enviar solicitud',
+  requestSent:
+    'Solicitud enviada',
+  viewReceivedRequest:
+    'Ver solicitud recibida',
+  openConversation:
+    'Abrir conversación',
+  requestUnavailable:
+    'Solicitud no disponible',
+  interactionUnavailable:
+    'Interacción no disponible',
+  blockUser:
+    'Bloquear usuario',
 },
 languageSettingsScreen: {
   languageNames: {

@@ -25,7 +25,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { auth, db } from '../firebaseConfig';
-import { type AppLanguage } from '../translations';
+import {
+  translations,
+  type AppLanguage,
+} from '../translations';
 
 type ConnectionState =
   | 'loading'
@@ -54,95 +57,28 @@ export default function PartnerProfileScreen() {
   }>();
 
   const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
-    const getLanguageName = (code: string) => {
-  const languageNames: Record<
-    string,
-    { es: string; en: string }
-  > = {
-    es: {
-      es: 'Español',
-      en: 'Spanish',
-    },
-    en: {
-      es: 'Inglés',
-      en: 'English',
-    },
-    fr: {
-      es: 'Francés',
-      en: 'French',
-    },
-    pt: {
-      es: 'Portugués',
-      en: 'Portuguese',
-    },
-    de: {
-      es: 'Alemán',
-      en: 'German',
-    },
-    it: {
-      es: 'Italiano',
-      en: 'Italian',
-    },
-  };
+  params.lang === 'es' ? 'es' : 'en';
+
+const text = translations[language];
+
+const getLanguageName = (code: string) => {
+  const languageNames: Record<string, string> =
+    text.partnerProfileScreen.languageNames;
 
   return (
-    languageNames[code]?.[language] ||
+    languageNames[code] ||
     code ||
-    (language === 'es'
-      ? 'No especificado'
-      : 'Not specified')
+    text.partnerProfileScreen.notSpecified
   );
 };
 
 const getLevelName = (levelCode: string) => {
-  const levelNames: Record<
-    string,
-    { es: string; en: string }
-  > = {
-    a1: {
-      es: 'A1 · Principiante',
-      en: 'A1 · Beginner',
-    },
-    a2: {
-      es: 'A2 · Básico',
-      en: 'A2 · Elementary',
-    },
-    b1: {
-      es: 'B1 · Intermedio',
-      en: 'B1 · Intermediate',
-    },
-    b2: {
-      es: 'B2 · Intermedio alto',
-      en: 'B2 · Upper intermediate',
-    },
-    c1: {
-      es: 'C1 · Avanzado',
-      en: 'C1 · Advanced',
-    },
-    c2: {
-      es: 'C2 · Dominio',
-      en: 'C2 · Proficiency',
-    },
-    beginner: {
-      es: 'A1 · Principiante',
-      en: 'A1 · Beginner',
-    },
-    intermediate: {
-      es: 'B1 · Intermedio',
-      en: 'B1 · Intermediate',
-    },
-    advanced: {
-      es: 'C1 · Avanzado',
-      en: 'C1 · Advanced',
-    },
-  };
+  const levelNames: Record<string, string> =
+    text.partnerProfileScreen.levelNames;
 
   return (
-    levelNames[levelCode]?.[language] ||
-    (language === 'es'
-      ? 'Nivel no especificado'
-      : 'Level not specified')
+    levelNames[levelCode] ||
+    text.partnerProfileScreen.levelNotSpecified
   );
 };
 
@@ -151,39 +87,29 @@ const getLevelName = (levelCode: string) => {
     const profileUserId = isOwnProfile
   ? auth.currentUser?.uid
   : params.partnerId;
-  const name =
-    params.name ||
-    (language === 'es'
-      ? 'Usuario de LangBridge'
-      : 'LangBridge user');
+ const name =
+  params.name ||
+  text.partnerProfileScreen.defaultUserName;
 
   const initials = params.initials || 'LB';
 
   const city =
-    params.city ||
-    (language === 'es'
-      ? 'Ubicación no indicada'
-      : 'Location not provided');
+  params.city ||
+  text.partnerProfileScreen.locationNotProvided;
 
   const bio = params.bio?.trim() || '';
 
   const nativeLanguage =
-    params.nativeLanguage ||
-    (language === 'es'
-      ? 'No especificado'
-      : 'Not specified');
+  params.nativeLanguage ||
+  text.partnerProfileScreen.notSpecified;
 
   const learningLanguage =
-    params.learningLanguage ||
-    (language === 'es'
-      ? 'No especificado'
-      : 'Not specified');
+  params.learningLanguage ||
+  text.partnerProfileScreen.notSpecified;
 
   const level =
-    params.level ||
-    (language === 'es'
-      ? 'Nivel no especificado'
-      : 'Level not specified');
+  params.level ||
+  text.partnerProfileScreen.levelNotSpecified;
 
   const isOnline = params.online === 'true';
 
@@ -225,12 +151,10 @@ useEffect(() => {
 
       setLoadedProfile({
         fullName:
-          profileData.fullName?.trim() ||
-          auth.currentUser?.displayName?.trim() ||
-          auth.currentUser?.email?.split('@')[0] ||
-          (language === 'es'
-            ? 'Usuario de LangBridge'
-            : 'LangBridge user'),
+  profileData.fullName?.trim() ||
+  auth.currentUser?.displayName?.trim() ||
+  auth.currentUser?.email?.split('@')[0] ||
+  text.partnerProfileScreen.defaultUserName,
         countryCode:
   typeof profileData.countryCode === 'string'
     ? profileData.countryCode.toUpperCase()
@@ -241,10 +165,8 @@ countryName:
     ? profileData.countryName.trim()
     : '',
         city:
-          profileData.city?.trim() ||
-          (language === 'es'
-            ? 'Ubicación no indicada'
-            : 'Location not provided'),
+  profileData.city?.trim() ||
+  text.partnerProfileScreen.locationNotProvided,
         bio: profileData.bio?.trim() || '',
         photoURL: profileData.photoURL || '',
         nativeLanguage:
@@ -289,9 +211,7 @@ const displayedInitials =
 const displayedLocation =
   loadedProfile?.countryName ||
   loadedProfile?.city ||
-  (language === 'es'
-    ? 'País no indicado'
-    : 'Country not provided');
+  text.partnerProfileScreen.countryNotProvided;
 
 const displayedCountryFlag =
   loadedProfile?.countryCode
@@ -556,52 +476,37 @@ const reverseRequestData =
   const currentUser = auth.currentUser;
   const partnerId = params.partnerId;
 
-  if (!currentUser || !partnerId) {
-    Alert.alert(
-      language === 'es'
-        ? 'No se pudo bloquear'
-        : 'Could not block',
-      language === 'es'
-        ? 'No encontramos la información necesaria del usuario.'
-        : 'The required user information could not be found.'
-    );
-    return;
-  }
+ if (!currentUser || !partnerId) {
+  Alert.alert(
+    text.partnerProfileScreen.blockUnavailableTitle,
+    text.partnerProfileScreen.blockUnavailableMessage
+  );
+  return;
+}
 
   if (currentUser.uid === partnerId) {
-    Alert.alert(
-      language === 'es'
-        ? 'Acción no válida'
-        : 'Invalid action',
-      language === 'es'
-        ? 'No puedes bloquear tu propio perfil.'
-        : 'You cannot block your own profile.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.partnerProfileScreen.invalidBlockActionTitle,
+    text.partnerProfileScreen.invalidBlockActionMessage
+  );
+  return;
+}
 
   Alert.alert(
-    language === 'es'
-      ? 'Bloquear usuario'
-      : 'Block user',
-    language === 'es'
-      ? `¿Quieres bloquear a ${name}? Esta persona dejará de aparecer en Explorar.`
-      : `Do you want to block ${name}? This person will no longer appear in Explore.`,
-    [
-      {
-        text:
-          language === 'es'
-            ? 'Cancelar'
-            : 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text:
-          language === 'es'
-            ? 'Bloquear'
-            : 'Block',
-        style: 'destructive',
-        onPress: async () => {
+  text.partnerProfileScreen.blockUserTitle,
+  text.partnerProfileScreen.blockConfirmationMessage.replace(
+    '{name}',
+    name
+  ),
+  [
+    {
+      text: text.partnerProfileScreen.cancel,
+      style: 'cancel',
+    },
+    {
+      text: text.partnerProfileScreen.block,
+      style: 'destructive',
+      onPress: async () => {
           try {
             const currentUserReference = doc(
               db,
@@ -620,19 +525,18 @@ const reverseRequestData =
             );
 
             Alert.alert(
-              language === 'es'
-                ? 'Usuario bloqueado'
-                : 'User blocked',
-              language === 'es'
-                ? `${name} fue bloqueado correctamente.`
-                : `${name} was blocked successfully.`,
-              [
-                {
-                  text: 'OK',
-                  onPress: () => router.back(),
-                },
-              ]
-            );
+  text.partnerProfileScreen.userBlockedTitle,
+  text.partnerProfileScreen.userBlockedMessage.replace(
+    '{name}',
+    name
+  ),
+  [
+    {
+      text: 'OK',
+      onPress: () => router.back(),
+    },
+  ]
+);
           } catch (error) {
             console.error(
               'Error blocking user:',
@@ -640,13 +544,9 @@ const reverseRequestData =
             );
 
             Alert.alert(
-              language === 'es'
-                ? 'No se pudo bloquear'
-                : 'Could not block',
-              language === 'es'
-                ? 'Revisa tu conexión e inténtalo nuevamente.'
-                : 'Check your connection and try again.'
-            );
+  text.partnerProfileScreen.blockErrorTitle,
+  text.partnerProfileScreen.connectionError
+);
           }
         },
       },
@@ -661,41 +561,29 @@ const reverseRequestData =
   const currentUser = auth.currentUser;
   const partnerId = params.partnerId;
 
-  if (!currentUser) {
-    Alert.alert(
-      language === 'es'
-        ? 'Sesión requerida'
-        : 'Login required',
-      language === 'es'
-        ? 'Debes iniciar sesión nuevamente para enviar una solicitud.'
-        : 'You must log in again to send a request.'
-    );
-    return;
-  }
+ if (!currentUser) {
+  Alert.alert(
+    text.partnerProfileScreen.loginRequiredTitle,
+    text.partnerProfileScreen.loginRequiredMessage
+  );
+  return;
+}
 
-  if (!partnerId) {
-    Alert.alert(
-      language === 'es'
-        ? 'Perfil no disponible'
-        : 'Profile unavailable',
-      language === 'es'
-        ? 'No se pudo identificar a este compañero.'
-        : 'This partner could not be identified.'
-    );
-    return;
-  }
+ if (!partnerId) {
+  Alert.alert(
+    text.partnerProfileScreen.profileUnavailableTitle,
+    text.partnerProfileScreen.profileUnavailableMessage
+  );
+  return;
+}
 
   if (currentUser.uid === partnerId) {
-    Alert.alert(
-      language === 'es'
-        ? 'Solicitud no válida'
-        : 'Invalid request',
-      language === 'es'
-        ? 'No puedes enviarte una solicitud a ti mismo.'
-        : 'You cannot send a request to yourself.'
-    );
-    return;
-  }
+  Alert.alert(
+    text.partnerProfileScreen.invalidRequestTitle,
+    text.partnerProfileScreen.invalidRequestMessage
+  );
+  return;
+}
 
   try {
     setIsSending(true);
@@ -775,13 +663,9 @@ const reverseRequestData =
       setActiveConnectionId('');
 
       Alert.alert(
-        language === 'es'
-          ? 'Interacción no disponible'
-          : 'Interaction unavailable',
-        language === 'es'
-          ? 'No es posible enviar una solicitud a este perfil.'
-          : 'A request cannot be sent to this profile.'
-      );
+  text.partnerProfileScreen.interactionUnavailableTitle,
+  text.partnerProfileScreen.interactionUnavailableMessage
+);
       return;
     }
 
@@ -814,13 +698,12 @@ const reverseRequestData =
       );
 
       Alert.alert(
-        language === 'es'
-          ? 'Conexión existente'
-          : 'Existing connection',
-        language === 'es'
-          ? `Ya estás conectado con ${displayedName}.`
-          : `You are already connected with ${displayedName}.`
-      );
+  text.partnerProfileScreen.existingConnectionTitle,
+  text.partnerProfileScreen.existingConnectionMessage.replace(
+    '{name}',
+    displayedName
+  )
+);
       return;
     }
 
@@ -833,13 +716,12 @@ const reverseRequestData =
       );
 
       Alert.alert(
-        language === 'es'
-          ? 'Conexión existente'
-          : 'Existing connection',
-        language === 'es'
-          ? `Ya estás conectado con ${displayedName}.`
-          : `You are already connected with ${displayedName}.`
-      );
+  text.partnerProfileScreen.existingConnectionTitle,
+  text.partnerProfileScreen.existingConnectionMessage.replace(
+    '{name}',
+    displayedName
+  )
+);
       return;
     }
 
@@ -852,13 +734,12 @@ const reverseRequestData =
       );
 
       Alert.alert(
-        language === 'es'
-          ? 'Solicitud ya enviada'
-          : 'Request already sent',
-        language === 'es'
-          ? `Ya enviaste una solicitud a ${displayedName}.`
-          : `You already sent a request to ${displayedName}.`
-      );
+  text.partnerProfileScreen.requestAlreadySentTitle,
+  text.partnerProfileScreen.requestAlreadySentMessage.replace(
+    '{name}',
+    displayedName
+  )
+);
       return;
     }
 
@@ -871,13 +752,12 @@ const reverseRequestData =
       );
 
       Alert.alert(
-        language === 'es'
-          ? 'Solicitud recibida'
-          : 'Request received',
-        language === 'es'
-          ? `${displayedName} ya te envió una solicitud. Revísala en Solicitudes.`
-          : `${displayedName} already sent you a request. Review it in Requests.`
-      );
+  text.partnerProfileScreen.requestReceivedTitle,
+  text.partnerProfileScreen.requestReceivedMessage.replace(
+    '{name}',
+    displayedName
+  )
+);
       return;
     }
 
@@ -889,13 +769,9 @@ const reverseRequestData =
       setActiveConnectionId('');
 
       Alert.alert(
-        language === 'es'
-          ? 'Solicitud no disponible'
-          : 'Request unavailable',
-        language === 'es'
-          ? 'Esta relación tiene una solicitud rechazada y no puede reabrirse automáticamente.'
-          : 'This relationship has a rejected request and cannot be reopened automatically.'
-      );
+  text.partnerProfileScreen.requestUnavailableTitle,
+  text.partnerProfileScreen.rejectedRequestMessage
+);
       return;
     }
 
@@ -925,13 +801,12 @@ const reverseRequestData =
     setActiveConnectionId(requestId);
 
     Alert.alert(
-      language === 'es'
-        ? 'Solicitud enviada'
-        : 'Request sent',
-      language === 'es'
-        ? `Tu solicitud de conexión fue enviada a ${displayedName}.`
-        : `Your connection request was sent to ${displayedName}.`
-    );
+  text.partnerProfileScreen.requestSentTitle,
+  text.partnerProfileScreen.requestSentMessage.replace(
+    '{name}',
+    displayedName
+  )
+);
   } catch (error) {
     console.error(
       'Error sending connection request:',
@@ -939,13 +814,9 @@ const reverseRequestData =
     );
 
     Alert.alert(
-      language === 'es'
-        ? 'Error al enviar'
-        : 'Send error',
-      language === 'es'
-        ? 'No se pudo enviar la solicitud. Revisa tu conexión e inténtalo nuevamente.'
-        : 'The request could not be sent. Check your connection and try again.'
-    );
+  text.partnerProfileScreen.sendErrorTitle,
+  text.partnerProfileScreen.sendErrorMessage
+);
   } finally {
     setIsSending(false);
   }
@@ -1000,7 +871,7 @@ const handleConnectionAction = () => {
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>
-              {language === 'es' ? '‹ Atrás' : '‹ Back'}
+              {text.partnerProfileScreen.back}
             </Text>
           </TouchableOpacity>
 
@@ -1049,21 +920,15 @@ const handleConnectionAction = () => {
                 ]}
               >
                 {displayedOnline
-                  ? language === 'es'
-                    ? 'En línea'
-                    : 'Online'
-                  : language === 'es'
-                    ? 'Desconectado'
-                    : 'Offline'}
+  ? text.partnerProfileScreen.online
+  : text.partnerProfileScreen.offline}
               </Text>
             </View>
           </View>
 {bio ? (
   <>
     <Text style={styles.aboutTitle}>
-      {language === 'es'
-        ? 'Acerca de mí'
-        : 'About me'}
+      {text.partnerProfileScreen.aboutMe}
     </Text>
 
     <View style={styles.aboutCard}>
@@ -1075,9 +940,7 @@ const handleConnectionAction = () => {
 ) : null}
 
           <Text style={styles.sectionTitle}>
-            {language === 'es'
-              ? 'Perfil lingüístico'
-              : 'Language profile'}
+            {text.partnerProfileScreen.languageProfile}
           </Text>
 
           <View style={styles.informationCard}>
@@ -1090,9 +953,7 @@ const handleConnectionAction = () => {
 
               <View style={styles.informationContent}>
                 <Text style={styles.informationLabel}>
-                  {language === 'es'
-                    ? 'Idioma nativo'
-                    : 'Native language'}
+                  {text.partnerProfileScreen.nativeLanguage}
                 </Text>
 
                 <Text style={styles.informationValue}>
@@ -1112,9 +973,7 @@ const handleConnectionAction = () => {
 
               <View style={styles.informationContent}>
                 <Text style={styles.informationLabel}>
-                  {language === 'es'
-                    ? 'Está aprendiendo'
-                    : 'Learning'}
+                  {text.partnerProfileScreen.learning}
                 </Text>
 
                 <Text style={styles.informationValue}>
@@ -1134,9 +993,7 @@ const handleConnectionAction = () => {
 
               <View style={styles.informationContent}>
                 <Text style={styles.informationLabel}>
-                  {language === 'es'
-                    ? 'Nivel actual'
-                    : 'Current level'}
+                  {text.partnerProfileScreen.currentLevel}
                 </Text>
 
                 <Text style={styles.informationValue}>
@@ -1147,18 +1004,14 @@ const handleConnectionAction = () => {
           </View>
 
           <View style={styles.matchCard}>
-            <Text style={styles.matchTitle}>
-              {language === 'es'
-                ? 'Practiquen y aprendan juntos'
-                : 'Practice and learn together'}
-            </Text>
+  <Text style={styles.matchTitle}>
+    {text.partnerProfileScreen.matchTitle}
+  </Text>
 
-            <Text style={styles.matchDescription}>
-              {language === 'es'
-                ? 'Envía una solicitud para comenzar una conexión de intercambio lingüístico.'
-                : 'Send a request to start a language exchange connection.'}
-            </Text>
-          </View>
+  <Text style={styles.matchDescription}>
+    {text.partnerProfileScreen.matchDescription}
+  </Text>
+</View>
           
          {!isOwnProfile ? (
           <>
@@ -1197,41 +1050,25 @@ const handleConnectionAction = () => {
       />
 
       <Text style={styles.sendingText}>
-        {isSending
-          ? language === 'es'
-            ? 'Enviando...'
-            : 'Sending...'
-          : language === 'es'
-            ? 'Comprobando relación...'
-            : 'Checking connection...'}
-      </Text>
+  {isSending
+    ? text.partnerProfileScreen.sending
+    : text.partnerProfileScreen.checkingConnection}
+</Text>
     </View>
   ) : (
     <Text style={styles.connectButtonText}>
-      {connectionState === 'none'
-        ? language === 'es'
-          ? 'Enviar solicitud'
-          : 'Send request'
-        : connectionState === 'sent'
-          ? language === 'es'
-            ? 'Solicitud enviada'
-            : 'Request sent'
-          : connectionState === 'received'
-            ? language === 'es'
-              ? 'Ver solicitud recibida'
-              : 'View received request'
-            : connectionState === 'connected'
-              ? language === 'es'
-                ? 'Abrir conversación'
-                : 'Open conversation'
-              : connectionState === 'rejected'
-                ? language === 'es'
-                  ? 'Solicitud no disponible'
-                  : 'Request unavailable'
-                : language === 'es'
-                  ? 'Interacción no disponible'
-                  : 'Interaction unavailable'}
-    </Text>
+  {connectionState === 'none'
+    ? text.partnerProfileScreen.sendRequest
+    : connectionState === 'sent'
+      ? text.partnerProfileScreen.requestSent
+      : connectionState === 'received'
+        ? text.partnerProfileScreen.viewReceivedRequest
+        : connectionState === 'connected'
+          ? text.partnerProfileScreen.openConversation
+          : connectionState === 'rejected'
+            ? text.partnerProfileScreen.requestUnavailable
+            : text.partnerProfileScreen.interactionUnavailable}
+</Text>
   )}
 </TouchableOpacity>
 <TouchableOpacity
@@ -1240,10 +1077,8 @@ const handleConnectionAction = () => {
     activeOpacity={0.85}
   >
     <Text style={styles.blockButtonText}>
-      {language === 'es'
-        ? 'Bloquear usuario'
-        : 'Block user'}
-    </Text>
+  {text.partnerProfileScreen.blockUser}
+</Text>
   </TouchableOpacity>
   </>
 ) : null}
