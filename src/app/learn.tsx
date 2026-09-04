@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   StyleSheet,
@@ -6,21 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  translations,
-  type AppLanguage,
-} from '../translations';
+import { useLanguage } from '../contexts/language-context';
+import { translations } from '../translations';
 
 export default function LearnScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ lang?: string }>();
+const { language } = useLanguage();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
-  
-  const text = translations[language];
+const text = translations[language];
 
   const goBack = () => {
     router.back();

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   arrayRemove,
@@ -17,12 +17,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '../contexts/language-context';
 
 import { auth, db } from '../firebaseConfig';
-import {
-  translations,
-  type AppLanguage,
-} from '../translations';
+import { translations } from '../translations';
 
 type BlockedUser = {
   id: string;
@@ -34,14 +32,9 @@ type BlockedUser = {
 export default function BlockedUsersScreen() {
   const router = useRouter();
 
-  const params = useLocalSearchParams<{
-    lang?: string;
-  }>();
+const { language } = useLanguage();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
-  
-  const text = translations[language];
+const text = translations[language];
     
   const [blockedUsers, setBlockedUsers] =
     useState<BlockedUser[]>([]);

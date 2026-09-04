@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from 'react';
 
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   Image,
@@ -15,6 +14,7 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useLanguage } from '../contexts/language-context';
 import {
   getLanguageDescription,
   isActiveLanguage,
@@ -26,7 +26,10 @@ import {
 } from '../translations';
 export default function WelcomeScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ lang?: string }>();
+const {
+  language,
+  changeLanguage,
+} = useLanguage();
 
 const [isLanguageListOpen, setIsLanguageListOpen] =
   useState(false);
@@ -34,7 +37,6 @@ const [isLanguageListOpen, setIsLanguageListOpen] =
 const [isSavingLanguage, setIsSavingLanguage] =
   useState(false);
 
-  const language: AppLanguage = params.lang === 'es' ? 'es' : 'en';
   const text = translations[language];
 
   const toggleLanguageList = () => {
@@ -57,16 +59,9 @@ const handleLanguageChange = async (
   try {
     setIsSavingLanguage(true);
 
-    await AsyncStorage.setItem(
-      'appLanguage',
-      newLanguage
-    );
+    await changeLanguage(newLanguage);
 
     setIsLanguageListOpen(false);
-
-    router.setParams({
-      lang: newLanguage,
-    });
   } catch (error) {
     console.error(
       'Error changing interface language:',

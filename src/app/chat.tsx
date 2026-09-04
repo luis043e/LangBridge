@@ -25,12 +25,10 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '../contexts/language-context';
 
 import { auth, db } from '../firebaseConfig';
-import {
-  translations,
-  type AppLanguage,
-} from '../translations';
+import { translations } from '../translations';
 
 type Message = {
   id: string;
@@ -51,10 +49,9 @@ export default function ChatScreen() {
   partnerName?: string;
 }>();
 
-  const language: AppLanguage =
-    params.lang === 'es' ? 'es' : 'en';
+  const { language } = useLanguage();
 
-    const text = translations[language];
+const text = translations[language];
 
   const partnerName =
   params.partnerName ||
