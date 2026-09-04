@@ -1,5 +1,12 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { updateProfile } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,34 +22,19 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { updateProfile } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+import { useLanguage } from '../contexts/language-context';
 
 import {
   getCountryName,
   getCountryOptions,
 } from '../countries';
 import { auth, db } from '../firebaseConfig';
-import {
-  translations,
-  type AppLanguage,
-} from '../translations';
+import { translations } from '../translations';
 
 export default function EditProfileScreen() {
   const router = useRouter();
 
-  const params = useLocalSearchParams<{
-    lang?: string;
-  }>();
-
-  const language: AppLanguage =
-  params.lang === 'es' ? 'es' : 'en';
+const { language } = useLanguage();
 
 const text = translations[language];
 
