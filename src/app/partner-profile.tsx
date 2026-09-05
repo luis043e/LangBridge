@@ -24,6 +24,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../contexts/language-context';
+import { getCountryName } from '../countries';
 import { auth, db } from '../firebaseConfig';
 import { translations } from '../translations';
 
@@ -45,6 +46,8 @@ export default function PartnerProfileScreen() {
     preview?: string;
     name?: string;
     initials?: string;
+    countryCode?: string;
+    countryName?: string;
     city?: string;
     bio?: string;
     nativeLanguage?: string;
@@ -88,7 +91,10 @@ const getLevelName = (levelCode: string) => {
   text.partnerProfileScreen.defaultUserName;
 
   const initials = params.initials || 'LB';
+  
+  const countryCode = params.countryCode || '';
 
+  const countryName = params.countryName || '';
   const city =
   params.city ||
   text.partnerProfileScreen.locationNotProvided;
@@ -205,9 +211,21 @@ const displayedInitials =
   initials;
 
 const displayedLocation =
-  loadedProfile?.countryName ||
-  loadedProfile?.city ||
-  text.partnerProfileScreen.countryNotProvided;
+  loadedProfile?.countryCode
+    ? getCountryName(
+        loadedProfile.countryCode,
+        language
+      )
+    : countryCode
+      ? getCountryName(
+          countryCode,
+          language
+        )
+      : loadedProfile?.countryName ||
+        countryName ||
+        loadedProfile?.city ||
+        city ||
+        text.partnerProfileScreen.countryNotProvided;
 
 const displayedCountryFlag =
   loadedProfile?.countryCode
