@@ -1970,3 +1970,5 @@ networkError:
 },
 },
 };
+export type TranslationDictionary =
+  typeof translations.en;
