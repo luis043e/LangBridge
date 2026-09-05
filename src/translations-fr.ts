@@ -554,5 +554,139 @@ requestsScreen: {
     saveChanges:
       'Enregistrer les modifications',
   },
+  partnerProfileScreen: {
+    languageNames: {
+      es: 'Espagnol',
+      en: 'Anglais',
+      fr: 'Français',
+      pt: 'Portugais',
+      de: 'Allemand',
+      it: 'Italien',
+    },
+    levelNames: {
+      a1: 'A1 · Débutant',
+      a2: 'A2 · Élémentaire',
+      b1: 'B1 · Intermédiaire',
+      b2: 'B2 · Intermédiaire supérieur',
+      c1: 'C1 · Avancé',
+      c2: 'C2 · Maîtrise',
+      beginner: 'A1 · Débutant',
+      intermediate: 'B1 · Intermédiaire',
+      advanced: 'C1 · Avancé',
+    },
+    notSpecified:
+      'Non spécifié',
+    levelNotSpecified:
+      'Niveau non spécifié',
+    defaultUserName:
+      'Utilisateur LangBridge',
+    locationNotProvided:
+      'Emplacement non indiqué',
+    countryNotProvided:
+      'Pays non indiqué',
+    blockUnavailableTitle:
+      'Impossible de bloquer',
+    blockUnavailableMessage:
+      "Les informations requises sur l'utilisateur sont introuvables.",
+    invalidBlockActionTitle:
+      'Action non valide',
+    invalidBlockActionMessage:
+      'Vous ne pouvez pas bloquer votre propre profil.',
+    blockUserTitle:
+      'Bloquer un utilisateur',
+    blockConfirmationMessage:
+      'Voulez-vous bloquer {name} ? Cette personne n’apparaîtra plus dans Explorer.',
+    cancel:
+      'Annuler',
+    block:
+      'Bloquer',
+    userBlockedTitle:
+      'Utilisateur bloqué',
+    userBlockedMessage:
+      '{name} a été bloqué avec succès.',
+    blockErrorTitle:
+      'Impossible de bloquer',
+    connectionError:
+      'Vérifiez votre connexion et réessayez.',
+    loginRequiredTitle:
+      'Connexion requise',
+    loginRequiredMessage:
+      'Vous devez vous reconnecter pour envoyer une demande.',
+    profileUnavailableTitle:
+      'Profil indisponible',
+    profileUnavailableMessage:
+      'Ce partenaire n’a pas pu être identifié.',
+    invalidRequestTitle:
+      'Demande non valide',
+    invalidRequestMessage:
+      'Vous ne pouvez pas vous envoyer une demande à vous-même.',
+    interactionUnavailableTitle:
+      'Interaction indisponible',
+    interactionUnavailableMessage:
+      'Une demande ne peut pas être envoyée à ce profil.',
+    existingConnectionTitle:
+      'Connexion existante',
+    existingConnectionMessage:
+      'Vous êtes déjà connecté avec {name}.',
+    requestAlreadySentTitle:
+      'Demande déjà envoyée',
+    requestAlreadySentMessage:
+      'Vous avez déjà envoyé une demande à {name}.',
+    requestReceivedTitle:
+      'Demande reçue',
+    requestReceivedMessage:
+      '{name} vous a déjà envoyé une demande. Consultez-la dans Demandes.',
+    requestUnavailableTitle:
+      'Demande indisponible',
+    rejectedRequestMessage:
+      'Cette relation comporte une demande refusée et ne peut pas être rouverte automatiquement.',
+    requestSentTitle:
+      'Demande envoyée',
+    requestSentMessage:
+      'Votre demande de connexion a été envoyée à {name}.',
+    sendErrorTitle:
+      'Erreur d’envoi',
+    sendErrorMessage:
+      'La demande n’a pas pu être envoyée. Vérifiez votre connexion et réessayez.',
+    back:
+      '‹ Retour',
+    online:
+      'En ligne',
+    offline:
+      'Hors ligne',
+    aboutMe:
+      'À propos de moi',
+    languageProfile:
+      'Profil linguistique',
+    nativeLanguage:
+      'Langue maternelle',
+    learning:
+      'Apprend',
+    currentLevel:
+      'Niveau actuel',
+    matchTitle:
+      'Pratiquez et apprenez ensemble',
+    matchDescription:
+      'Envoyez une demande pour commencer un échange linguistique.',
+    sending:
+      'Envoi...',
+    checkingConnection:
+      'Vérification de la connexion...',
+    sendRequest:
+      'Envoyer une demande',
+    requestSent:
+      'Demande envoyée',
+    viewReceivedRequest:
+      'Voir la demande reçue',
+    openConversation:
+      'Ouvrir la conversation',
+    requestUnavailable:
+      'Demande indisponible',
+    interactionUnavailable:
+      'Interaction indisponible',
+    blockUser:
+      'Bloquer l’utilisateur',
+  },
 };
+
 
