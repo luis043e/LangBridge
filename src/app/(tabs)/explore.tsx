@@ -77,41 +77,48 @@ export default function ExploreScreen() {
     const languageNames: Record<
       string,
       {
-        es: string;
-        en: string;
-        fr: string;
-      }
+  es: string;
+  en: string;
+  fr: string;
+  pt: string;
+}
     > = {
       es: {
-        es: 'Español',
-        en: 'Spanish',
-        fr: 'Espagnol',
-      },
-      en: {
-        es: 'Inglés',
-        en: 'English',
-        fr: 'Anglais',
-      },
-      fr: {
-        es: 'Francés',
-        en: 'French',
-        fr: 'Français',
-      },
-      pt: {
-        es: 'Portugués',
-        en: 'Portuguese',
-        fr: 'Portugais',
-      },
-      de: {
-        es: 'Alemán',
-        en: 'German',
-        fr: 'Allemand',
-      },
-      it: {
-        es: 'Italiano',
-        en: 'Italian',
-        fr: 'Italien',
-      },
+  es: 'Español',
+  en: 'Spanish',
+  fr: 'Espagnol',
+  pt: 'Espanhol',
+},
+en: {
+  es: 'Inglés',
+  en: 'English',
+  fr: 'Anglais',
+  pt: 'Inglês',
+},
+fr: {
+  es: 'Francés',
+  en: 'French',
+  fr: 'Français',
+  pt: 'Francês',
+},
+pt: {
+  es: 'Portugués',
+  en: 'Portuguese',
+  fr: 'Portugais',
+  pt: 'Português',
+},
+de: {
+  es: 'Alemán',
+  en: 'German',
+  fr: 'Allemand',
+  pt: 'Alemão',
+},
+it: {
+  es: 'Italiano',
+  en: 'Italian',
+  fr: 'Italien',
+  pt: 'Italiano',
+},
     };
 
     return (
@@ -127,53 +134,63 @@ export default function ExploreScreen() {
         es: string;
         en: string;
         fr: string;
+        pt: string;
       }
     > = {
       a1: {
-        es: 'A1 · Principiante',
-        en: 'A1 · Beginner',
-        fr: 'A1 · Débutant',
-      },
-      a2: {
-        es: 'A2 · Básico',
-        en: 'A2 · Elementary',
-        fr: 'A2 · Élémentaire',
-      },
-      b1: {
-        es: 'B1 · Intermedio',
-        en: 'B1 · Intermediate',
-        fr: 'B1 · Intermédiaire',
-      },
-      b2: {
-        es: 'B2 · Intermedio alto',
-        en: 'B2 · Upper intermediate',
-        fr: 'B2 · Intermédiaire supérieur',
-      },
-      c1: {
-        es: 'C1 · Avanzado',
-        en: 'C1 · Advanced',
-        fr: 'C1 · Avancé',
-      },
-      c2: {
-        es: 'C2 · Dominio',
-        en: 'C2 · Proficiency',
-        fr: 'C2 · Maîtrise',
-      },
-      beginner: {
-        es: 'A1 · Principiante',
-        en: 'A1 · Beginner',
-        fr: 'A1 · Débutant',
-      },
-      intermediate: {
-        es: 'B1 · Intermedio',
-        en: 'B1 · Intermediate',
-        fr: 'B1 · Intermédiaire',
-      },
-      advanced: {
-        es: 'C1 · Avanzado',
-        en: 'C1 · Advanced',
-        fr: 'C1 · Avancé',
-      },
+  es: 'A1 · Principiante',
+  en: 'A1 · Beginner',
+  fr: 'A1 · Débutant',
+  pt: 'A1 · Iniciante',
+},
+a2: {
+  es: 'A2 · Básico',
+  en: 'A2 · Elementary',
+  fr: 'A2 · Élémentaire',
+  pt: 'A2 · Básico',
+},
+b1: {
+  es: 'B1 · Intermedio',
+  en: 'B1 · Intermediate',
+  fr: 'B1 · Intermédiaire',
+  pt: 'B1 · Intermediário',
+},
+b2: {
+  es: 'B2 · Intermedio alto',
+  en: 'B2 · Upper intermediate',
+  fr: 'B2 · Intermédiaire supérieur',
+  pt: 'B2 · Intermediário superior',
+},
+c1: {
+  es: 'C1 · Avanzado',
+  en: 'C1 · Advanced',
+  fr: 'C1 · Avancé',
+  pt: 'C1 · Avançado',
+},
+c2: {
+  es: 'C2 · Dominio',
+  en: 'C2 · Proficiency',
+  fr: 'C2 · Maîtrise',
+  pt: 'C2 · Proficiência',
+},
+beginner: {
+  es: 'A1 · Principiante',
+  en: 'A1 · Beginner',
+  fr: 'A1 · Débutant',
+  pt: 'A1 · Iniciante',
+},
+intermediate: {
+  es: 'B1 · Intermedio',
+  en: 'B1 · Intermediate',
+  fr: 'B1 · Intermédiaire',
+  pt: 'B1 · Intermediário',
+},
+advanced: {
+  es: 'C1 · Avanzado',
+  en: 'C1 · Advanced',
+  fr: 'C1 · Avancé',
+  pt: 'C1 · Avançado',
+},
     };
 
     return (
