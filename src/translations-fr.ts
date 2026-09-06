@@ -1,4 +1,5 @@
-﻿export const frTranslations = {
+﻿import type { TranslationDictionary } from './translations';
+export const frTranslations = {
   chooseLanguage: {
     title: 'Choisissez votre langue',
     subtitle:
@@ -687,6 +688,412 @@ requestsScreen: {
     blockUser:
       'Bloquer l’utilisateur',
   },
-};
+  languageSettingsScreen: {
+    languageNames: {
+      es: 'Espagnol',
+      en: 'Anglais',
+      fr: 'Français',
+      pt: 'Portugais',
+      de: 'Allemand',
+      it: 'Italien',
+      nl: 'Néerlandais',
+      ru: 'Russe',
+      uk: 'Ukrainien',
+      pl: 'Polonais',
+      tr: 'Turc',
+      ar: 'Arabe',
+      hi: 'Hindi',
+      bn: 'Bengali',
+      zh: 'Chinois mandarin',
+      ja: 'Japonais',
+      ko: 'Coréen',
+      id: 'Indonésien',
+      vi: 'Vietnamien',
+      el: 'Grec',
+    },
+    levelNames: {
+      a1: 'A1 · Débutant',
+      a2: 'A2 · Élémentaire',
+      b1: 'B1 · Intermédiaire',
+      b2: 'B2 · Intermédiaire supérieur',
+      c1: 'C1 · Avancé',
+      c2: 'C2 · Maîtrise',
+    },
+    selectNativeLanguage:
+      'Sélectionnez votre langue maternelle',
+    selectLearningLanguage:
+      'Sélectionnez la langue que vous souhaitez apprendre',
+    selectLevel:
+      'Sélectionnez votre niveau',
+    differentLanguagesTitle:
+      'Sélectionnez des langues différentes',
+    differentLanguagesMessage:
+      'Votre langue maternelle et la langue que vous souhaitez apprendre doivent être différentes.',
+    sessionUnavailableTitle:
+      'Session indisponible',
+    sessionUnavailableMessage:
+      'Veuillez vous reconnecter pour enregistrer vos modifications.',
+    changesSavedTitle:
+      'Modifications enregistrées',
+    changesSavedMessage:
+      'Vos langues et votre niveau ont été mis à jour avec succès.',
+    saveErrorTitle:
+      'Impossible d’enregistrer les modifications',
+    connectionError:
+      'Vérifiez votre connexion et réessayez.',
+    back:
+      '‹ Retour',
+    title:
+      'Langues et niveau',
+    subtitle:
+      'Configurez les langues que vous parlez et souhaitez apprendre.',
+    nativeLanguage:
+      'Langue maternelle',
+    learningLanguage:
+      'Je souhaite apprendre',
+    currentLevel:
+      'Mon niveau actuel',
+    loading:
+      'Chargement...',
+    saving:
+      'Enregistrement...',
+    saveChanges:
+      'Enregistrer les modifications',
+    close:
+      'Fermer',
+  },
+  languageProfileScreen: {
+    languageNames: {
+      es: 'Espagnol',
+      en: 'Anglais',
+      fr: 'Français',
+      pt: 'Portugais',
+      de: 'Allemand',
+      it: 'Italien',
+    },
+    levelNames: {
+      a1: 'A1 · Débutant',
+      a2: 'A2 · Élémentaire',
+      b1: 'B1 · Intermédiaire',
+      b2: 'B2 · Intermédiaire supérieur',
+      c1: 'C1 · Avancé',
+      c2: 'C2 · Maîtrise',
+    },
+    selectCurrentLevel:
+      'Sélectionnez votre niveau actuel',
+    nativeLanguageRequiredTitle:
+      'Langue maternelle requise',
+    nativeLanguageRequiredMessage:
+      'Sélectionnez votre langue maternelle pour continuer.',
+    learningLanguageRequiredTitle:
+      'Langue d’apprentissage requise',
+    learningLanguageRequiredMessage:
+      'Sélectionnez la langue que vous souhaitez apprendre.',
+    differentLanguagesTitle:
+      'Sélectionnez des langues différentes',
+    differentLanguagesMessage:
+      'Votre langue maternelle et la langue que vous souhaitez apprendre doivent être différentes.',
+    levelRequiredTitle:
+      'Niveau requis',
+    levelRequiredMessage:
+      'Sélectionnez votre niveau actuel pour continuer.',
+    loginRequiredTitle:
+      'Connexion requise',
+    loginRequiredMessage:
+      'Vous devez vous reconnecter pour enregistrer votre profil.',
+    profileSavedTitle:
+      'Profil enregistré',
+    profileSavedMessage:
+      'Votre profil linguistique a été enregistré avec succès.',
+    changesSavedTitle:
+      'Modifications enregistrées',
+    changesSavedMessage:
+      'Votre profil linguistique a été mis à jour avec succès.',
+    continue:
+      'Continuer',
+    saveErrorTitle:
+      'Erreur d’enregistrement',
+    saveErrorMessage:
+      'Votre profil n’a pas pu être enregistré. Vérifiez votre connexion et réessayez.',
+    loadingProfile:
+      'Chargement de votre profil linguistique...',
+    loadErrorTitle:
+      'Impossible de charger votre profil',
+    loadErrorMessage:
+      'Vérifiez votre connexion et réessayez.',
+    tryAgain:
+      'Réessayer',
+    goBack:
+      'Retour',
+    back:
+      '‹ Retour',
+    step:
+      'ÉTAPE 1 SUR 3',
+    createTitle:
+      'Créez votre profil linguistique',
+    editTitle:
+      'Modifiez votre profil linguistique',
+    createSubtitle:
+      'Indiquez-nous la langue que vous parlez et celle que vous souhaitez apprendre.',
+    editSubtitle:
+      'Mettez à jour vos langues et votre niveau à tout moment.',
+    nativeLanguageQuestion:
+      'Quelle est votre langue maternelle ?',
+    selectNativeLanguage:
+      'Sélectionnez votre langue maternelle',
+    learningLanguageQuestion:
+      'Quelle langue souhaitez-vous apprendre ?',
+    selectLearningLanguage:
+      'Sélectionnez une langue à apprendre',
+    currentLevelQuestion:
+      'Quel est votre niveau actuel ?',
+    informationTitle:
+      'Pourquoi avons-nous besoin de ces informations ?',
+    informationText:
+      'LangBridge utilise vos langues et votre niveau pour vous recommander des partenaires compatibles qui peuvent vous aider à atteindre vos objectifs.',
+    saving:
+      'Enregistrement...',
+    saveChanges:
+      'Enregistrer les modifications',
+  },
+  settingsScreen: {
+    defaultUserName:
+      'Utilisateur LangBridge',
+    emailUnavailable:
+      'E-mail indisponible',
+    signOutTitle:
+      'Se déconnecter',
+    signOutConfirmation:
+      'Voulez-vous vraiment vous déconnecter ?',
+    cancel:
+      'Annuler',
+    signOut:
+      'Se déconnecter',
+    signOutErrorTitle:
+      'Échec de la déconnexion',
+    tryAgain:
+      'Veuillez réessayer.',
+    back:
+      '‹ Retour',
+    title:
+      'Profil et paramètres',
+    subtitle:
+      'Gérez votre compte et vos préférences.',
+    accountSection:
+      'Compte',
+    editProfile:
+      'Modifier le profil',
+    editProfileDescription:
+      'Nom, emplacement et informations personnelles.',
+    viewPublicProfile:
+      'Voir mon profil public',
+    viewPublicProfileDescription:
+      'Prévisualisez la manière dont les autres personnes voient votre profil.',
+    changeInterfaceLanguage:
+      "Changer la langue de l'interface",
+    interfaceLanguage:
+      "Langue de l'interface",
+    interfaceLanguageDescription:
+      'Changez la langue des textes et des menus de LangBridge.',
+    languagesAndLevel:
+      'Langues et niveau',
+    languagesAndLevelDescription:
+      'Mettez à jour votre profil linguistique.',
+    privacyAndSecurity:
+      'Confidentialité et sécurité',
+    privacyAndSecurityDescription:
+      'Blocages, signalements et contrôles du compte.',
+  },
+  tabs: {
+    home: 'Accueil',
+    explore: 'Explorer',
+    conversations: 'Discussions',
+    settings: 'Profil',
+  },
+  lessonScreen: {
+    exerciseProgress:
+      'EXERCICE 1 SUR 3',
+    title:
+      'Choisissez la bonne traduction',
+    question:
+      'Comment dit-on « Hola » en anglais ?',
+    answerChecked:
+      'Réponse vérifiée',
+    check:
+      'Vérifier',
+  },
+  learnScreen: {
+    back:
+      '‹ Retour',
+    title:
+      'Apprendre',
+    subtitle:
+      'Progressez avec de courtes leçons et une pratique quotidienne.',
+    streak:
+      'Série',
+    points:
+      'Points',
+    lives:
+      'Vies',
+    dailyGoal:
+      'Objectif quotidien',
+    dailyGoalDescription:
+      'Terminez une leçon aujourd’hui',
+    unitOneTitle:
+      'Unité 1 : Premiers pas',
+    unitOneDescription:
+      'Apprenez les salutations et les expressions essentielles.',
+    lessonOneAvailable:
+      'Leçon 1 disponible',
+  },
+  googleAuth: {
+    missingWebClientId:
+      "L'identifiant Web Client ID de Google n'est pas configuré.",
+    invalidIdToken:
+      "Google n'a pas renvoyé de jeton valide.",
+  },
+  loginScreen: {
+    title:
+      'Content de vous revoir',
+    subtitle:
+      'Connectez-vous pour continuer à pratiquer et à créer des liens grâce aux langues.',
+    emailLabel:
+      'Adresse e-mail',
+    emailPlaceholder:
+      'Saisissez votre adresse e-mail',
+    passwordLabel:
+      'Mot de passe',
+    passwordPlaceholder:
+      'Saisissez votre mot de passe',
+    forgotPassword:
+      'Mot de passe oublié ?',
+    loginButton:
+      'Se connecter',
+    noAccount:
+      "Vous n'avez pas de compte ?",
+    createOne:
+      'Créer un compte',
+    back:
+      '‹ Retour',
+    or:
+      'ou',
+    continueWithGoogle:
+      'Continuer avec Google',
+    googleErrorTitle:
+      'Impossible de continuer avec Google',
+    tryAgain:
+      'Veuillez réessayer.',
+    incompleteFieldsTitle:
+      'Champs incomplets',
+    incompleteFieldsMessage:
+      'Saisissez votre adresse e-mail et votre mot de passe.',
+    invalidEmailTitle:
+      'Adresse e-mail non valide',
+    invalidEmailMessage:
+      'Saisissez une adresse e-mail valide.',
+    loginErrorTitle:
+      'Erreur de connexion',
+    genericLoginError:
+      'Impossible de vous connecter. Vérifiez vos informations et réessayez.',
+    invalidCredentials:
+      "L'adresse e-mail ou le mot de passe est incorrect.",
+    tooManyLoginAttempts:
+      'Trop de tentatives ont été effectuées. Attendez quelques minutes et réessayez.',
+    userDisabled:
+      'Ce compte a été désactivé.',
+    networkError:
+      'Vérifiez votre connexion Internet et réessayez.',
+    emailRequiredTitle:
+      'Adresse e-mail requise',
+    emailRequiredMessage:
+      "Saisissez d'abord votre adresse e-mail.",
+    resetEmailSentTitle:
+      'E-mail envoyé',
+    resetEmailSentMessage:
+      'Consultez votre boîte de réception pour obtenir les instructions de réinitialisation de votre mot de passe.',
+    resetErrorTitle:
+      'Erreur de réinitialisation',
+    genericResetError:
+      "L'e-mail de réinitialisation du mot de passe n'a pas pu être envoyé. Vérifiez l'adresse et réessayez.",
+    tooManyResetRequests:
+      'Trop de demandes ont été effectuées. Attendez quelques minutes et réessayez.',
+  },
+  registerScreen: {
+    title:
+      'Créez votre compte',
+    subtitle:
+      'Rejoignez LangBridge et commencez à créer des liens grâce aux langues.',
+    fullNameLabel:
+      'Nom complet',
+    fullNamePlaceholder:
+      'Saisissez votre nom complet',
+    emailLabel:
+      'Adresse e-mail',
+    emailPlaceholder:
+      'Saisissez votre adresse e-mail',
+    passwordLabel:
+      'Mot de passe',
+    passwordPlaceholder:
+      'Créez un mot de passe',
+    confirmPasswordLabel:
+      'Confirmer le mot de passe',
+    confirmPasswordPlaceholder:
+      'Confirmez votre mot de passe',
+    createAccount:
+      'Créer un compte',
+    terms:
+      'En créant un compte, vous acceptez les Conditions d’utilisation et la Politique de confidentialité.',
+    hasAccount:
+      'Vous avez déjà un compte ?',
+    login:
+      'Se connecter',
+    accountCreatedTitle:
+      'Compte créé',
+    accountCreatedMessage:
+      'Votre compte LangBridge a été créé avec succès.',
+    continue:
+      'Continuer',
+    googleErrorTitle:
+      'Impossible de continuer avec Google',
+    tryAgain:
+      'Veuillez réessayer.',
+    back:
+      '‹ Retour',
+    or:
+      'ou',
+    continueWithGoogle:
+      'Continuer avec Google',
+    incompleteFieldsTitle:
+      'Champs incomplets',
+    incompleteFieldsMessage:
+      'Remplissez tous les champs pour créer votre compte.',
+    invalidNameTitle:
+      'Nom non valide',
+    invalidNameMessage:
+      'Saisissez votre nom complet.',
+    invalidEmailTitle:
+      'Adresse e-mail non valide',
+    invalidEmailMessage:
+      'Saisissez une adresse e-mail valide.',
+    shortPasswordTitle:
+      'Mot de passe trop court',
+    shortPasswordMessage:
+      'Le mot de passe doit contenir au moins 6 caractères.',
+    passwordsDoNotMatchTitle:
+      'Les mots de passe ne correspondent pas',
+    passwordsDoNotMatchMessage:
+      'Saisissez le même mot de passe dans les deux champs.',
+    registrationErrorTitle:
+      "Erreur d'inscription",
+    genericRegistrationError:
+      'Le compte n’a pas pu être créé. Veuillez réessayer.',
+    emailAlreadyRegistered:
+      'Cette adresse e-mail est déjà enregistrée.',
+    weakPassword:
+      'Le mot de passe est trop faible.',
+    networkError:
+      'Vérifiez votre connexion Internet et réessayez.',
+  },
+} satisfies TranslationDictionary;
 
 
