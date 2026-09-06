@@ -1,3 +1,4 @@
+import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
 import { ptTranslations } from './translations-pt';
 export const supportedLanguageCodes = [
@@ -26,6 +27,7 @@ export const activeLanguageCodes = [
   'es',
   'fr',
   'pt',
+  'de',
 ] as const;
 
 export type AppLanguage =
@@ -1976,6 +1978,7 @@ networkError:
 
 fr: frTranslations,
 pt: ptTranslations,
+de: deTranslations,
 };
 
 export type TranslationDictionary =

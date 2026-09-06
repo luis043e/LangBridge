@@ -81,6 +81,7 @@ export default function ExploreScreen() {
   en: string;
   fr: string;
   pt: string;
+  de: string;
 }
     > = {
       es: {
@@ -88,36 +89,42 @@ export default function ExploreScreen() {
   en: 'Spanish',
   fr: 'Espagnol',
   pt: 'Espanhol',
+  de: 'Spanisch',
 },
 en: {
   es: 'Inglés',
   en: 'English',
   fr: 'Anglais',
   pt: 'Inglês',
+  de: 'Englisch',
 },
 fr: {
   es: 'Francés',
   en: 'French',
   fr: 'Français',
   pt: 'Francês',
+  de: 'Französisch',
 },
 pt: {
   es: 'Portugués',
   en: 'Portuguese',
   fr: 'Portugais',
   pt: 'Português',
+  de: 'Portugiesisch',
 },
 de: {
   es: 'Alemán',
   en: 'German',
   fr: 'Allemand',
   pt: 'Alemão',
+  de: 'Deutsch',
 },
 it: {
   es: 'Italiano',
   en: 'Italian',
   fr: 'Italien',
   pt: 'Italiano',
+  de: 'Italienisch',
 },
     };
 
@@ -135,6 +142,7 @@ it: {
         en: string;
         fr: string;
         pt: string;
+        de: string;
       }
     > = {
       a1: {
@@ -142,54 +150,63 @@ it: {
   en: 'A1 · Beginner',
   fr: 'A1 · Débutant',
   pt: 'A1 · Iniciante',
+  de: 'A1 · Anfänger',
 },
 a2: {
   es: 'A2 · Básico',
   en: 'A2 · Elementary',
   fr: 'A2 · Élémentaire',
   pt: 'A2 · Básico',
+  de: 'A2 · Grundkenntnisse',
 },
 b1: {
   es: 'B1 · Intermedio',
   en: 'B1 · Intermediate',
   fr: 'B1 · Intermédiaire',
   pt: 'B1 · Intermediário',
+  de: 'B1 · Mittelstufe',
 },
 b2: {
   es: 'B2 · Intermedio alto',
   en: 'B2 · Upper intermediate',
   fr: 'B2 · Intermédiaire supérieur',
   pt: 'B2 · Intermediário superior',
+  de: 'B2 · Fortgeschrittene Mittelstufe',
 },
 c1: {
   es: 'C1 · Avanzado',
   en: 'C1 · Advanced',
   fr: 'C1 · Avancé',
   pt: 'C1 · Avançado',
+  de: 'C1 · Fortgeschritten',
 },
 c2: {
   es: 'C2 · Dominio',
   en: 'C2 · Proficiency',
   fr: 'C2 · Maîtrise',
   pt: 'C2 · Proficiência',
+  de: 'C2 · Beherrschung',
 },
 beginner: {
   es: 'A1 · Principiante',
   en: 'A1 · Beginner',
   fr: 'A1 · Débutant',
   pt: 'A1 · Iniciante',
+  de: 'A1 · Anfänger',
 },
 intermediate: {
   es: 'B1 · Intermedio',
   en: 'B1 · Intermediate',
   fr: 'B1 · Intermédiaire',
   pt: 'B1 · Intermediário',
+  de: 'B1 · Mittelstufe',
 },
 advanced: {
   es: 'C1 · Avanzado',
   en: 'C1 · Advanced',
   fr: 'C1 · Avancé',
   pt: 'C1 · Avançado',
+  de: 'C1 · Fortgeschritten',
 },
     };
 
