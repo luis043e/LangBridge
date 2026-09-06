@@ -84,6 +84,7 @@ export default function ExploreScreen() {
   de: string;
   it: string;
   ja: string;
+  ko: string;
 }
     > = {
       es: {
@@ -94,6 +95,7 @@ export default function ExploreScreen() {
   de: 'Spanisch',
   it: 'Spagnolo',
   ja: 'スペイン語',
+  ko: '스페인어',
 },
 en: {
   es: 'Inglés',
@@ -103,6 +105,7 @@ en: {
   de: 'Englisch',
   it: 'Inglese',
   ja: '英語',
+  ko: '영어',
 },
 fr: {
   es: 'Francés',
@@ -112,6 +115,7 @@ fr: {
   de: 'Französisch',
   it: 'Francese',
   ja: 'フランス語',
+  ko: '프랑스어',
 },
 pt: {
   es: 'Portugués',
@@ -121,6 +125,7 @@ pt: {
   de: 'Portugiesisch',
   it: 'Portoghese',
   ja: 'ポルトガル語',
+  ko: '포르투갈어',
 },
 de: {
   es: 'Alemán',
@@ -130,6 +135,7 @@ de: {
   de: 'Deutsch',
   it: 'Tedesco',
   ja: 'ドイツ語',
+  ko: '독일어',
 },
 it: {
   es: 'Italiano',
@@ -139,6 +145,7 @@ it: {
   de: 'Italienisch',
   it: 'Italiano',
   ja: 'イタリア語',
+  ko: '이탈리아어',
 },
     };
 
@@ -159,6 +166,7 @@ it: {
         de: string;
         it: string;
         ja: string;
+        ko: string;
       }
     > = {
       a1: {
@@ -169,6 +177,7 @@ it: {
   de: 'A1 · Anfänger',
   it: 'A1 · Principiante',
   ja: 'A1 · 初心者',
+  ko: 'A1 · 초급',
 },
 a2: {
   es: 'A2 · Básico',
@@ -178,6 +187,7 @@ a2: {
   de: 'A2 · Grundkenntnisse',
   it: 'A2 · Elementare',
   ja: 'A2 · 初級',
+  ko: 'A2 · 초급',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -187,6 +197,7 @@ b1: {
   de: 'B1 · Mittelstufe',
   it: 'B1 · Intermedio',
   ja: 'B1 · 中級',
+  ko: 'B1 · 중급',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -196,6 +207,7 @@ b2: {
   de: 'B2 · Fortgeschrittene Mittelstufe',
   it: 'B2 · Intermedio superiore',
   ja: 'B2 · 中上級',
+  ko: 'B2 · 중상급',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -205,6 +217,7 @@ c1: {
   de: 'C1 · Fortgeschritten',
   it: 'C1 · Avanzato',
   ja: 'C1 · 上級',
+  ko: 'C1 · 고급',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -214,6 +227,7 @@ c2: {
   de: 'C2 · Beherrschung',
   it: 'C2 · Padronanza',
   ja: 'C2 · 熟練',
+  ko: 'C2 · 숙련',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -223,6 +237,7 @@ beginner: {
   de: 'A1 · Anfänger',
   it: 'A1 · Principiante',
   ja: 'A1 · 初心者',
+  ko: 'A1 · 초급',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -232,6 +247,7 @@ intermediate: {
   de: 'B1 · Mittelstufe',
   it: 'B1 · Intermedio',
   ja: 'B1 · 中級',
+  ko: 'B1 · 중급',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -241,6 +257,7 @@ advanced: {
   de: 'C1 · Fortgeschritten',
   it: 'C1 · Avanzato',
   ja: 'C1 · 上級',
+  ko: 'C1 · 고급',
 },
     };
 
