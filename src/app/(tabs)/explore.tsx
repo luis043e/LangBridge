@@ -72,7 +72,7 @@ export default function ExploreScreen() {
 
   const [loadError, setLoadError] =
     useState<string | null>(null);
-
+   
    const getLanguageName = (code: string) => {
     const languageNames: Record<
       string,
@@ -83,6 +83,7 @@ export default function ExploreScreen() {
   pt: string;
   de: string;
   it: string;
+  ja: string;
 }
     > = {
       es: {
@@ -92,6 +93,7 @@ export default function ExploreScreen() {
   pt: 'Espanhol',
   de: 'Spanisch',
   it: 'Spagnolo',
+  ja: 'スペイン語',
 },
 en: {
   es: 'Inglés',
@@ -100,6 +102,7 @@ en: {
   pt: 'Inglês',
   de: 'Englisch',
   it: 'Inglese',
+  ja: '英語',
 },
 fr: {
   es: 'Francés',
@@ -108,6 +111,7 @@ fr: {
   pt: 'Francês',
   de: 'Französisch',
   it: 'Francese',
+  ja: 'フランス語',
 },
 pt: {
   es: 'Portugués',
@@ -116,6 +120,7 @@ pt: {
   pt: 'Português',
   de: 'Portugiesisch',
   it: 'Portoghese',
+  ja: 'ポルトガル語',
 },
 de: {
   es: 'Alemán',
@@ -124,6 +129,7 @@ de: {
   pt: 'Alemão',
   de: 'Deutsch',
   it: 'Tedesco',
+  ja: 'ドイツ語',
 },
 it: {
   es: 'Italiano',
@@ -132,6 +138,7 @@ it: {
   pt: 'Italiano',
   de: 'Italienisch',
   it: 'Italiano',
+  ja: 'イタリア語',
 },
     };
 
@@ -151,6 +158,7 @@ it: {
         pt: string;
         de: string;
         it: string;
+        ja: string;
       }
     > = {
       a1: {
@@ -160,6 +168,7 @@ it: {
   pt: 'A1 · Iniciante',
   de: 'A1 · Anfänger',
   it: 'A1 · Principiante',
+  ja: 'A1 · 初心者',
 },
 a2: {
   es: 'A2 · Básico',
@@ -168,6 +177,7 @@ a2: {
   pt: 'A2 · Básico',
   de: 'A2 · Grundkenntnisse',
   it: 'A2 · Elementare',
+  ja: 'A2 · 初級',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -176,6 +186,7 @@ b1: {
   pt: 'B1 · Intermediário',
   de: 'B1 · Mittelstufe',
   it: 'B1 · Intermedio',
+  ja: 'B1 · 中級',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -184,6 +195,7 @@ b2: {
   pt: 'B2 · Intermediário superior',
   de: 'B2 · Fortgeschrittene Mittelstufe',
   it: 'B2 · Intermedio superiore',
+  ja: 'B2 · 中上級',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -192,6 +204,7 @@ c1: {
   pt: 'C1 · Avançado',
   de: 'C1 · Fortgeschritten',
   it: 'C1 · Avanzato',
+  ja: 'C1 · 上級',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -200,6 +213,7 @@ c2: {
   pt: 'C2 · Proficiência',
   de: 'C2 · Beherrschung',
   it: 'C2 · Padronanza',
+  ja: 'C2 · 熟練',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -208,6 +222,7 @@ beginner: {
   pt: 'A1 · Iniciante',
   de: 'A1 · Anfänger',
   it: 'A1 · Principiante',
+  ja: 'A1 · 初心者',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -216,6 +231,7 @@ intermediate: {
   pt: 'B1 · Intermediário',
   de: 'B1 · Mittelstufe',
   it: 'B1 · Intermedio',
+  ja: 'B1 · 中級',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -224,6 +240,7 @@ advanced: {
   pt: 'C1 · Avançado',
   de: 'C1 · Fortgeschritten',
   it: 'C1 · Avanzato',
+  ja: 'C1 · 上級',
 },
     };
 

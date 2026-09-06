@@ -1,6 +1,7 @@
 import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
 import { itTranslations } from './translations-it';
+import { jaTranslations } from './translations-ja';
 import { ptTranslations } from './translations-pt';
 export const supportedLanguageCodes = [
   'en',
@@ -30,6 +31,7 @@ export const activeLanguageCodes = [
   'pt',
   'de',
   'it',
+  'ja',
 ] as const;
 
 export type AppLanguage =
@@ -1982,6 +1984,7 @@ fr: frTranslations,
 pt: ptTranslations,
 de: deTranslations,
 it: itTranslations,
+ja: jaTranslations,
 };
 
 export type TranslationDictionary =
