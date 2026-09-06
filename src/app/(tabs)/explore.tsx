@@ -82,6 +82,7 @@ export default function ExploreScreen() {
   fr: string;
   pt: string;
   de: string;
+  it: string;
 }
     > = {
       es: {
@@ -90,6 +91,7 @@ export default function ExploreScreen() {
   fr: 'Espagnol',
   pt: 'Espanhol',
   de: 'Spanisch',
+  it: 'Spagnolo',
 },
 en: {
   es: 'Inglés',
@@ -97,6 +99,7 @@ en: {
   fr: 'Anglais',
   pt: 'Inglês',
   de: 'Englisch',
+  it: 'Inglese',
 },
 fr: {
   es: 'Francés',
@@ -104,6 +107,7 @@ fr: {
   fr: 'Français',
   pt: 'Francês',
   de: 'Französisch',
+  it: 'Francese',
 },
 pt: {
   es: 'Portugués',
@@ -111,6 +115,7 @@ pt: {
   fr: 'Portugais',
   pt: 'Português',
   de: 'Portugiesisch',
+  it: 'Portoghese',
 },
 de: {
   es: 'Alemán',
@@ -118,6 +123,7 @@ de: {
   fr: 'Allemand',
   pt: 'Alemão',
   de: 'Deutsch',
+  it: 'Tedesco',
 },
 it: {
   es: 'Italiano',
@@ -125,6 +131,7 @@ it: {
   fr: 'Italien',
   pt: 'Italiano',
   de: 'Italienisch',
+  it: 'Italiano',
 },
     };
 
@@ -143,6 +150,7 @@ it: {
         fr: string;
         pt: string;
         de: string;
+        it: string;
       }
     > = {
       a1: {
@@ -151,6 +159,7 @@ it: {
   fr: 'A1 · Débutant',
   pt: 'A1 · Iniciante',
   de: 'A1 · Anfänger',
+  it: 'A1 · Principiante',
 },
 a2: {
   es: 'A2 · Básico',
@@ -158,6 +167,7 @@ a2: {
   fr: 'A2 · Élémentaire',
   pt: 'A2 · Básico',
   de: 'A2 · Grundkenntnisse',
+  it: 'A2 · Elementare',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -165,6 +175,7 @@ b1: {
   fr: 'B1 · Intermédiaire',
   pt: 'B1 · Intermediário',
   de: 'B1 · Mittelstufe',
+  it: 'B1 · Intermedio',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -172,6 +183,7 @@ b2: {
   fr: 'B2 · Intermédiaire supérieur',
   pt: 'B2 · Intermediário superior',
   de: 'B2 · Fortgeschrittene Mittelstufe',
+  it: 'B2 · Intermedio superiore',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -179,6 +191,7 @@ c1: {
   fr: 'C1 · Avancé',
   pt: 'C1 · Avançado',
   de: 'C1 · Fortgeschritten',
+  it: 'C1 · Avanzato',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -186,6 +199,7 @@ c2: {
   fr: 'C2 · Maîtrise',
   pt: 'C2 · Proficiência',
   de: 'C2 · Beherrschung',
+  it: 'C2 · Padronanza',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -193,6 +207,7 @@ beginner: {
   fr: 'A1 · Débutant',
   pt: 'A1 · Iniciante',
   de: 'A1 · Anfänger',
+  it: 'A1 · Principiante',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -200,6 +215,7 @@ intermediate: {
   fr: 'B1 · Intermédiaire',
   pt: 'B1 · Intermediário',
   de: 'B1 · Mittelstufe',
+  it: 'B1 · Intermedio',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -207,6 +223,7 @@ advanced: {
   fr: 'C1 · Avancé',
   pt: 'C1 · Avançado',
   de: 'C1 · Fortgeschritten',
+  it: 'C1 · Avanzato',
 },
     };
 

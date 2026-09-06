@@ -678,6 +678,26 @@
       'Sta imparando',
     currentLevel:
       'Livello attuale',
+        matchTitle:
+      'Praticate e imparate insieme',
+    matchDescription:
+      'Invia una richiesta per iniziare una connessione di scambio linguistico.',
+    sending:
+      'Invio in corso...',
+    checkingConnection:
+      'Verifica della connessione...',
+    sendRequest:
+      'Invia richiesta',
+    requestSent:
+      'Richiesta inviata',
+    viewReceivedRequest:
+      'Visualizza richiesta ricevuta',
+    openConversation:
+      'Apri conversazione',
+    requestUnavailable:
+      'Richiesta non disponibile',
+    interactionUnavailable:
+      'Interazione non disponibile',  
      blockUser:
       'Blocca utente',
   },
