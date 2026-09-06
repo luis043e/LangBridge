@@ -73,97 +73,114 @@ export default function ExploreScreen() {
   const [loadError, setLoadError] =
     useState<string | null>(null);
 
-  const getLanguageName = (code: string) => {
+   const getLanguageName = (code: string) => {
     const languageNames: Record<
       string,
       {
         es: string;
         en: string;
+        fr: string;
       }
     > = {
       es: {
         es: 'Español',
         en: 'Spanish',
+        fr: 'Espagnol',
       },
       en: {
         es: 'Inglés',
         en: 'English',
+        fr: 'Anglais',
       },
       fr: {
         es: 'Francés',
         en: 'French',
+        fr: 'Français',
       },
       pt: {
         es: 'Portugués',
         en: 'Portuguese',
+        fr: 'Portugais',
       },
       de: {
         es: 'Alemán',
         en: 'German',
+        fr: 'Allemand',
       },
       it: {
         es: 'Italiano',
         en: 'Italian',
+        fr: 'Italien',
       },
     };
 
     return (
       languageNames[code]?.[language] ||
-text.exploreScreen.unspecified
+      text.exploreScreen.unspecified
     );
   };
 
   const getLevelName = (level: string) => {
-  const levelNames: Record<
-    string,
-    {
-      es: string;
-      en: string;
-    }
-  > = {
-    a1: {
-      es: 'A1 · Principiante',
-      en: 'A1 · Beginner',
-    },
-    a2: {
-      es: 'A2 · Básico',
-      en: 'A2 · Elementary',
-    },
-    b1: {
-      es: 'B1 · Intermedio',
-      en: 'B1 · Intermediate',
-    },
-    b2: {
-      es: 'B2 · Intermedio alto',
-      en: 'B2 · Upper intermediate',
-    },
-    c1: {
-      es: 'C1 · Avanzado',
-      en: 'C1 · Advanced',
-    },
-    c2: {
-      es: 'C2 · Dominio',
-      en: 'C2 · Proficiency',
-    },
-    beginner: {
-      es: 'A1 · Principiante',
-      en: 'A1 · Beginner',
-    },
-    intermediate: {
-      es: 'B1 · Intermedio',
-      en: 'B1 · Intermediate',
-    },
-    advanced: {
-      es: 'C1 · Avanzado',
-      en: 'C1 · Advanced',
-    },
-  };
+    const levelNames: Record<
+      string,
+      {
+        es: string;
+        en: string;
+        fr: string;
+      }
+    > = {
+      a1: {
+        es: 'A1 · Principiante',
+        en: 'A1 · Beginner',
+        fr: 'A1 · Débutant',
+      },
+      a2: {
+        es: 'A2 · Básico',
+        en: 'A2 · Elementary',
+        fr: 'A2 · Élémentaire',
+      },
+      b1: {
+        es: 'B1 · Intermedio',
+        en: 'B1 · Intermediate',
+        fr: 'B1 · Intermédiaire',
+      },
+      b2: {
+        es: 'B2 · Intermedio alto',
+        en: 'B2 · Upper intermediate',
+        fr: 'B2 · Intermédiaire supérieur',
+      },
+      c1: {
+        es: 'C1 · Avanzado',
+        en: 'C1 · Advanced',
+        fr: 'C1 · Avancé',
+      },
+      c2: {
+        es: 'C2 · Dominio',
+        en: 'C2 · Proficiency',
+        fr: 'C2 · Maîtrise',
+      },
+      beginner: {
+        es: 'A1 · Principiante',
+        en: 'A1 · Beginner',
+        fr: 'A1 · Débutant',
+      },
+      intermediate: {
+        es: 'B1 · Intermedio',
+        en: 'B1 · Intermediate',
+        fr: 'B1 · Intermédiaire',
+      },
+      advanced: {
+        es: 'C1 · Avanzado',
+        en: 'C1 · Advanced',
+        fr: 'C1 · Avancé',
+      },
+    };
 
-  return (
-    levelNames[level]?.[language] ||
-text.exploreScreen.levelNotSpecified
-  );
-};
+    return (
+      levelNames[level]?.[language] ||
+      text.exploreScreen.levelNotSpecified
+    );
+  };
   useEffect(() => {
     let isMounted = true;
 

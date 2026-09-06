@@ -1,9 +1,8 @@
-﻿import type { TranslationDictionary } from './translations';
-export const frTranslations = {
+﻿export const frTranslations = {
   chooseLanguage: {
     title: 'Choisissez votre langue',
     subtitle:
-      'SÃ©lectionnez la langue que vous souhaitez utiliser dans LangBridge.',
+      'Sélectionnez la langue que vous souhaitez utiliser dans LangBridge.',
     english: 'Anglais',
     englishDescription:
       'Utiliser LangBridge en anglais',
@@ -11,15 +10,15 @@ export const frTranslations = {
     spanishDescription:
       'Utiliser LangBridge en espagnol',
     note:
-      "Vous pourrez modifier la langue de l'interface plus tard dans les paramÃ¨tres.",
+      "Vous pourrez modifier la langue de l'interface plus tard dans les paramètres.",
     continue: 'Continuer',
     changeInterfaceLanguage:
       "Changer la langue de l'interface",
-    comingSoon: 'BIENTÃ”T',
+    comingSoon: 'BIENTÔT',
     saveErrorTitle:
-      'Impossible dâ€™enregistrer la langue',
+      'Impossible d’enregistrer la langue',
     saveErrorMessage:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     loadingLanguage:
       'Chargement de votre langue...',
     interfaceLanguage:
@@ -34,113 +33,113 @@ welcome: {
   slogan:
     'Pratiquez. Connectez-vous. Progressez.',
   description:
-    'Connectez-vous avec des locuteurs natifs, Ã©changez des langues et progressez ensemble.',
+    'Connectez-vous avec des locuteurs natifs, échangez des langues et progressez ensemble.',
   getStarted:
     'Commencer',
   login:
-    "J'ai dÃ©jÃ  un compte",
+    "J'ai déjà un compte",
   footer:
-    'CrÃ©ez de vraies connexions grÃ¢ce aux langues',
+    'Créez de vraies connexions grâce aux langues',
 },
   homeScreen: {
     welcome: 'Bienvenue sur LangBridge',
     subtitle:
-      'Votre parcours dâ€™apprentissage des langues commence ici.',
+      'Votre parcours d’apprentissage des langues commence ici.',
     weeklyGoal:
       'VOTRE OBJECTIF HEBDOMADAIRE',
     startPracticing:
-      "Commencez Ã  pratiquer aujourd'hui",
+      "Commencez à pratiquer aujourd'hui",
     profileDescription:
-      'ComplÃ©tez votre profil linguistique pour trouver des partenaires compatibles.',
+      'Complétez votre profil linguistique pour trouver des partenaires compatibles.',
     profileProgress:
       'Progression du profil',
     quickActions:
       'Actions rapides',
     completeProfile:
-      'ComplÃ©ter le profil',
+      'Compléter le profil',
     completeProfileDescription:
-      'Ajoutez votre langue maternelle, la langue que vous apprenez et vos centres dâ€™intÃ©rÃªt.',
+      'Ajoutez votre langue maternelle, la langue que vous apprenez et vos centres d’intérêt.',
     findPartners:
       'Trouver des partenaires linguistiques',
     findPartnersDescription:
-      'DÃ©couvrez des personnes souhaitant Ã©changer des langues avec vous.',
+      'Découvrez des personnes souhaitant échanger des langues avec vous.',
     conversations:
       'Vos conversations',
     conversationsDescription:
-      'Continuez Ã  pratiquer avec vos partenaires linguistiques.',
+      'Continuez à pratiquer avec vos partenaires linguistiques.',
     learn:
       'Apprendre',
     newBadge:
       'NOUVEAU',
     learnDescription:
-      'LeÃ§ons, niveaux, points et pratique quotidienne.',
+      'Leçons, niveaux, points et pratique quotidienne.',
     requests:
       'Demandes',
     requestsDescription:
-      'Consultez et rÃ©pondez Ã  vos demandes de connexion.',
+      'Consultez et répondez à vos demandes de connexion.',
     connections:
       'Mes connexions',
     connectionsDescription:
-      'Consultez les personnes avec lesquelles vous pouvez dÃ©jÃ  pratiquer.',
+      'Consultez les personnes avec lesquelles vous pouvez déjà pratiquer.',
     profileAndSettings:
-      'Profil et paramÃ¨tres',
+      'Profil et paramètres',
     profileAndSettingsDescription:
-      'GÃ©rez votre compte, vos prÃ©fÃ©rences et votre session.',
+      'Gérez votre compte, vos préférences et votre session.',
     tipLabel:
       'CONSEIL LANGBRIDGE',
     tipText:
-      'Un profil complet vous aide Ã  trouver des partenaires linguistiques plus fiables et compatibles.',
+      'Un profil complet vous aide à trouver des partenaires linguistiques plus fiables et compatibles.',
   },
   exploreScreen: {
-    unspecified: 'Non spÃ©cifiÃ©',
+    unspecified: 'Non spécifié',
     levelNotSpecified:
-      'Niveau non spÃ©cifiÃ©',
+      'Niveau non spécifié',
     defaultUserName:
       'Utilisateur LangBridge',
     locationNotSpecified:
-      'Emplacement non indiquÃ©',
+      'Emplacement non indiqué',
     countryNotSpecified:
-      'Pays non indiquÃ©',
+      'Pays non indiqué',
     loadError:
       'Impossible de charger les partenaires linguistiques.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
       'Trouver des partenaires linguistiques',
     subtitle:
-      'Connectez-vous avec des personnes qui peuvent vous aider Ã  pratiquer la langue que vous apprenez.',
+      'Connectez-vous avec des personnes qui peuvent vous aider à pratiquer la langue que vous apprenez.',
     searchPlaceholder:
       'Rechercher par nom, pays ou langue',
     partnerFound:
-      'partenaire trouvÃ©',
+      'partenaire trouvé',
     partnersFound:
-      'partenaires trouvÃ©s',
+      'partenaires trouvés',
     allFilter:
       'Tous',
     matchesFilter:
-      'âœ¨ Correspondances',
+      '✨ Correspondances',
     onlineFilter:
-      'â— En ligne',
+      '● En ligne',
     findingPartners:
       'Recherche de partenaires...',
     profilesCouldNotBeLoaded:
       'Impossible de charger les profils',
     noIdealMatchesFound:
-      'Aucune correspondance idÃ©ale trouvÃ©e pour le moment',
+      'Aucune correspondance idéale trouvée pour le moment',
     noResultsFound:
-      'Aucun rÃ©sultat trouvÃ©',
+      'Aucun résultat trouvé',
     noOtherPartners:
       'Aucun autre partenaire pour le moment',
     noIdealMatchesOnline:
-      'Aucune correspondance idÃ©ale nâ€™est actuellement en ligne. Vous pouvez consulter toutes les correspondances ou tous les partenaires.',
+      'Aucune correspondance idéale n’est actuellement en ligne. Vous pouvez consulter toutes les correspondances ou tous les partenaires.',
     idealMatchesDescription:
-      'Lorsquâ€™une personne possÃ¨de une correspondance linguistique rÃ©ciproque avec vous, elle apparaÃ®tra ici.',
+      'Lorsqu’une personne possède une correspondance linguistique réciproque avec vous, elle apparaîtra ici.',
     tryAnotherSearch:
       'Essayez un autre nom, pays ou langue.',
     viewAllPartners:
       'Voir tous les partenaires',
     idealMatchBadge:
-      'âœ¨ Correspondance idÃ©ale',
+      '✨ Correspondance idéale',
     speaks:
       'Parle',
     learns:
@@ -158,11 +157,11 @@ welcome: {
     loadError:
       'Impossible de charger les conversations.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
       'Conversations',
     subtitle:
-      'Continuez Ã  pratiquer avec vos connexions.',
+      'Continuez à pratiquer avec vos connexions.',
     loading:
       'Chargement des conversations...',
     loadErrorTitle:
@@ -176,29 +175,29 @@ welcome: {
     defaultPartnerName:
       'Partenaire LangBridge',
     preparationError:
-      'Cette conversation nâ€™a pas pu Ãªtre prÃ©parÃ©e.',
+      'Cette conversation n’a pas pu être préparée.',
     openError:
-      'Impossible dâ€™ouvrir la conversation. Veuillez rÃ©essayer.',
+      'Impossible d’ouvrir la conversation. Veuillez réessayer.',
     timeLocale:
       'fr-FR',
     messagesLoadError:
       'Impossible de charger les messages.',
     identificationError:
-      'Cette conversation nâ€™a pas pu Ãªtre identifiÃ©e.',
+      'Cette conversation n’a pas pu être identifiée.',
     sendError:
-      'Le message nâ€™a pas pu Ãªtre envoyÃ©. VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Le message n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.',
     connectionStatus:
       'Connexion linguistique',
     emptyTitle:
       'Commencez la conversation',
     emptyDescription:
-      'Envoyez un message Ã  {partnerName} pour commencer Ã  pratiquer.',
+      'Envoyez un message à {partnerName} pour commencer à pratiquer.',
     seen:
       'Vu',
     sent:
-      'EnvoyÃ©',
+      'Envoyé',
     messagePlaceholder:
-      'Ã‰crivez un message...',
+      'Écrivez un message...',
   },
   connectionsScreen: {
     loginRequired:
@@ -208,7 +207,7 @@ welcome: {
     loadError:
       'Impossible de charger vos connexions.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
       'Mes connexions',
     subtitle:
@@ -218,9 +217,9 @@ welcome: {
     emptyTitle:
       'Aucune connexion pour le moment',
     emptyDescription:
-      'Les demandes acceptÃ©es apparaÃ®tront ici.',
+      'Les demandes acceptées apparaîtront ici.',
     acceptedConnection:
-  'Connexion acceptÃ©e',
+  'Connexion acceptée',
   },
 
 requestsScreen: {
@@ -231,21 +230,21 @@ requestsScreen: {
   loadError:
     'Impossible de charger les demandes.',
   acceptedTitle:
-    'Demande acceptÃ©e',
+    'Demande acceptée',
   rejectedTitle:
-    'Demande refusÃ©e',
+    'Demande refusée',
   acceptedMessage:
-    'Cette personne fait dÃ©sormais partie de vos connexions.',
+    'Cette personne fait désormais partie de vos connexions.',
   rejectedMessage:
-    'La demande a Ã©tÃ© refusÃ©e avec succÃ¨s.',
+    'La demande a été refusée avec succès.',
   responseErrorTitle:
-    'Ã‰chec de la rÃ©ponse',
+    'Échec de la réponse',
   responseErrorMessage:
-    'La demande nâ€™a pas pu Ãªtre mise Ã  jour. VÃ©rifiez votre connexion et rÃ©essayez.',
+    'La demande n’a pas pu être mise à jour. Vérifiez votre connexion et réessayez.',
   back:
-    'â€¹ Retour',
+    '‹ Retour',
   title:
-    'Demandes reÃ§ues',
+    'Demandes reçues',
   subtitle:
     'Personnes souhaitant se connecter avec vous pour pratiquer des langues.',
   loading:
@@ -255,7 +254,7 @@ requestsScreen: {
   emptyTitle:
     'Aucune demande en attente',
   emptyDescription:
-    'Les nouvelles demandes apparaÃ®tront ici.',
+    'Les nouvelles demandes apparaîtront ici.',
   wantsToConnect:
     'Souhaite se connecter avec vous.',
   pending:
@@ -273,33 +272,33 @@ requestsScreen: {
     loadErrorTitle:
       'Impossible de charger',
     connectionError:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     unblockTitle:
-      'DÃ©bloquer un utilisateur',
+      'Débloquer un utilisateur',
     unblockConfirmation:
-      'Voulez-vous dÃ©bloquer {userName} ?',
+      'Voulez-vous débloquer {userName} ?',
     cancel:
       'Annuler',
     unblock:
-      'DÃ©bloquer',
+      'Débloquer',
     unblockSuccessTitle:
-      'Utilisateur dÃ©bloquÃ©',
+      'Utilisateur débloqué',
     unblockSuccessMessage:
-      '{userName} a Ã©tÃ© dÃ©bloquÃ©.',
+      '{userName} a été débloqué.',
     unblockErrorTitle:
-      'Impossible de dÃ©bloquer',
+      'Impossible de débloquer',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
-      'Utilisateurs bloquÃ©s',
+      'Utilisateurs bloqués',
     subtitle:
-      'GÃ©rez les comptes que vous avez bloquÃ©s sur LangBridge.',
+      'Gérez les comptes que vous avez bloqués sur LangBridge.',
     loading:
-      'Chargement des utilisateurs bloquÃ©s...',
+      'Chargement des utilisateurs bloqués...',
     emptyTitle:
-      "Vous n'avez aucun utilisateur bloquÃ©",
+      "Vous n'avez aucun utilisateur bloqué",
     emptyDescription:
-      'Les comptes que vous bloquez apparaÃ®tront ici.',
+      'Les comptes que vous bloquez apparaîtront ici.',
   },
   reportProblemScreen: {
     sessionUnavailableTitle:
@@ -307,50 +306,50 @@ requestsScreen: {
     sessionUnavailableMessage:
       'Veuillez vous reconnecter pour envoyer le signalement.',
     selectCategoryTitle:
-      'SÃ©lectionnez une catÃ©gorie',
+      'Sélectionnez une catégorie',
     selectCategoryMessage:
-      'Choisissez le type de problÃ¨me que vous souhaitez signaler.',
+      'Choisissez le type de problème que vous souhaitez signaler.',
     addMoreInformationTitle:
       "Ajoutez plus d'informations",
     addMoreInformationMessage:
-      'La description doit contenir au moins 10 caractÃ¨res.',
+      'La description doit contenir au moins 10 caractères.',
     reportSubmittedTitle:
-      'Signalement envoyÃ©',
+      'Signalement envoyé',
     reportSubmittedMessage:
       'Merci. Nous examinerons les informations que vous avez fournies.',
     submitErrorTitle:
       "Impossible d'envoyer",
     connectionError:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
-      'Signaler un problÃ¨me',
+      'Signaler un problème',
     subtitle:
-      "DÃ©crivez ce qui s'est passÃ© afin que nous puissions vous aider.",
+      "Décrivez ce qui s'est passé afin que nous puissions vous aider.",
     problemType:
-      'Type de problÃ¨me',
+      'Type de problème',
     describeProblem:
-      'DÃ©crivez le problÃ¨me',
+      'Décrivez le problème',
     descriptionPlaceholder:
-      "Expliquez ce qui s'est passÃ© avec le plus de dÃ©tails possible...",
+      "Expliquez ce qui s'est passé avec le plus de détails possible...",
     privateReportNotice:
-      'Votre signalement sera envoyÃ© de maniÃ¨re privÃ©e pour examen.',
+      'Votre signalement sera envoyé de manière privée pour examen.',
     submitting:
       'Envoi en cours...',
     submitReport:
       'Envoyer le signalement',
     categories: {
       technical:
-        'ProblÃ¨me technique',
+        'Problème technique',
       account:
-        'ProblÃ¨me de compte',
+        'Problème de compte',
       user:
         'Signaler un comportement',
       privacy:
-        'ConfidentialitÃ© ou sÃ©curitÃ©',
+        'Confidentialité ou sécurité',
       other:
-        'Autre problÃ¨me',
+        'Autre problème',
     },
   },
   deleteAccountScreen: {
@@ -367,43 +366,43 @@ requestsScreen: {
     confirmRequestTitle:
       'Confirmer la demande',
     confirmRequestMessage:
-      'Votre profil sera masquÃ© et une demande de suppression de compte sera crÃ©Ã©e.',
+      'Votre profil sera masqué et une demande de suppression de compte sera créée.',
     cancel:
       'Annuler',
     continue:
       'Continuer',
     requestSubmittedTitle:
-      'Demande envoyÃ©e',
+      'Demande envoyée',
     requestSubmittedMessage:
-      'Votre profil a Ã©tÃ© masquÃ© et la demande a Ã©tÃ© enregistrÃ©e.',
+      'Votre profil a été masqué et la demande a été enregistrée.',
     submitErrorTitle:
       "Impossible d'envoyer",
     connectionError:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
       'Supprimer le compte',
     subtitle:
-      'Demandez la suppression dÃ©finitive de votre compte LangBridge.',
+      'Demandez la suppression définitive de votre compte LangBridge.',
     warningTitle:
       'Avant de continuer',
     warningText:
-      'Cette demande masquera immÃ©diatement votre profil pendant le traitement de la suppression.',
+      'Cette demande masquera immédiatement votre profil pendant le traitement de la suppression.',
     consequencesTitle:
       'La suppression peut affecter :',
     profileConsequence:
-      'â€¢ Votre profil et vos prÃ©fÃ©rences.',
+      '• Votre profil et vos préférences.',
     connectionsConsequence:
-      'â€¢ Vos demandes et connexions.',
+      '• Vos demandes et connexions.',
     conversationsConsequence:
-      'â€¢ Vos conversations et messages.',
+      '• Vos conversations et messages.',
     accessConsequence:
-      'â€¢ Votre accÃ¨s futur Ã  LangBridge.',
+      '• Votre accès futur à LangBridge.',
     confirmationLabel:
       'Pour confirmer, tapez SUPPRIMER',
     helperText:
-      'Le mot doit Ãªtre saisi exactement comme indiquÃ© ci-dessus.',
+      'Le mot doit être saisi exactement comme indiqué ci-dessus.',
     processing:
       'Traitement de la demande...',
     requestDeletion:
@@ -411,77 +410,77 @@ requestsScreen: {
     cancelAndKeepAccount:
       'Annuler et conserver mon compte',
     securityNote:
-      "Pour des raisons de sÃ©curitÃ©, la suppression dÃ©finitive nÃ©cessitera une vÃ©rification supplÃ©mentaire de lâ€™identitÃ©.",
+      "Pour des raisons de sécurité, la suppression définitive nécessitera une vérification supplémentaire de l’identité.",
   },
   privacySecurityScreen: {
     emailUnavailableTitle:
       'E-mail indisponible',
     emailUnavailableMessage:
-      "Aucune adresse e-mail n'a Ã©tÃ© trouvÃ©e pour ce compte.",
+      "Aucune adresse e-mail n'a été trouvée pour ce compte.",
     changePasswordTitle:
       'Changer le mot de passe',
     changePasswordMessage:
-      'Nous enverrons un lien de changement de mot de passe Ã  {email}.',
+      'Nous enverrons un lien de changement de mot de passe à {email}.',
     cancel:
       'Annuler',
     sendEmail:
       'Envoyer un e-mail',
     emailSentTitle:
-      'E-mail envoyÃ©',
+      'E-mail envoyé',
     emailSentMessage:
-      'VÃ©rifiez votre boÃ®te de rÃ©ception et votre dossier spam.',
+      'Vérifiez votre boîte de réception et votre dossier spam.',
     sendErrorTitle:
       "Impossible d'envoyer",
     connectionError:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     comingSoonTitle:
-      'FonctionnalitÃ© en dÃ©veloppement',
+      'Fonctionnalité en développement',
     comingSoonMessage:
-      'Cette option sera bientÃ´t disponible.',
+      'Cette option sera bientôt disponible.',
     sessionUnavailableTitle:
       'Session indisponible',
     sessionUnavailableMessage:
       'Veuillez vous reconnecter pour modifier cette option.',
     visibilityUpdatedTitle:
-      'VisibilitÃ© mise Ã  jour',
+      'Visibilité mise à jour',
     profileVisibleMessage:
       'Les autres personnes pourront trouver votre profil.',
     profileHiddenMessage:
-      'Votre profil nâ€™apparaÃ®tra plus dans les recherches.',
+      'Votre profil n’apparaîtra plus dans les recherches.',
     saveErrorTitle:
       "Impossible d'enregistrer",
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
-      'ConfidentialitÃ© et sÃ©curitÃ©',
+      'Confidentialité et sécurité',
     subtitle:
-      'GÃ©rez la sÃ©curitÃ© et la confidentialitÃ© de votre compte.',
+      'Gérez la sécurité et la confidentialité de votre compte.',
     accountSecurityTitle:
-      'SÃ©curitÃ© du compte',
+      'Sécurité du compte',
     changePassword:
       'Changer le mot de passe',
     changePasswordDescription:
-      'Mettre Ã  jour le mot de passe de votre compte.',
+      'Mettre à jour le mot de passe de votre compte.',
     blockedUsers:
-      'Utilisateurs bloquÃ©s',
+      'Utilisateurs bloqués',
     blockedUsersDescription:
-      'GÃ©rez les comptes que vous avez bloquÃ©s.',
+      'Gérez les comptes que vous avez bloqués.',
     profilePrivacyTitle:
-      'ConfidentialitÃ© du profil',
+      'Confidentialité du profil',
     visibleProfile:
       'Profil visible',
     visibleProfileDescription:
       'Permettre aux autres personnes de trouver votre profil.',
     helpAndControlTitle:
-      'Aide et contrÃ´le',
+      'Aide et contrôle',
     reportProblem:
-      'Signaler un problÃ¨me',
+      'Signaler un problème',
     reportProblemDescription:
-      'Signaler un comportement inappropriÃ© ou un problÃ¨me de lâ€™application.',
+      'Signaler un comportement inapproprié ou un problème de l’application.',
     deleteAccount:
       'Supprimer le compte',
     deleteAccountDescription:
-      'Supprimer dÃ©finitivement votre compte et vos donnÃ©es.',
+      'Supprimer définitivement votre compte et vos données.',
   },
   editProfileScreen: {
     photoUnavailableTitle:
@@ -491,7 +490,7 @@ requestsScreen: {
     removePhotoTitle:
       'Supprimer la photo',
     removePhotoMessage:
-      'Les initiales de votre nom seront affichÃ©es.',
+      'Les initiales de votre nom seront affichées.',
     cancel:
       'Annuler',
     remove:
@@ -499,7 +498,7 @@ requestsScreen: {
     loginRequiredTitle:
       'Connexion requise',
     loginRequiredMessage:
-      'Veuillez vous reconnecter pour mettre Ã  jour votre profil.',
+      'Veuillez vous reconnecter pour mettre à jour votre profil.',
     nameRequiredTitle:
       'Nom requis',
     nameRequiredMessage:
@@ -507,27 +506,27 @@ requestsScreen: {
     countryRequiredTitle:
       'Pays requis',
     countryRequiredMessage:
-      'SÃ©lectionnez votre pays pour continuer.',
+      'Sélectionnez votre pays pour continuer.',
     profileUpdatedTitle:
-      'Profil mis Ã  jour',
+      'Profil mis à jour',
     profileUpdatedMessage:
-      'Vos modifications ont Ã©tÃ© enregistrÃ©es avec succÃ¨s.',
+      'Vos modifications ont été enregistrées avec succès.',
     saveFailedTitle:
-      "Ã‰chec de l'enregistrement",
+      "Échec de l'enregistrement",
     connectionError:
-      'VÃ©rifiez votre connexion et rÃ©essayez.',
+      'Vérifiez votre connexion et réessayez.',
     back:
-      'â€¹ Retour',
+      '‹ Retour',
     title:
       'Modifier le profil',
     subtitle:
-      'Mettez Ã  jour les informations que vos partenaires verront.',
+      'Mettez à jour les informations que vos partenaires verront.',
     profilePhoto:
       'Photo de profil',
     changePhoto:
       'Changer la photo',
     changePhotoMessage:
-      'Nous connecterons la galerie du tÃ©lÃ©phone Ã  la prochaine Ã©tape.',
+      'Nous connecterons la galerie du téléphone à la prochaine étape.',
     useGooglePhoto:
       'Utiliser la photo Google',
     removePhoto:
@@ -539,15 +538,15 @@ requestsScreen: {
     country:
       'Pays',
     selectCountry:
-      'SÃ©lectionnez votre pays',
+      'Sélectionnez votre pays',
     countryPrivacyHelper:
-      'Seul votre pays sera affichÃ© publiquement.',
+      'Seul votre pays sera affiché publiquement.',
     searchCountry:
       'Rechercher un pays...',
     noCountryResults:
-      "Nous n'avons pas trouvÃ© ce pays.",
+      "Nous n'avons pas trouvé ce pays.",
     aboutMe:
-      'Ã€ propos de moi',
+      'À propos de moi',
     bioPlaceholder:
       'Dites aux autres ce que vous souhaitez pratiquer.',
     saving:
@@ -956,7 +955,7 @@ requestsScreen: {
     title:
       'Content de vous revoir',
     subtitle:
-      'Connectez-vous pour continuer à pratiquer et à créer des liens grâce aux langues.',
+      'Connectez-vous pour continuer � pratiquer et � cr�er des liens gr�ce aux langues.',
     emailLabel:
       'Adresse e-mail',
     emailPlaceholder:
@@ -1022,7 +1021,7 @@ requestsScreen: {
     title:
       'Créez votre compte',
     subtitle:
-      'Rejoignez LangBridge et commencez à créer des liens grâce aux langues.',
+      'Rejoignez LangBridge et commencez � cr�er des liens gr�ce aux langues.',
     fullNameLabel:
       'Nom complet',
     fullNamePlaceholder:
@@ -1093,7 +1092,7 @@ requestsScreen: {
       'Le mot de passe est trop faible.',
     networkError:
       'Vérifiez votre connexion Internet et réessayez.',
-  },
-} satisfies TranslationDictionary;
+},
+};
 
 

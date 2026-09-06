@@ -1,3 +1,5 @@
+import { frTranslations } from './translations-fr';
+
 export const supportedLanguageCodes = [
   'en',
   'es',
@@ -22,6 +24,7 @@ export type SupportedLanguageCode =
 export const activeLanguageCodes = [
   'en',
   'es',
+  'fr',
 ] as const;
 
 export type AppLanguage =
@@ -1969,6 +1972,9 @@ networkError:
   'Revisa tu conexión a Internet e inténtalo nuevamente.',
 },
 },
+
+fr: frTranslations,
 };
+
 export type TranslationDictionary =
   typeof translations.en;
