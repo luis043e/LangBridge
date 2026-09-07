@@ -1,6 +1,7 @@
 import { arTranslations } from './translations-ar';
 import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
+import { hiTranslations } from './translations-hi';
 import { itTranslations } from './translations-it';
 import { jaTranslations } from './translations-ja';
 import { koTranslations } from './translations-ko';
@@ -2001,6 +2002,7 @@ zh: zhTranslations,
 ar: arTranslations,
 ru: ruTranslations,
 tr: trTranslations,
+hi: hiTranslations,
 };
 
 export type TranslationDictionary =
