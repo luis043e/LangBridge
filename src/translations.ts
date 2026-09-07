@@ -6,6 +6,7 @@ import { jaTranslations } from './translations-ja';
 import { koTranslations } from './translations-ko';
 import { ptTranslations } from './translations-pt';
 import { ruTranslations } from './translations-ru';
+import { trTranslations } from './translations-tr';
 import { zhTranslations } from './translations-zh';
 export const supportedLanguageCodes = [
   'en',
@@ -23,6 +24,7 @@ export const supportedLanguageCodes = [
   'nl',
   'pl',
   'hi',
+  'bn',
 ] as const;
 
 export type SupportedLanguageCode =
@@ -40,6 +42,7 @@ export const activeLanguageCodes = [
   'zh',
   'ar',
   'ru',
+  'tr',
 ] as const;
 
 export type AppLanguage =
@@ -1997,6 +2000,7 @@ ko: koTranslations,
 zh: zhTranslations,
 ar: arTranslations,
 ru: ruTranslations,
+tr: trTranslations,
 };
 
 export type TranslationDictionary =
