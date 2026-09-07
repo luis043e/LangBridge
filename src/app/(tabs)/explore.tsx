@@ -87,6 +87,7 @@ export default function ExploreScreen() {
   ko: string;
   zh: string;
   ar: string;
+  ru: string;
 }
     > = {
       es: {
@@ -100,6 +101,7 @@ export default function ExploreScreen() {
   ko: '스페인어',
   zh: '西班牙语',
   ar: 'الإسبانية',
+  ru: 'Испанский',
 },
 en: {
   es: 'Inglés',
@@ -112,6 +114,7 @@ en: {
   ko: '영어',
   zh: '英语',
   ar: 'الإنجليزية',
+  ru: 'Английский',
 },
 fr: {
   es: 'Francés',
@@ -124,6 +127,7 @@ fr: {
   ko: '프랑스어',
   zh: '法语',
   ar: 'الفرنسية',
+  ru: 'Французский',
 },
 pt: {
   es: 'Portugués',
@@ -136,6 +140,7 @@ pt: {
   ko: '포르투갈어',
   zh: '葡萄牙语',
   ar: 'البرتغالية',
+  ru: 'Португальский',
 },
 de: {
   es: 'Alemán',
@@ -148,6 +153,7 @@ de: {
   ko: '독일어',
   zh: '德语',
   ar: 'الألمانية',
+  ru: 'Немецкий',
 },
 it: {
   es: 'Italiano',
@@ -160,6 +166,7 @@ it: {
   ko: '이탈리아어',
   zh: '意大利语',
   ar: 'الإيطالية',
+  ru: 'Итальянский',
 },
     };
 
@@ -183,6 +190,7 @@ it: {
         ko: string;
         zh: string;
         ar: string;
+        ru: string;
       }
     > = {
       a1: {
@@ -196,6 +204,7 @@ it: {
   ko: 'A1 · 초급',
   zh: 'A1 · 初学者',
   ar: 'A1 · مبتدئ',
+  ru: 'A1 · Начальный',
 },
 a2: {
   es: 'A2 · Básico',
@@ -208,6 +217,7 @@ a2: {
   ko: 'A2 · 초급',
   zh: 'A2 · 初级',
   ar: 'A2 · مبتدئ',
+  ru: 'A2 · Элементарный',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -220,6 +230,7 @@ b1: {
   ko: 'B1 · 중급',
   zh: 'B1 · 中级',
   ar: 'B1 · متوسط',
+  ru: 'B1 · Средний',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -232,6 +243,7 @@ b2: {
   ko: 'B2 · 중상급',
   zh: 'B2 · 中高级',
   ar: 'B2 · متوسط متقدم',
+  ru: 'B2 · Выше среднего',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -244,6 +256,7 @@ c1: {
   ko: 'C1 · 고급',
   zh: 'C1 · 高级',
   ar: 'C1 · متقدم',
+  ru: 'C1 · Продвинутый',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -256,6 +269,7 @@ c2: {
   ko: 'C2 · 숙련',
   zh: 'C2 · 精通',
   ar: 'C2 · إتقان',
+  ru: 'C2 · Свободное владение',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -268,6 +282,7 @@ beginner: {
   ko: 'A1 · 초급',
   zh: 'A1 · 初学者',
   ar: 'A1 · مبتدئ',
+  ru: 'A1 · Начальный',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -280,6 +295,7 @@ intermediate: {
   ko: 'B1 · 중급',
   zh: 'B1 · 中级',
   ar: 'B1 · متوسط',
+  ru: 'B1 · Средний',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -292,6 +308,7 @@ advanced: {
   ko: 'C1 · 고급',
   zh: 'C1 · 高级',
   ar: 'C1 · متقدم',
+  ru: 'C1 · Продвинутый',
 },
     };
 
