@@ -86,6 +86,7 @@ export default function ExploreScreen() {
   ja: string;
   ko: string;
   zh: string;
+  ar: string;
 }
     > = {
       es: {
@@ -98,6 +99,7 @@ export default function ExploreScreen() {
   ja: 'スペイン語',
   ko: '스페인어',
   zh: '西班牙语',
+  ar: 'الإسبانية',
 },
 en: {
   es: 'Inglés',
@@ -109,6 +111,7 @@ en: {
   ja: '英語',
   ko: '영어',
   zh: '英语',
+  ar: 'الإنجليزية',
 },
 fr: {
   es: 'Francés',
@@ -120,6 +123,7 @@ fr: {
   ja: 'フランス語',
   ko: '프랑스어',
   zh: '法语',
+  ar: 'الفرنسية',
 },
 pt: {
   es: 'Portugués',
@@ -131,6 +135,7 @@ pt: {
   ja: 'ポルトガル語',
   ko: '포르투갈어',
   zh: '葡萄牙语',
+  ar: 'البرتغالية',
 },
 de: {
   es: 'Alemán',
@@ -142,6 +147,7 @@ de: {
   ja: 'ドイツ語',
   ko: '독일어',
   zh: '德语',
+  ar: 'الألمانية',
 },
 it: {
   es: 'Italiano',
@@ -153,6 +159,7 @@ it: {
   ja: 'イタリア語',
   ko: '이탈리아어',
   zh: '意大利语',
+  ar: 'الإيطالية',
 },
     };
 
@@ -175,6 +182,7 @@ it: {
         ja: string;
         ko: string;
         zh: string;
+        ar: string;
       }
     > = {
       a1: {
@@ -187,6 +195,7 @@ it: {
   ja: 'A1 · 初心者',
   ko: 'A1 · 초급',
   zh: 'A1 · 初学者',
+  ar: 'A1 · مبتدئ',
 },
 a2: {
   es: 'A2 · Básico',
@@ -198,6 +207,7 @@ a2: {
   ja: 'A2 · 初級',
   ko: 'A2 · 초급',
   zh: 'A2 · 初级',
+  ar: 'A2 · مبتدئ',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -209,6 +219,7 @@ b1: {
   ja: 'B1 · 中級',
   ko: 'B1 · 중급',
   zh: 'B1 · 中级',
+  ar: 'B1 · متوسط',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -220,6 +231,7 @@ b2: {
   ja: 'B2 · 中上級',
   ko: 'B2 · 중상급',
   zh: 'B2 · 中高级',
+  ar: 'B2 · متوسط متقدم',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -231,6 +243,7 @@ c1: {
   ja: 'C1 · 上級',
   ko: 'C1 · 고급',
   zh: 'C1 · 高级',
+  ar: 'C1 · متقدم',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -242,6 +255,7 @@ c2: {
   ja: 'C2 · 熟練',
   ko: 'C2 · 숙련',
   zh: 'C2 · 精通',
+  ar: 'C2 · إتقان',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -253,6 +267,7 @@ beginner: {
   ja: 'A1 · 初心者',
   ko: 'A1 · 초급',
   zh: 'A1 · 初学者',
+  ar: 'A1 · مبتدئ',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -264,6 +279,7 @@ intermediate: {
   ja: 'B1 · 中級',
   ko: 'B1 · 중급',
   zh: 'B1 · 中级',
+  ar: 'B1 · متوسط',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -275,6 +291,7 @@ advanced: {
   ja: 'C1 · 上級',
   ko: 'C1 · 고급',
   zh: 'C1 · 高级',
+  ar: 'C1 · متقدم',
 },
     };
 

@@ -1,3 +1,4 @@
+import { arTranslations } from './translations-ar';
 import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
 import { itTranslations } from './translations-it';
@@ -36,6 +37,7 @@ export const activeLanguageCodes = [
   'ja',
   'ko',
   'zh',
+  'ar',
 ] as const;
 
 export type AppLanguage =
@@ -1991,6 +1993,7 @@ it: itTranslations,
 ja: jaTranslations,
 ko: koTranslations,
 zh: zhTranslations,
+ar: arTranslations,
 };
 
 export type TranslationDictionary =
