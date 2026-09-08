@@ -6,6 +6,7 @@ import { hiTranslations } from './translations-hi';
 import { itTranslations } from './translations-it';
 import { jaTranslations } from './translations-ja';
 import { koTranslations } from './translations-ko';
+import { nlTranslations } from './translations-nl';
 import { ptTranslations } from './translations-pt';
 import { ruTranslations } from './translations-ru';
 import { trTranslations } from './translations-tr';
@@ -47,6 +48,7 @@ export const activeLanguageCodes = [
   'tr',
   'hi',
   'bn',
+  'nl',
 ] as const;
 
 export type AppLanguage =
@@ -2007,6 +2009,7 @@ ru: ruTranslations,
 tr: trTranslations,
 hi: hiTranslations,
 bn: bnTranslations,
+nl: nlTranslations,
 };
 
 export type TranslationDictionary =
