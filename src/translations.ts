@@ -1,4 +1,5 @@
 import { arTranslations } from './translations-ar';
+import { bnTranslations } from './translations-bn';
 import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
 import { hiTranslations } from './translations-hi';
@@ -44,6 +45,8 @@ export const activeLanguageCodes = [
   'ar',
   'ru',
   'tr',
+  'hi',
+  'bn',
 ] as const;
 
 export type AppLanguage =
@@ -2003,6 +2006,7 @@ ar: arTranslations,
 ru: ruTranslations,
 tr: trTranslations,
 hi: hiTranslations,
+bn: bnTranslations,
 };
 
 export type TranslationDictionary =

@@ -14,7 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../../contexts/language-context';
 import { auth, db } from '../../firebaseConfig';
-import { translations } from '../../translations';
+import {
+  translations,
+  type SupportedLanguageCode,
+} from '../../translations';
 
 type Partner = {
   id: string;
@@ -75,22 +78,9 @@ export default function ExploreScreen() {
    
    const getLanguageName = (code: string) => {
     const languageNames: Record<
-      string,
-      {
-  es: string;
-  en: string;
-  fr: string;
-  pt: string;
-  de: string;
-  it: string;
-  ja: string;
-  ko: string;
-  zh: string;
-  ar: string;
-  ru: string;
-  tr: string;
-}
-    > = {
+  string,
+  Partial<Record<SupportedLanguageCode, string>>
+> = {
       es: {
   es: 'Español',
   en: 'Spanish',
@@ -104,6 +94,7 @@ export default function ExploreScreen() {
   ar: 'الإسبانية',
   ru: 'Испанский',
   tr: 'İspanyolca',
+  hi: 'स्पेनिश',
 },
 en: {
   es: 'Inglés',
@@ -118,6 +109,7 @@ en: {
   ar: 'الإنجليزية',
   ru: 'Английский',
   tr: 'İngilizce',
+  hi: 'अंग्रेज़ी',
 },
 fr: {
   es: 'Francés',
@@ -132,6 +124,7 @@ fr: {
   ar: 'الفرنسية',
   ru: 'Французский',
   tr: 'Fransızca',
+  hi: 'फ्रेंच',
 },
 pt: {
   es: 'Portugués',
@@ -146,6 +139,7 @@ pt: {
   ar: 'البرتغالية',
   ru: 'Португальский',
   tr: 'Portekizce',
+  hi: 'पुर्तगाली',
 },
 de: {
   es: 'Alemán',
@@ -160,6 +154,7 @@ de: {
   ar: 'الألمانية',
   ru: 'Немецкий',
   tr: 'Almanca',
+  hi: 'जर्मन',
 },
 it: {
   es: 'Italiano',
@@ -174,6 +169,7 @@ it: {
   ar: 'الإيطالية',
   ru: 'Итальянский',
   tr: 'İtalyanca',
+  hi: 'इतालवी',
 },
     };
 
@@ -185,22 +181,9 @@ it: {
 
   const getLevelName = (level: string) => {
     const levelNames: Record<
-      string,
-      {
-        es: string;
-        en: string;
-        fr: string;
-        pt: string;
-        de: string;
-        it: string;
-        ja: string;
-        ko: string;
-        zh: string;
-        ar: string;
-        ru: string;
-        tr: string;
-      }
-    > = {
+  string,
+  Partial<Record<SupportedLanguageCode, string>>
+> = {
       a1: {
   es: 'A1 · Principiante',
   en: 'A1 · Beginner',
@@ -214,6 +197,7 @@ it: {
   ar: 'A1 · مبتدئ',
   ru: 'A1 · Начальный',
 tr: 'A1 · Başlangıç',
+hi: 'A1 · नौकरी',
 },
 a2: {
   es: 'A2 · Básico',
@@ -228,6 +212,7 @@ a2: {
   ar: 'A2 · مبتدئ',
   ru: 'A2 · Элементарный',
   tr: 'A2 · Temel',
+  hi: 'A2 · मौलिक',
 },
 b1: {
   es: 'B1 · Intermedio',
@@ -242,6 +227,7 @@ b1: {
   ar: 'B1 · متوسط',
   ru: 'B1 · Средний',
   tr: 'B1 · Orta',
+  hi: 'B1 · मध्यम',
 },
 b2: {
   es: 'B2 · Intermedio alto',
@@ -256,6 +242,7 @@ b2: {
   ar: 'B2 · متوسط متقدم',
   ru: 'B2 · Выше среднего',
   tr: 'B2 · Orta Üstü',
+  hi: 'B2 · उच्च मध्यवर्ती',
 },
 c1: {
   es: 'C1 · Avanzado',
@@ -270,6 +257,7 @@ c1: {
   ar: 'C1 · متقدم',
   ru: 'C1 · Продвинутый',
   tr: 'C1 · İleri',
+  hi: 'C1 · उन्नत',
 },
 c2: {
   es: 'C2 · Dominio',
@@ -284,6 +272,7 @@ c2: {
   ar: 'C2 · إتقان',
   ru: 'C2 · Свободное владение',
   tr: 'C2 · Ustalık',
+  hi: 'C2 · प्रवीणता',
 },
 beginner: {
   es: 'A1 · Principiante',
@@ -298,6 +287,7 @@ beginner: {
   ar: 'A1 · مبتدئ',
   ru: 'A1 · Начальный',
   tr: 'A1 · Başlangıç',
+  hi: 'A1 · नौकरी',
 },
 intermediate: {
   es: 'B1 · Intermedio',
@@ -312,6 +302,7 @@ intermediate: {
   ar: 'B1 · متوسط',
   ru: 'B1 · Средний',
   tr: 'B1 · Orta',
+  hi: 'B1 · मध्यम',
 },
 advanced: {
   es: 'C1 · Avanzado',
@@ -326,6 +317,7 @@ advanced: {
   ar: 'C1 · متقدم',
   ru: 'C1 · Продвинутый',
   tr: 'C1 · İleri',
+  hi: 'C1 · उन्नत',
 },
     };
 

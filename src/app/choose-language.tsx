@@ -21,6 +21,7 @@ import {
   type LanguageCatalogOption,
 } from '../language-catalog';
 import {
+  isAppLanguage,
   translations,
   type AppLanguage,
 } from '../translations';
@@ -59,12 +60,11 @@ export default function ChooseLanguageScreen() {
         await AsyncStorage.getItem('appLanguage');
 
       if (
-        isActive &&
-        (savedLanguage === 'en' ||
-          savedLanguage === 'es')
-      ) {
-        setSelectedLanguage(savedLanguage);
-      }
+  isActive &&
+  isAppLanguage(savedLanguage)
+) {
+  setSelectedLanguage(savedLanguage);
+}
     } catch (error) {
       console.error(
         'Error loading saved language:',

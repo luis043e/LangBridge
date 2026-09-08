@@ -136,6 +136,14 @@ export const languageCatalog: LanguageCatalogOption[] = [
     descriptionEn: 'Use LangBridge in Hindi.',
     direction: 'ltr',
   },
+ {
+  code: 'bn',
+  flag: '🇧🇩',
+  nativeName: 'বাংলা',
+  descriptionEs: 'Usar LangBridge en bengalí.',
+  descriptionEn: 'Use LangBridge in Bengali.',
+  direction: 'ltr',
+}, 
 ];
 
 export const isActiveLanguage = (

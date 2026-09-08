@@ -311,6 +311,119 @@ blockedUsersScreen: {
   emptyDescription:
     'जिन खातों को आपने ब्लॉक किया है वे यहाँ दिखाई देंगे।',
 },
+reportProblemScreen: {
+  sessionUnavailableTitle:
+    'सत्र उपलब्ध नहीं है',
+  sessionUnavailableMessage:
+    'रिपोर्ट भेजने के लिए फिर से साइन इन करें।',
+  selectCategoryTitle:
+    'एक श्रेणी चुनें',
+  selectCategoryMessage:
+    'जिस प्रकार की समस्या की आप रिपोर्ट करना चाहते हैं, उसे चुनें।',
+  addMoreInformationTitle:
+    'अधिक जानकारी जोड़ें',
+  addMoreInformationMessage:
+    'विवरण में कम से कम 10 अक्षर होने चाहिए।',
+  reportSubmittedTitle:
+    'रिपोर्ट भेज दी गई',
+  reportSubmittedMessage:
+    'धन्यवाद। हम आपके द्वारा भेजी गई जानकारी की समीक्षा करेंगे।',
+  submitErrorTitle:
+    'रिपोर्ट भेजी नहीं जा सकी',
+  connectionError:
+    'अपना कनेक्शन जाँचें और पुनः प्रयास करें।',
+  back:
+    '‹ वापस',
+  title:
+    'समस्या की रिपोर्ट करें',
+  subtitle:
+    'हमें बताएँ कि क्या हुआ ताकि हम आपकी सहायता कर सकें।',
+  problemType:
+    'समस्या का प्रकार',
+  describeProblem:
+    'समस्या का वर्णन करें',
+  descriptionPlaceholder:
+    'जो हुआ उसका यथासंभव विस्तार से वर्णन करें...',
+  privateReportNotice:
+    'आपकी रिपोर्ट निजी रूप से समीक्षा के लिए भेजी जाएगी।',
+  submitting:
+    'भेजी जा रही है...',
+  submitReport:
+    'रिपोर्ट भेजें',
+  categories: {
+    technical:
+      'तकनीकी समस्या',
+    account:
+      'खाते की समस्या',
+    user:
+      'उपयोगकर्ता के व्यवहार की रिपोर्ट',
+    privacy:
+      'गोपनीयता या सुरक्षा',
+    other:
+      'अन्य समस्या',
+  },
+},
+
+deleteAccountScreen: {
+  requiredConfirmation:
+    'हटाएँ',
+  sessionUnavailableTitle:
+    'सत्र उपलब्ध नहीं है',
+  sessionUnavailableMessage:
+    'जारी रखने के लिए फिर से साइन इन करें।',
+  incorrectConfirmationTitle:
+    'गलत पुष्टि',
+  incorrectConfirmationMessage:
+    'अनुरोध की पुष्टि करने के लिए हटाएँ लिखें।',
+  confirmRequestTitle:
+    'अनुरोध की पुष्टि करें',
+  confirmRequestMessage:
+    'आपकी प्रोफ़ाइल छिपा दी जाएगी और खाता हटाने का अनुरोध बनाया जाएगा।',
+  cancel:
+    'रद्द करें',
+  continue:
+    'जारी रखें',
+  requestSubmittedTitle:
+    'अनुरोध भेज दिया गया',
+  requestSubmittedMessage:
+    'आपकी प्रोफ़ाइल छिपा दी गई है और खाता हटाने का अनुरोध सहेज लिया गया है।',
+  submitErrorTitle:
+    'अनुरोध भेजा नहीं जा सका',
+  connectionError:
+    'अपना कनेक्शन जाँचें और पुनः प्रयास करें।',
+  back:
+    '‹ वापस',
+  title:
+    'खाता हटाएँ',
+  subtitle:
+    'अपने LangBridge खाते को स्थायी रूप से हटाने का अनुरोध करें।',
+  warningTitle:
+    'जारी रखने से पहले',
+  warningText:
+    'अनुरोध भेजने के बाद, हटाने की प्रक्रिया पूरी होने तक आपकी प्रोफ़ाइल छिपी रहेगी।',
+  consequencesTitle:
+    'खाता हटाने से निम्नलिखित चीज़ें प्रभावित हो सकती हैं:',
+  profileConsequence:
+    '• आपकी प्रोफ़ाइल और प्राथमिकताएँ।',
+  connectionsConsequence:
+    '• आपके अनुरोध और संपर्क।',
+  conversationsConsequence:
+    '• आपकी बातचीत और संदेश।',
+  accessConsequence:
+    '• भविष्य में LangBridge तक आपकी पहुँच।',
+  confirmationLabel:
+    'पुष्टि करने के लिए हटाएँ लिखें',
+  helperText:
+    'ऊपर दिखाया गया शब्द बिल्कुल उसी प्रकार लिखें।',
+  processing:
+    'अनुरोध संसाधित किया जा रहा है...',
+  requestDeletion:
+    'खाता हटाने का अनुरोध करें',
+  cancelAndKeepAccount:
+    'रद्द करें और खाता बनाए रखें',
+  securityNote:
+    'सुरक्षा कारणों से अंतिम रूप से हटाने से पहले अतिरिक्त पहचान सत्यापन आवश्यक हो सकता है।',
+},
 privacySecurityScreen: {
   emailUnavailableTitle:
     'ईमेल उपलब्ध नहीं है',
