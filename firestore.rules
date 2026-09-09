@@ -1,0 +1,180 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function connectionRequest(connectionId) {
+      return get(
+        /databases/$(database)/documents/connectionRequests/$(connectionId)
+      );
+    }
+
+    function isAcceptedConnection(connectionId) {
+      return connectionRequest(connectionId).data.status == 'accepted';
+    }
+
+    function isConnectionParticipant(connectionId) {
+      return request.auth.uid ==
+          connectionRequest(connectionId).data.senderId
+        || request.auth.uid ==
+          connectionRequest(connectionId).data.recipientId;
+    }
+
+    function isConversationParticipant(conversationId) {
+      return request.auth.uid in
+        get(
+          /databases/$(database)/documents/conversations/$(conversationId)
+        ).data.participants;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+
+      allow create, update, delete: if isAuthenticated()
+        && request.auth.uid == userId;
+    }
+
+    match /connectionRequests/{requestId} {
+      allow create: if isAuthenticated()
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.recipientId is string
+        && request.resource.data.recipientId != request.auth.uid
+        && request.resource.data.status == 'pending'
+        && requestId == request.resource.data.senderId
+          + '_'
+          + request.resource.data.recipientId;
+
+      allow read: if isAuthenticated()
+        && (
+          request.auth.uid == resource.data.senderId
+          || request.auth.uid == resource.data.recipientId
+        );
+
+      allow update: if isAuthenticated()
+        && request.auth.uid == resource.data.recipientId
+        && resource.data.status == 'pending'
+        && request.resource.data.status in [
+          'accepted',
+          'rejected'
+        ]
+        && request.resource.data.senderId
+          == resource.data.senderId
+        && request.resource.data.recipientId
+          == resource.data.recipientId
+        && request.resource.data.createdAt
+          == resource.data.createdAt;
+
+      allow delete: if false;
+    }
+
+    match /conversations/{conversationId} {
+      allow create: if isAuthenticated()
+        && isAcceptedConnection(conversationId)
+        && isConnectionParticipant(conversationId)
+        && request.resource.data.participants is list
+        && request.resource.data.participants.size() == 2
+        && request.resource.data.participants.hasAll([
+          connectionRequest(conversationId).data.senderId,
+          connectionRequest(conversationId).data.recipientId
+        ]);
+
+      allow get: if isAuthenticated()
+        && isAcceptedConnection(conversationId)
+        && isConnectionParticipant(conversationId);
+
+      allow list: if isAuthenticated()
+        && request.auth.uid in resource.data.participants;
+
+      allow update, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated()
+          && isConversationParticipant(conversationId);
+
+        allow create: if isAuthenticated()
+          && isConversationParticipant(conversationId)
+          && request.resource.data.senderId
+            == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000;
+
+        allow update: if isAuthenticated()
+  && isConversationParticipant(conversationId)
+  && resource.data.senderId != request.auth.uid
+  && request.resource.data.diff(resource.data)
+    .affectedKeys()
+    .hasOnly(['readAt']);
+
+        allow delete: if false;
+      }
+    }
+
+    match /reports/{reportId} {
+      allow create: if isAuthenticated()
+        && request.resource.data.reporterId
+          == request.auth.uid
+        && request.resource.data.reporterEmail
+          is string
+        && request.resource.data.category
+          in [
+            'technical',
+            'account',
+            'user',
+            'privacy',
+            'other'
+          ]
+        && request.resource.data.description
+          is string
+        && request.resource.data.description.size() >= 10
+        && request.resource.data.description.size() <= 1000
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt
+          == request.time
+        && request.resource.data.updatedAt
+          == request.time
+        && request.resource.data.keys().hasOnly([
+          'reporterId',
+          'reporterEmail',
+          'category',
+          'description',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ]);
+
+      allow read, update, delete: if false;
+    }
+
+    match /accountDeletionRequests/{requestId} {
+      allow create: if isAuthenticated()
+        && request.resource.data.userId
+          == request.auth.uid
+        && request.resource.data.userEmail
+          is string
+        && request.resource.data.status
+          == 'pending'
+        && request.resource.data.createdAt
+          == request.time
+        && request.resource.data.updatedAt
+          == request.time
+        && request.resource.data.keys().hasOnly([
+          'userId',
+          'userEmail',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ]);
+
+      allow read, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
