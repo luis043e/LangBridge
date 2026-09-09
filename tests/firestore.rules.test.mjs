@@ -518,3 +518,227 @@ test(
     );
   }
 );
+test(
+  'a sender can create a valid connection request',
+  async () => {
+    const requestId = 'user-one_user-two';
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'connectionRequests',
+          requestId
+        ),
+        {
+          senderId: 'user-one',
+          recipientId: 'user-two',
+          senderName: 'Test User One',
+          recipientName: 'Test User Two',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a recipient can accept a pending connection request',
+  async () => {
+    const requestId = 'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            requestId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const recipientContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      recipientContext.firestore();
+
+    await assertSucceeds(
+      updateDoc(
+        doc(
+          firestore,
+          'connectionRequests',
+          requestId
+        ),
+        {
+          status: 'accepted',
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'a connection request cannot contain unknown fields',
+  async () => {
+    const requestId = 'user-one_user-two';
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'connectionRequests',
+          requestId
+        ),
+        {
+          senderId: 'user-one',
+          recipientId: 'user-two',
+          senderName: 'Test User One',
+          recipientName: 'Test User Two',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          administratorApproved: true,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a recipient cannot change request names when responding',
+  async () => {
+    const requestId = 'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            requestId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const recipientContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      recipientContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'connectionRequests',
+          requestId
+        ),
+        {
+          status: 'accepted',
+          senderName: 'Changed Name',
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a recipient cannot use an invalid updatedAt value',
+  async () => {
+    const requestId = 'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            requestId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const recipientContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      recipientContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'connectionRequests',
+          requestId
+        ),
+        {
+          status: 'accepted',
+          updatedAt: 'not-a-server-timestamp',
+        }
+      )
+    );
+  }
+);
