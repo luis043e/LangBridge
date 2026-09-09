@@ -32,11 +32,76 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isAuthenticated();
+  allow read: if isAuthenticated();
 
-      allow create, update, delete: if isAuthenticated()
-        && request.auth.uid == userId;
-    }
+  allow create: if isAuthenticated()
+    && request.auth.uid == userId
+    && request.resource.data.keys().hasOnly([
+      'uid',
+      'fullName',
+      'email',
+      'photoURL',
+      'googlePhotoURL',
+      'authProvider',
+      'countryCode',
+      'countryName',
+      'bio',
+      'interfaceLanguage',
+      'nativeLanguage',
+      'learningLanguage',
+      'level',
+      'profileCompleted',
+      'online',
+      'accountCreatedAt',
+      'blockedUserIds',
+      'isProfileVisible',
+      'deletionRequested',
+      'deletionRequestedAt',
+      'createdAt',
+      'updatedAt'
+    ])
+    && (
+      !request.resource.data.keys().hasAny(['uid'])
+      || request.resource.data.uid == userId
+    );
+
+  allow update: if isAuthenticated()
+    && request.auth.uid == userId
+    && request.resource.data.keys().hasOnly([
+      'uid',
+      'fullName',
+      'email',
+      'photoURL',
+      'googlePhotoURL',
+      'authProvider',
+      'countryCode',
+      'countryName',
+      'bio',
+      'interfaceLanguage',
+      'nativeLanguage',
+      'learningLanguage',
+      'level',
+      'profileCompleted',
+      'online',
+      'accountCreatedAt',
+      'blockedUserIds',
+      'isProfileVisible',
+      'deletionRequested',
+      'deletionRequestedAt',
+      'createdAt',
+      'updatedAt'
+    ])
+    && (
+      !request.resource.data.keys().hasAny(['uid'])
+      || request.resource.data.uid == userId
+    )
+    && (
+      !resource.data.keys().hasAny(['uid'])
+      || request.resource.data.uid == resource.data.uid
+    );
+
+  allow delete: if false;
+}
 
     match /connectionRequests/{requestId} {
       allow create: if isAuthenticated()

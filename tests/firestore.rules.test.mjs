@@ -319,3 +319,202 @@ test(
     );
   }
 );
+test(
+  'a user cannot delete the user own profile document',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-one'
+          ),
+          {
+            uid: 'user-one',
+            fullName: 'Test User One',
+            email: 'user-one@example.com',
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      deleteDoc(
+        doc(
+          firestore,
+          'users',
+          'user-one'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'a user cannot add an unknown field to the profile',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-one'
+          ),
+          {
+            uid: 'user-one',
+            fullName: 'Test User One',
+            email: 'user-one@example.com',
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'users',
+          'user-one'
+        ),
+        {
+          administrator: true,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a user cannot change the stored uid',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-one'
+          ),
+          {
+            uid: 'user-one',
+            fullName: 'Test User One',
+            email: 'user-one@example.com',
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'users',
+          'user-one'
+        ),
+        {
+          uid: 'user-two',
+        }
+      )
+    );
+  }
+);
+test(
+  'an authenticated user can create a valid email profile',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'users',
+          'user-one'
+        ),
+        {
+          uid: 'user-one',
+          fullName: 'Test User One',
+          email: 'user-one@example.com',
+          interfaceLanguage: 'es',
+          nativeLanguage: 'es',
+          learningLanguage: 'en',
+          level: 'a1',
+          profileCompleted: true,
+          online: false,
+          accountCreatedAt: null,
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'an authenticated user can create a valid Google profile without uid',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-google'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'users',
+          'user-google'
+        ),
+        {
+          fullName: 'Google Test User',
+          email: 'google-user@example.com',
+          photoURL:
+            'https://example.com/profile.jpg',
+          authProvider: 'google',
+          interfaceLanguage: 'es',
+          isProfileVisible: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
