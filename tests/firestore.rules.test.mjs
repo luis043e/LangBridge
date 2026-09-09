@@ -1439,3 +1439,264 @@ test(
     );
   }
 );
+test(
+  'an authenticated user can create a valid report',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one',
+        {
+          email: 'user-one@example.com',
+        }
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'reports',
+          'report-one'
+        ),
+        {
+          reporterId: 'user-one',
+          reporterEmail:
+            'user-one@example.com',
+          category: 'technical',
+          description:
+            'This is a valid test report.',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'a report cannot use another user as reporter',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'reports',
+          'report-one'
+        ),
+        {
+          reporterId: 'user-two',
+          reporterEmail:
+            'user-two@example.com',
+          category: 'technical',
+          description:
+            'This is a valid test description.',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a report cannot use an invalid category',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'reports',
+          'report-one'
+        ),
+        {
+          reporterId: 'user-one',
+          reporterEmail:
+            'user-one@example.com',
+          category: 'administrator',
+          description:
+            'This is a valid test description.',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a report cannot contain unknown fields',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'reports',
+          'report-one'
+        ),
+        {
+          reporterId: 'user-one',
+          reporterEmail:
+            'user-one@example.com',
+          category: 'technical',
+          description:
+            'This is a valid test description.',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          administratorApproved: true,
+        }
+      )
+    );
+  }
+);
+test(
+  'an authenticated user can create a valid account deletion request',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'deletion-request-one'
+        ),
+        {
+          userId: 'user-one',
+          userEmail:
+            'user-one@example.com',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'an account deletion request cannot use another user id',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'deletion-request-one'
+        ),
+        {
+          userId: 'user-two',
+          userEmail:
+            'user-two@example.com',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'an account deletion request cannot use an invalid status',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'deletion-request-one'
+        ),
+        {
+          userId: 'user-one',
+          userEmail:
+            'user-one@example.com',
+          status: 'approved',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'an account deletion request cannot contain unknown fields',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'deletion-request-one'
+        ),
+        {
+          userId: 'user-one',
+          userEmail:
+            'user-one@example.com',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          administratorApproved: true,
+        }
+      )
+    );
+  }
+);
