@@ -1700,3 +1700,64 @@ test(
     );
   }
 );
+test(
+  'a historical user profile with city can be updated',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-one'
+          ),
+          {
+            uid: 'user-one',
+            fullName: 'Historical User',
+            email: 'user-one@example.com',
+            city: 'Historical City',
+            countryCode: 'DO',
+            countryName: 'Dominican Republic',
+            bio: 'Original biography',
+            interfaceLanguage: 'es',
+            nativeLanguage: 'es',
+            learningLanguage: 'en',
+            level: 'b1',
+            online: false,
+            photoURL: '',
+            googlePhotoURL: '',
+            profileCompleted: true,
+            blockedUserIds: [],
+            isProfileVisible: true,
+            deletionRequested: false,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      updateDoc(
+        doc(
+          firestore,
+          'users',
+          'user-one'
+        ),
+        {
+          bio: 'Updated biography',
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
