@@ -1039,3 +1039,403 @@ test(
     );
   }
 );
+test(
+  'a conversation participant can send a valid message',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          senderId: 'user-one',
+          text: 'Hello from user one',
+          createdAt: serverTimestamp(),
+          readAt: null,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a message recipient can mark a received message as read',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId,
+            'messages',
+            'message-one'
+          ),
+          {
+            senderId: 'user-one',
+            text: 'Hello from user one',
+            createdAt: serverTimestamp(),
+            readAt: null,
+          }
+        );
+      }
+    );
+
+    const recipientContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      recipientContext.firestore();
+
+    await assertSucceeds(
+      updateDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          readAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'a message cannot contain unknown fields',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          senderId: 'user-one',
+          text: 'Hello from user one',
+          createdAt: serverTimestamp(),
+          readAt: null,
+          administratorApproved: true,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a message cannot use an invalid createdAt value',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          senderId: 'user-one',
+          text: 'Hello from user one',
+          createdAt: 'invalid-date',
+          readAt: null,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a new message must begin with readAt set to null',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          senderId: 'user-one',
+          text: 'Hello from user one',
+          createdAt: serverTimestamp(),
+          readAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+test(
+  'a message sender cannot mark the sender own message as read',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId,
+            'messages',
+            'message-one'
+          ),
+          {
+            senderId: 'user-one',
+            text: 'Hello from user one',
+            createdAt: serverTimestamp(),
+            readAt: null,
+          }
+        );
+      }
+    );
+
+    const senderContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      senderContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId,
+          'messages',
+          'message-one'
+        ),
+        {
+          readAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);

@@ -200,26 +200,44 @@ allow list: if isAuthenticated()
 allow update, delete: if false;
 
       match /messages/{messageId} {
-        allow read: if isAuthenticated()
-          && isConversationParticipant(conversationId);
+  allow read: if isAuthenticated()
+    && isConversationParticipant(conversationId);
 
-        allow create: if isAuthenticated()
-          && isConversationParticipant(conversationId)
-          && request.resource.data.senderId
-            == request.auth.uid
-          && request.resource.data.text is string
-          && request.resource.data.text.size() > 0
-          && request.resource.data.text.size() <= 1000;
+  allow create: if isAuthenticated()
+    && isConversationParticipant(conversationId)
+    && request.resource.data.keys().hasOnly([
+      'senderId',
+      'text',
+      'createdAt',
+      'readAt'
+    ])
+    && request.resource.data.senderId
+      == request.auth.uid
+    && request.resource.data.text
+      is string
+    && request.resource.data.text.size() > 0
+    && request.resource.data.text.size() <= 1000
+    && request.resource.data.createdAt
+      == request.time
+    && request.resource.data.readAt
+      == null;
 
-        allow update: if isAuthenticated()
-  && isConversationParticipant(conversationId)
-  && resource.data.senderId != request.auth.uid
-  && request.resource.data.diff(resource.data)
-    .affectedKeys()
-    .hasOnly(['readAt']);
+  allow update: if isAuthenticated()
+    && isConversationParticipant(conversationId)
+    && resource.data.senderId
+      != request.auth.uid
+    && resource.data.readAt
+      == null
+    && request.resource.data.diff(resource.data)
+      .affectedKeys()
+      .hasOnly([
+        'readAt'
+      ])
+    && request.resource.data.readAt
+      == request.time;
 
-        allow delete: if false;
-      }
+  allow delete: if false;
+}
     }
 
     match /reports/{reportId} {
