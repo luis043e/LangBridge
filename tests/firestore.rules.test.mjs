@@ -742,3 +742,300 @@ test(
     );
   }
 );
+test(
+  'a participant can create a valid conversation for an accepted connection',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const participantContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      participantContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId
+        ),
+        {
+          connectionId: conversationId,
+          participants: [
+            'user-one',
+            'user-two',
+          ],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a conversation participant can read the conversation',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        await setDoc(
+          doc(
+            firestore,
+            'conversations',
+            conversationId
+          ),
+          {
+            connectionId: conversationId,
+            participants: [
+              'user-one',
+              'user-two',
+            ],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const participantContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      participantContext.firestore();
+
+    await assertSucceeds(
+      getDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId
+        )
+      )
+    );
+  }
+);
+test(
+  'a conversation cannot contain unknown fields',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const participantContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      participantContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId
+        ),
+        {
+          connectionId: conversationId,
+          participants: [
+            'user-one',
+            'user-two',
+          ],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          administratorMessage: true,
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a conversation connectionId must match its document id',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const participantContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      participantContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId
+        ),
+        {
+          connectionId: 'different-connection',
+          participants: [
+            'user-one',
+            'user-two',
+          ],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a conversation cannot use invalid timestamps',
+  async () => {
+    const conversationId =
+      'user-one_user-two';
+
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'connectionRequests',
+            conversationId
+          ),
+          {
+            senderId: 'user-one',
+            recipientId: 'user-two',
+            senderName: 'Test User One',
+            recipientName: 'Test User Two',
+            status: 'accepted',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const participantContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      participantContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'conversations',
+          conversationId
+        ),
+        {
+          connectionId: conversationId,
+          participants: [
+            'user-one',
+            'user-two',
+          ],
+          createdAt: 'invalid-date',
+          updatedAt: 'invalid-date',
+        }
+      )
+    );
+  }
+);
