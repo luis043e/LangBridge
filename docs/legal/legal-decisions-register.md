@@ -63,81 +63,148 @@ Una decisión solamente será publicable cuando:
 
 ### Estado
 
-- Pendiente.
+- Aprobada.
 
-### Pregunta
+### Decisión
 
-¿Qué nombre identificará públicamente al responsable de LangBridge?
+LangBridge operará inicialmente bajo el nombre personal completo de su responsable, debido a que actualmente no posee una empresa constituida ni un nombre comercial registrado.
 
-### Opciones
+### Nombre aprobado
 
-- Nombre personal completo.
-- Nombre comercial registrado.
-- Empresa constituida.
-- Nombre del producto acompañado del responsable.
+- Luis Enrique Nuñez Minaya
 
-### Recomendación preliminar
+### Alcance
 
-No presentar como entidad legal un nombre comercial que no esté formalmente establecido.
+Este nombre se utilizará para identificar públicamente al responsable inicial de LangBridge en:
 
-### Valor aprobado
+- Política de privacidad.
+- Términos y condiciones.
+- Política pública de eliminación de cuenta.
+- Información de soporte y privacidad.
+- Sitio web oficial.
+- Información aplicable de Google Play.
 
-- [PENDIENTE]
+### Condición de revisión
+
+Esta decisión deberá revisarse si LangBridge registra posteriormente un nombre comercial, constituye una empresa o transfiere formalmente la responsabilidad del servicio a otra entidad.
+
+### Estado de implementación
+
+- Pendiente de incorporar en los documentos públicos.
 
 ## 6. Decisión LEG-002: país y medio oficial de contacto
 
 ### Estado
 
-- En análisis.
+- Aprobada.
 
-### Información confirmada
+### Decisión
 
-- País de operación principal: República Dominicana.
+LangBridge utilizará República Dominicana como país de operación principal y ofrecerá contacto público mediante canales electrónicos oficiales.
 
-### Recomendación preliminar
-
-Utilizar un medio o dirección comercial y evitar publicar un domicilio residencial.
-
-### Valor aprobado
+### Valores aprobados
 
 - País: República Dominicana.
-- Dirección o medio oficial: [PENDIENTE]
+- Medio oficial: correo electrónico y futuro sitio web de LangBridge.
+- Dirección residencial: no se publicará.
+- Dirección comercial: no disponible actualmente.
+
+### Justificación
+
+La publicación de un domicilio residencial no resulta necesaria en esta etapa y podría crear riesgos de privacidad y seguridad para el responsable.
+
+### Condición de revisión
+
+Esta decisión deberá revisarse si LangBridge establece una oficina, dirección comercial, apartado postal o entidad legal que requiera publicar una dirección diferente.
+
+### Estado de implementación
+
+- Pendiente de incorporar en los documentos públicos.
 
 ## 7. Decisión LEG-003: correo oficial de soporte
 
 ### Estado
 
-- Pendiente.
+- Aprobada provisionalmente.
 
-### Requisitos
+### Correo aprobado
 
-- Dedicado a LangBridge.
-- Revisado regularmente.
-- Protegido con autenticación multifactor.
-- Separado de credenciales administrativas.
-- Apto para consultas de cuenta y funcionamiento.
+- bridgelang00@gmail.com
 
-### Valor aprobado
+### Finalidades
 
-- [PENDIENTE]
+Este correo se utilizará provisionalmente para:
+
+- Consultas de funcionamiento.
+- Problemas de acceso.
+- Soporte de cuentas.
+- Reportes generales.
+- Comunicaciones relacionadas con eliminación.
+- Consultas sobre LangBridge.
+
+### Requisitos operativos
+
+- Activar autenticación multifactor.
+- Mantener métodos seguros de recuperación.
+- Revisar el correo regularmente.
+- No compartir la contraseña.
+- No utilizarlo para almacenar credenciales administrativas.
+- Evitar enviar información personal innecesaria.
+- Mantener un registro controlado de solicitudes importantes.
+
+### Condición de revisión
+
+El correo deberá evaluarse nuevamente cuando LangBridge disponga de un dominio oficial. En ese momento podrá sustituirse por una dirección profesional dedicada al soporte.
+
+### Estado de implementación
+
+- Pendiente de incorporar en los documentos públicos.
 
 ## 8. Decisión LEG-004: correo oficial de privacidad
 
 ### Estado
 
-- Pendiente.
+- Aprobada provisionalmente.
+
+### Correo aprobado
+
+- bridgelang00@gmail.com
 
 ### Finalidades
 
-- Consultas sobre datos personales.
-- Solicitudes de acceso o corrección.
+Este correo se utilizará provisionalmente para:
+
+- Consultas sobre información personal.
+- Solicitudes de acceso.
+- Solicitudes de corrección.
 - Solicitudes de eliminación.
 - Consultas sobre retención.
 - Comunicaciones relacionadas con privacidad.
+- Seguimiento de solicitudes verificadas.
 
-### Valor aprobado
+### Separación futura
 
-- [PENDIENTE]
+Actualmente el mismo correo se utilizará para soporte y privacidad debido a la etapa inicial de LangBridge.
+
+Cuando exista un dominio oficial y capacidad operativa suficiente, se recomienda separar ambos canales.
+
+### Requisitos operativos
+
+- Activar autenticación multifactor.
+- Restringir el acceso.
+- Evitar reenviar datos personales innecesariamente.
+- Verificar la identidad antes de procesar solicitudes sensibles.
+- No solicitar contraseñas.
+- Mantener control de solicitudes y respuestas.
+- Eliminar correos o adjuntos cuando dejen de ser necesarios, conforme a la política de retención.
+
+### Condición de revisión
+
+El correo deberá revisarse cuando LangBridge implemente su sitio web o adopte un dominio oficial.
+
+### Estado de implementación
+
+- Pendiente de incorporar en los documentos públicos.
 
 ## 9. Decisión LEG-005: sitio web oficial
 
