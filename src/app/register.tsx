@@ -46,6 +46,7 @@ const text = translations[language];
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAcceptedLegalTerms, setHasAcceptedLegalTerms] = useState(false);
 const openLegalPage = async (url: string) => {
  try {
  const canOpen = await Linking.canOpenURL(url);
@@ -83,6 +84,13 @@ Alert.alert(
 };
 
   const handleRegister = async () => {
+    if (!hasAcceptedLegalTerms) {
+ showAlert(
+ 'Aceptación requerida',
+ 'Debes leer y aceptar los documentos legales de LangBridge antes de crear una cuenta.'
+ );
+ return;
+ }
     const cleanName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
 
@@ -209,7 +217,13 @@ const handleGoogleSignIn = async () => {
   if (isLoading) {
     return;
   }
-
+if (!hasAcceptedLegalTerms) {
+ showAlert(
+ 'Aceptación requerida',
+ 'Debes leer y aceptar los documentos legales de LangBridge antes de continuar con Google.'
+ );
+ return;
+ }
   try {
     setIsLoading(true);
 
@@ -422,9 +436,86 @@ const handleGoogleSignIn = async () => {
     {text.registerScreen.continueWithGoogle}
   </Text>
 </TouchableOpacity>
-            <Text style={styles.terms}>
-              {text.registerScreen.terms}
-            </Text>
+            <View style={styles.legalContainer}>
+ <TouchableOpacity
+ style={styles.acceptanceRow}
+ onPress={() =>
+ setHasAcceptedLegalTerms(
+ (currentValue) => !currentValue
+ )
+ }
+ activeOpacity={0.8}
+ disabled={isLoading}
+ accessibilityRole="checkbox"
+ accessibilityLabel={text.registerScreen.terms}
+ accessibilityState={{
+ checked: hasAcceptedLegalTerms,
+ disabled: isLoading,
+ }}
+ >
+ <View
+ style={[
+ styles.checkbox,
+ hasAcceptedLegalTerms &&
+ styles.checkboxSelected,
+ ]}
+ >
+ {hasAcceptedLegalTerms ? (
+ <Text style={styles.checkboxMark}>
+ ✓
+ </Text>
+ ) : null}
+ </View>
+
+ <Text style={styles.acceptanceText}>
+ He leído y acepto los documentos legales de LangBridge.
+ </Text>
+ </TouchableOpacity>
+
+ <View style={styles.legalLinks}>
+ <TouchableOpacity
+ onPress={() => openLegalPage(TERMS_URL)}
+ activeOpacity={0.8}
+ disabled={isLoading}
+ accessibilityRole="link"
+ accessibilityLabel="Abrir Términos y condiciones"
+ >
+ <Text style={styles.legalLink}>
+ Términos y condiciones
+ </Text>
+ </TouchableOpacity>
+
+ <Text style={styles.legalSeparator}>•</Text>
+
+ <TouchableOpacity
+ onPress={() => openLegalPage(PRIVACY_URL)}
+ activeOpacity={0.8}
+ disabled={isLoading}
+ accessibilityRole="link"
+ accessibilityLabel="Abrir Política de privacidad"
+ >
+ <Text style={styles.legalLink}>
+ Política de privacidad
+ </Text>
+ </TouchableOpacity>
+
+ <Text style={styles.legalSeparator}>•</Text>
+
+ <TouchableOpacity
+ onPress={() =>
+ openLegalPage(COMMUNITY_GUIDELINES_URL)
+ }
+ activeOpacity={0.8}
+ disabled={isLoading}
+ accessibilityRole="link"
+ accessibilityLabel="Abrir Normas de la comunidad"
+ >
+ <Text style={styles.legalLink}>
+ Normas de la comunidad
+ </Text>
+ </TouchableOpacity>
+ </View>
+ </View>
 
             <TouchableOpacity
               style={styles.loginButton}
@@ -581,13 +672,75 @@ disabledButton: {
     fontWeight: 'bold',
   },
 
-  terms: {
-    color: '#64748B',
-    fontSize: 12,
-    lineHeight: 18,
-    textAlign: 'center',
-    marginTop: 18,
-  },
+  legalContainer: {
+ width: '100%',
+ marginTop: 20,
+ },
+
+acceptanceRow: {
+ width: '100%',
+ flexDirection: 'row',
+ alignItems: 'flex-start',
+ backgroundColor: '#0D1835',
+ borderWidth: 1,
+ borderColor: '#334C7D',
+ borderRadius: 14,
+ padding: 14,
+ },
+
+checkbox: {
+ width: 24,
+ height: 24,
+ borderRadius: 6,
+ borderWidth: 2,
+ borderColor: '#64748B',
+ alignItems: 'center',
+ justifyContent: 'center',
+ marginRight: 12,
+ marginTop: 1,
+ },
+
+checkboxSelected: {
+ backgroundColor: '#4F46E5',
+ borderColor: '#22D3EE',
+ },
+
+checkboxMark: {
+ color: '#FFFFFF',
+ fontSize: 16,
+ lineHeight: 18,
+ fontWeight: 'bold',
+ },
+
+acceptanceText: {
+ flex: 1,
+ color: '#D7E0F5',
+ fontSize: 13,
+ lineHeight: 20,
+ },
+
+legalLinks: {
+ flexDirection: 'row',
+ flexWrap: 'wrap',
+ alignItems: 'center',
+ justifyContent: 'center',
+ marginTop: 14,
+ paddingHorizontal: 4,
+ },
+
+legalLink: {
+ color: '#22D3EE',
+ fontSize: 12,
+ lineHeight: 20,
+ fontWeight: '700',
+ textDecorationLine: 'underline',
+ },
+
+legalSeparator: {
+ color: '#64748B',
+ fontSize: 12,
+ marginHorizontal: 7,
+ },
 
   loginButton: {
     alignItems: 'center',
