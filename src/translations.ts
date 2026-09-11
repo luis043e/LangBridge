@@ -1,4 +1,4 @@
-import { arTranslations } from './translations-ar';
+﻿import { arTranslations } from './translations-ar';
 import { bnTranslations } from './translations-bn';
 import { deTranslations } from './translations-de';
 import { frTranslations } from './translations-fr';
@@ -982,7 +982,7 @@ genericResetError:
   'The password reset email could not be sent. Check the address and try again.',
 tooManyResetRequests:
   'Too many requests were made. Wait a few minutes and try again.',
-}, 
+},
 registerScreen: {
   title: 'Create your account',
   subtitle:
@@ -1035,6 +1035,24 @@ weakPassword:
   'The password is too weak.',
 networkError:
   'Check your Internet connection and try again.',
+legalAcceptanceText:
+ 'I have read and accept the LangBridge legal documents.',
+ termsLink:
+ 'Terms and Conditions',
+ privacyLink:
+ 'Privacy Policy',
+ communityGuidelinesLink:
+ 'Community Guidelines',
+ legalAcceptanceRequiredTitle:
+ 'Acceptance required',
+ legalAcceptanceRequiredEmail:
+ 'You must read and accept the LangBridge legal documents before creating an account.',
+ legalAcceptanceRequiredGoogle:
+ 'You must read and accept the LangBridge legal documents before continuing with Google.',
+ legalLinkErrorTitle:
+ 'The link could not be opened',
+ legalLinkErrorMessage:
+ 'Check your Internet connection and try again.',
 },
   },
 
@@ -1996,6 +2014,24 @@ weakPassword:
   'La contraseña es demasiado débil.',
 networkError:
   'Revisa tu conexión a Internet e inténtalo nuevamente.',
+legalAcceptanceText:
+ 'He leído y acepto los documentos legales de LangBridge.',
+ termsLink:
+ 'Términos y condiciones',
+ privacyLink:
+ 'Política de privacidad',
+ communityGuidelinesLink:
+ 'Normas de la comunidad',
+ legalAcceptanceRequiredTitle:
+ 'Aceptación requerida',
+ legalAcceptanceRequiredEmail:
+ 'Debes leer y aceptar los documentos legales de LangBridge antes de crear una cuenta.',
+ legalAcceptanceRequiredGoogle:
+ 'Debes leer y aceptar los documentos legales de LangBridge antes de continuar con Google.',
+ legalLinkErrorTitle:
+ 'No se pudo abrir el enlace',
+ legalLinkErrorMessage:
+ 'Revisa tu conexión a Internet e inténtalo nuevamente.',
 },
 },
 
