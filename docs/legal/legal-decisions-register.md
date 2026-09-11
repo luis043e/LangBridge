@@ -210,48 +210,109 @@ El correo deberá revisarse cuando LangBridge implemente su sitio web o adopte u
 
 ### Estado
 
-- Pendiente.
+- Aprobada provisionalmente.
+
+### Decisión
+
+LangBridge utilizará inicialmente Firebase Hosting dentro del proyecto `langbridge-d048f` para publicar su sitio web oficial y la documentación legal accesible al público.
+
+### URL base aprobada
+
+- https://langbridge-d048f.web.app
+
+### Plataforma
+
+- Firebase Hosting.
+- Proyecto: `langbridge-d048f`.
+- Salida web: `dist`.
+- Generación web: exportación estática mediante Expo Router.
+
+### Contenido previsto
+
+El sitio deberá publicar:
+
+- Política de privacidad.
+- Términos y condiciones.
+- Normas de la comunidad.
+- Página de eliminación de cuenta y datos.
+- Información de soporte.
+- Datos de contacto.
+- Fecha y versión de los documentos.
 
 ### Requisitos
 
-- Accesible sin iniciar sesión.
-- Utilizar HTTPS.
-- Ser compatible con teléfonos.
-- Mantener URL estable.
-- Alojar políticas, términos, normas, soporte y eliminación.
+- Acceso sin iniciar sesión.
+- Conexión HTTPS.
+- Compatibilidad con teléfonos.
+- Rutas estables.
+- Navegación clara.
+- Documentos coherentes con la aplicación.
+- Pruebas antes del despliegue.
+- Posibilidad de incorporar un dominio personalizado en el futuro.
 
-### URL aprobada
+### Condición de revisión
 
-- [PENDIENTE]
+La URL podrá sustituirse o complementarse con un dominio personalizado cuando LangBridge registre y configure un dominio oficial.
+
+### Estado de implementación
+
+- Sitio de Firebase Hosting disponible.
+- Páginas legales pendientes de creación.
+- Configuración de Hosting en `firebase.json` pendiente.
+- Exportación web pendiente.
+- Despliegue pendiente.
+
 
 ## 10. Decisión LEG-006: URL pública de eliminación
 
 ### Estado
 
-- Pendiente.
+- Aprobada provisionalmente.
+
+### URL prevista
+
+- https://langbridge-d048f.web.app/account-deletion
+
+### Finalidad
+
+Esta página permitirá que una persona consulte el procedimiento y solicite la eliminación de su cuenta y de los datos asociados sin necesidad de instalar o abrir LangBridge.
 
 ### Requisitos
 
-- Ser pública y estable.
+- Ser pública.
+- Estar disponible sin iniciar sesión.
 - Identificar claramente a LangBridge.
-- Permitir iniciar una solicitud.
-- Explicar qué se elimina y qué podría retenerse.
-- No exigir instalar la aplicación.
+- Explicar qué datos se eliminan.
+- Explicar cualquier retención limitada.
 - No solicitar contraseñas.
 - Permitir verificación segura.
-- Ser apta para Play Console.
-
-### URL aprobada
-
-- [PENDIENTE]
+- Ofrecer el correo `bridgelang00@gmail.com` como contacto provisional.
+- Ser compatible con los requisitos de Google Play.
+- Mantener coherencia con la ruta interna de eliminación.
 
 ### Dependencias
 
-- Sitio web.
-- Correo de privacidad.
-- Verificación de identidad.
-- Eliminación efectiva.
-- Confirmación de finalización.
+- Crear la página `/account-deletion`.
+- Definir el procedimiento de verificación.
+- Implementar la eliminación efectiva.
+- Definir el plazo de procesamiento.
+- Definir el tratamiento de mensajes y reportes.
+- Configurar Firebase Hosting.
+- Exportar y probar el sitio.
+- Realizar el despliegue.
+- Confirmar que la URL responde públicamente.
+
+### Condición de revisión
+
+La URL podrá migrarse a un dominio personalizado manteniendo una redirección o una ruta pública estable.
+
+### Estado de implementación
+
+- Ruta documental definida.
+- Página web pendiente de creación.
+- Formulario o mecanismo de solicitud pendiente.
+- Despliegue pendiente.
+- Validación pública pendiente.
 
 ## 11. Decisión LEG-007: edad mínima
 
