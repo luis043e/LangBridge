@@ -28,7 +28,7 @@
     changeLater:
       'Vous pourrez modifier cette langue plus tard.',
   },
-  
+
 welcome: {
   slogan:
     'Pratiquez. Connectez-vous. Progressez.',
@@ -1092,6 +1092,24 @@ requestsScreen: {
       'Le mot de passe est trop faible.',
     networkError:
       'Vérifiez votre connexion Internet et réessayez.',
+    legalAcceptanceText:
+ 'J’ai lu et j’accepte les documents juridiques de LangBridge.',
+ termsLink:
+ 'Conditions générales',
+ privacyLink:
+ 'Politique de confidentialité',
+ communityGuidelinesLink:
+ 'Règles de la communauté',
+ legalAcceptanceRequiredTitle:
+ 'Acceptation requise',
+ legalAcceptanceRequiredEmail:
+ 'Vous devez lire et accepter les documents juridiques de LangBridge avant de créer un compte.',
+ legalAcceptanceRequiredGoogle:
+ 'Vous devez lire et accepter les documents juridiques de LangBridge avant de continuer avec Google.',
+ legalLinkErrorTitle:
+ 'Impossible d’ouvrir le lien',
+ legalLinkErrorMessage:
+ 'Vérifiez votre connexion Internet et réessayez.',
 },
 };
 

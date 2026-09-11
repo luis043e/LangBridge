@@ -1118,6 +1118,24 @@ export const ptTranslations = {
       'A senha é muito fraca.',
     networkError:
       'Verifique sua conexão com a Internet e tente novamente.',
+    legalAcceptanceText:
+ 'Li e aceito os documentos legais do LangBridge.',
+ termsLink:
+ 'Termos e Condições',
+ privacyLink:
+ 'Política de Privacidade',
+ communityGuidelinesLink:
+ 'Diretrizes da Comunidade',
+ legalAcceptanceRequiredTitle:
+ 'Aceitação obrigatória',
+ legalAcceptanceRequiredEmail:
+ 'Você deve ler e aceitar os documentos legais do LangBridge antes de criar uma conta.',
+ legalAcceptanceRequiredGoogle:
+ 'Você deve ler e aceitar os documentos legais do LangBridge antes de continuar com o Google.',
+ legalLinkErrorTitle:
+ 'Não foi possível abrir o link',
+ legalLinkErrorMessage:
+ 'Verifique sua conexão com a Internet e tente novamente.',
   },
 };
 
