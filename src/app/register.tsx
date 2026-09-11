@@ -1,4 +1,4 @@
-import { LinearGradient } from 'expo-linear-gradient';
+﻿import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -26,7 +27,14 @@ import {
 import { auth } from '../firebaseConfig';
 import { signInWithGoogle } from '../googleAuth';
 import { translations } from '../translations';
+const PRIVACY_URL =
+ 'https://langbridge-d048f.web.app/privacy';
 
+const TERMS_URL =
+ 'https://langbridge-d048f.web.app/terms';
+
+const COMMUNITY_GUIDELINES_URL =
+ 'https://langbridge-d048f.web.app/community-guidelines';
 export default function RegisterScreen() {
   const router = useRouter();
 const { language } = useLanguage();
@@ -38,7 +46,35 @@ const text = translations[language];
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+const openLegalPage = async (url: string) => {
+ try {
+ const canOpen = await Linking.canOpenURL(url);
 
+if (!canOpen) {
+  Alert.alert(
+    'No se pudo abrir el enlace',
+    'Inténtalo nuevamente o visita el sitio web de LangBridge.'
+  );
+  return;
+}
+
+await Linking.openURL(url);
+
+
+} catch (error) {
+ console.error(
+ 'Error opening legal page:',
+ error
+ );
+
+Alert.alert(
+  'No se pudo abrir el enlace',
+  'Revisa tu conexión a Internet e inténtalo nuevamente.'
+);
+
+
+}
+ };
   const showAlert = (
   title: string,
   message: string
