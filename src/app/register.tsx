@@ -254,7 +254,12 @@ if (!hasAcceptedLegalTerms) {
     setIsLoading(true);
 
     const googleResult =
-      await signInWithGoogle(language);
+ await signInWithGoogle(
+ language,
+ {
+ recordLegalAcceptance: true,
+ }
+ );
 
     if (!googleResult) {
       return;

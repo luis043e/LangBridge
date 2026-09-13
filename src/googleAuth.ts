@@ -1,10 +1,11 @@
-import {
+﻿import {
   GoogleSignin,
   isSuccessResponse,
 } from '@react-native-google-signin/google-signin';
 import {
   GoogleAuthProvider,
   signInWithCredential,
+  signOut,
 } from 'firebase/auth';
 import {
   doc,
@@ -14,19 +15,23 @@ import {
 } from 'firebase/firestore';
 
 import { auth, db } from './firebaseConfig';
+import { createLegalAcceptanceData } from './legalAcceptance';
 import {
   translations,
   type AppLanguage,
 } from './translations';
-
+type GoogleSignInOptions = {
+ recordLegalAcceptance?: boolean;
+ };
 GoogleSignin.configure({
   webClientId:
     process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
 });
 
 export async function signInWithGoogle(
-  language: AppLanguage
-) {
+ language: AppLanguage,
+ options: GoogleSignInOptions = {}
+ ) {
   const webClientId =
     process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
@@ -41,11 +46,11 @@ export async function signInWithGoogle(
   await GoogleSignin.hasPlayServices({
     showPlayServicesUpdateDialog: true,
   });
-  
+
   await GoogleSignin.signOut();
-  
+
   const googleResponse = await GoogleSignin.signIn();
-  
+
   if (!isSuccessResponse(googleResponse)) {
     return null;
   }
@@ -76,7 +81,16 @@ export async function signInWithGoogle(
 
   const userSnapshot = await getDoc(userReference);
   const isNewUser = !userSnapshot.exists();
+  if (
+ isNewUser &&
+ !options.recordLegalAcceptance
+ ) {
+ await signOut(auth);
 
+throw new Error(
+ text.registerScreen.legalAcceptanceRequiredGoogle
+ );
+ }
   const userData = {
     fullName:
       firebaseUser.displayName ||
@@ -93,12 +107,16 @@ export async function signInWithGoogle(
     authProvider: 'google',
     updatedAt: serverTimestamp(),
     ...(isNewUser
-      ? {
-          interfaceLanguage: language,
-          isProfileVisible: true,
-          createdAt: serverTimestamp(),
-        }
-      : {}),
+ ? {
+ interfaceLanguage: language,
+ isProfileVisible: true,
+ createdAt: serverTimestamp(),
+ ...createLegalAcceptanceData(
+ language,
+ 'google'
+ ),
+ }
+ : {}),
   };
 
   await setDoc(
