@@ -1116,6 +1116,24 @@
       'Пароль слишком слабый.',
     networkError:
       'Проверьте подключение к Интернету и повторите попытку.',
+    legalAcceptanceText:
+ 'Я прочитал(а) юридические документы LangBridge и принимаю их.',
+ termsLink:
+ 'Условия использования',
+ privacyLink:
+ 'Политика конфиденциальности',
+ communityGuidelinesLink:
+ 'Правила сообщества',
+ legalAcceptanceRequiredTitle:
+ 'Необходимо согласие',
+ legalAcceptanceRequiredEmail:
+ 'Перед созданием аккаунта необходимо прочитать и принять юридические документы LangBridge.',
+ legalAcceptanceRequiredGoogle:
+ 'Перед продолжением с Google необходимо прочитать и принять юридические документы LangBridge.',
+ legalLinkErrorTitle:
+ 'Не удалось открыть ссылку',
+ legalLinkErrorMessage:
+ 'Проверьте подключение к Интернету и повторите попытку.',
   },
 };
 

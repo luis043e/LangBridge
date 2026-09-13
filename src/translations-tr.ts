@@ -1116,6 +1116,24 @@ registerScreen: {
     'Şifre çok zayıf.',
   networkError:
     'İnternet bağlantınızı kontrol edip tekrar deneyin.',
+  legalAcceptanceText:
+ 'LangBridge yasal belgelerini okudum ve kabul ediyorum.',
+ termsLink:
+ 'Şartlar ve Koşullar',
+ privacyLink:
+ 'Gizlilik Politikası',
+ communityGuidelinesLink:
+ 'Topluluk Kuralları',
+ legalAcceptanceRequiredTitle:
+ 'Onay gerekli',
+ legalAcceptanceRequiredEmail:
+ 'Hesap oluşturmadan önce LangBridge yasal belgelerini okuyup kabul etmelisiniz.',
+ legalAcceptanceRequiredGoogle:
+ 'Google ile devam etmeden önce LangBridge yasal belgelerini okuyup kabul etmelisiniz.',
+ legalLinkErrorTitle:
+ 'Bağlantı açılamadı',
+ legalLinkErrorMessage:
+ 'İnternet bağlantınızı kontrol edip tekrar deneyin.',
 },
 };
 
