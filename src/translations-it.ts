@@ -697,7 +697,7 @@
     requestUnavailable:
       'Richiesta non disponibile',
     interactionUnavailable:
-      'Interazione non disponibile',  
+      'Interazione non disponibile',
      blockUser:
       'Blocca utente',
   },
@@ -1116,6 +1116,24 @@
       'La password è troppo debole.',
     networkError:
       'Controlla la connessione a Internet e riprova.',
+    legalAcceptanceText:
+ 'Ho letto e accetto i documenti legali di LangBridge.',
+ termsLink:
+ 'Termini e condizioni',
+ privacyLink:
+ 'Informativa sulla privacy',
+ communityGuidelinesLink:
+ 'Linee guida della comunità',
+ legalAcceptanceRequiredTitle:
+ 'Accettazione obbligatoria',
+ legalAcceptanceRequiredEmail:
+ 'Devi leggere e accettare i documenti legali di LangBridge prima di creare un account.',
+ legalAcceptanceRequiredGoogle:
+ 'Devi leggere e accettare i documenti legali di LangBridge prima di continuare con Google.',
+ legalLinkErrorTitle:
+ 'Impossibile aprire il collegamento',
+ legalLinkErrorMessage:
+ 'Controlla la connessione a Internet e riprova.',
   },
 };
 

@@ -1116,6 +1116,24 @@
       'Das Passwort ist zu schwach.',
     networkError:
       'Überprüfe deine Internetverbindung und versuche es erneut.',
+    legalAcceptanceText:
+ 'Ich habe die rechtlichen Dokumente von LangBridge gelesen und akzeptiere sie.',
+ termsLink:
+ 'Allgemeine Geschäftsbedingungen',
+ privacyLink:
+ 'Datenschutzerklärung',
+ communityGuidelinesLink:
+ 'Community-Richtlinien',
+ legalAcceptanceRequiredTitle:
+ 'Zustimmung erforderlich',
+ legalAcceptanceRequiredEmail:
+ 'Du musst die rechtlichen Dokumente von LangBridge lesen und akzeptieren, bevor du ein Konto erstellst.',
+ legalAcceptanceRequiredGoogle:
+ 'Du musst die rechtlichen Dokumente von LangBridge lesen und akzeptieren, bevor du mit Google fortfährst.',
+ legalLinkErrorTitle:
+ 'Der Link konnte nicht geöffnet werden',
+ legalLinkErrorMessage:
+ 'Überprüfe deine Internetverbindung und versuche es erneut.',
   },
 };
 
