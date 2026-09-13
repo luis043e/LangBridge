@@ -404,7 +404,7 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 
 ### Estado
 
-- En análisis.
+- Aprobada.
 
 ### Alternativas
 
@@ -422,13 +422,17 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 
 ### Decisión aprobada
 
-- [PENDIENTE]
+- Se adopta DEL-A: al eliminar una cuenta, se eliminarán permanentemente todas las conversaciones en las que participe.
+- Antes de eliminar cada conversación, se eliminarán todos los mensajes almacenados en su subcolección.
+- La eliminación también afectará el historial compartido disponible para las demás personas participantes.
+- La eliminación será irreversible y, si la persona vuelve a LangBridge, comenzará desde cero.
+- Esta decisión reduce datos almacenados y evita referencias asociadas con cuentas eliminadas.
 
 ## 15. Decisión LEG-011: tratamiento de mensajes
 
 ### Estado
 
-- En análisis.
+- Aprobada.
 
 ### Alternativas
 
@@ -446,13 +450,17 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 
 ### Decisión aprobada
 
-- [PENDIENTE]
+- Se adopta DEL-A: se eliminarán permanentemente todos los mensajes de las conversaciones relacionadas con la cuenta eliminada.
+- Se eliminarán los mensajes enviados por la cuenta eliminada y los enviados por las demás personas dentro de esas conversaciones.
+- No se conservarán el texto, el UID del remitente, la fecha de creación ni la fecha de lectura.
+- No se aplicará anonimización en la primera versión del procedimiento.
+- Los mensajes se eliminarán antes de eliminar el documento principal de la conversación.
 
 ## 16. Decisión LEG-012: solicitudes de conexión
 
 ### Estado
 
-- Propuesta.
+- Aprobada.
 
 ### Propuesta
 
@@ -464,13 +472,18 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 
 ### Decisión aprobada
 
-- [PENDIENTE]
+- Al eliminar una cuenta, se eliminarán todas las solicitudes de conexión donde la cuenta aparezca como senderId o recipientId.
+- Se eliminarán las solicitudes con estado pending, accepted o rejected.
+- Se eliminarán los nombres, UID, estados y fechas almacenados dentro de esos documentos.
+- Las conversaciones relacionadas se procesarán y eliminarán antes de eliminar las solicitudes aceptadas que les dieron origen.
+- Si la persona vuelve a LangBridge, no recuperará solicitudes ni conexiones anteriores.
+- Esta decisión forma parte de DEL-A.
 
 ## 17. Decisión LEG-013: listas de bloqueo
 
 ### Estado
 
-- Propuesta.
+- Aprobada.
 
 ### Propuesta
 
@@ -481,13 +494,18 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 
 ### Decisión aprobada
 
-- [PENDIENTE]
+- La lista blockedUserIds almacenada en el perfil eliminado desaparecerá al eliminar el documento users/{uid}.
+- El UID de la cuenta eliminada se retirará de las listas blockedUserIds de las demás cuentas.
+- No se conservará una referencia ordinaria de bloqueo vinculada con la cuenta eliminada.
+- La limpieza deberá evitar referencias huérfanas y deberá poder repetirse sin afectar otros bloqueos.
+- Si la persona vuelve a LangBridge con una cuenta nueva, comenzará sin su lista anterior de bloqueos.
+- Esta decisión forma parte de DEL-A.
 
 ## 18. Decisión LEG-014: reportes técnicos
 
 ### Estado
 
-- En análisis.
+- Aprobada.
 
 ### Propuesta
 
@@ -497,15 +515,20 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 - Eliminar descripciones con datos personales innecesarios.
 - Aplicar revisión periódica.
 
-### Período aprobado
+### Decisión aprobada
 
-- [PENDIENTE]
+- Se adopta DEL-R1: al eliminar una cuenta, se eliminarán todos los reportes enviados por esa cuenta.
+- La eliminación incluirá el UID, correo electrónico, categoría, descripción, estado y fechas del reporte.
+- No se conservará una copia anonimizada de esos reportes en la primera versión del procedimiento.
+- Los reportes se localizarán mediante el campo reporterId antes de eliminar el perfil y la cuenta de Authentication.
+- Si la persona vuelve a LangBridge, no recuperará los reportes anteriores.
+- Esta decisión reduce datos almacenados y mantiene coherencia con DEL-A.
 
 ## 19. Decisión LEG-015: reportes de seguridad
 
 ### Estado
 
-- En análisis.
+- Aprobada para el modelo actual.
 
 ### Criterios
 
@@ -518,15 +541,18 @@ No publicar un plazo que no pueda cumplirse técnicamente.
 - Minimización.
 - Acceso restringido.
 
-### Período aprobado
+### Decisión aprobada
 
-- [PENDIENTE]
+- El modelo actual de reportes no almacena reportedUserId ni reportedMessageId.
+- Los reportes actuales identifican solamente a la cuenta que los envía mediante reporterId y reporterEmail.
+- En esta primera versión, esos reportes también se eliminarán al eliminar la cuenta que los envió.
+- No se aplicará una retención especial de reportes de seguridad en el modelo actual.
+- Si LangBridge incorpora denuncias específicas contra usuarios o mensajes, esta decisión deberá revisarse antes de activar esa función.
+- La decisión vigente corresponde a DEL-R1.
 
 ### Regla
 
 No se utilizará una retención de seguridad para conservar indefinidamente el perfil completo.
-
-No se debe utilizar una retención de seguridad para conservar indefinidamente el perfil completo.
 
 ## 20. Decisión LEG-016: registro mínimo de eliminación
 
