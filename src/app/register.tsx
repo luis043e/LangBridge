@@ -53,8 +53,8 @@ const openLegalPage = async (url: string) => {
 
 if (!canOpen) {
   Alert.alert(
-    'No se pudo abrir el enlace',
-    'Inténtalo nuevamente o visita el sitio web de LangBridge.'
+    text.registerScreen.legalLinkErrorTitle,
+    text.registerScreen.legalLinkErrorMessage
   );
   return;
 }
@@ -69,8 +69,8 @@ await Linking.openURL(url);
  );
 
 Alert.alert(
-  'No se pudo abrir el enlace',
-  'Revisa tu conexión a Internet e inténtalo nuevamente.'
+  text.registerScreen.legalLinkErrorTitle,
+  text.registerScreen.legalLinkErrorMessage
 );
 
 
@@ -86,8 +86,8 @@ Alert.alert(
   const handleRegister = async () => {
     if (!hasAcceptedLegalTerms) {
  showAlert(
- 'Aceptación requerida',
- 'Debes leer y aceptar los documentos legales de LangBridge antes de crear una cuenta.'
+ text.registerScreen.legalAcceptanceRequiredTitle,
+ text.registerScreen.legalAcceptanceRequiredEmail
  );
  return;
  }
@@ -219,8 +219,8 @@ const handleGoogleSignIn = async () => {
   }
 if (!hasAcceptedLegalTerms) {
  showAlert(
- 'Aceptación requerida',
- 'Debes leer y aceptar los documentos legales de LangBridge antes de continuar con Google.'
+ text.registerScreen.legalAcceptanceRequiredTitle,
+ text.registerScreen.legalAcceptanceRequiredGoogle
  );
  return;
  }
@@ -447,7 +447,7 @@ if (!hasAcceptedLegalTerms) {
  activeOpacity={0.8}
  disabled={isLoading}
  accessibilityRole="checkbox"
- accessibilityLabel={text.registerScreen.terms}
+accessibilityLabel={text.registerScreen.legalAcceptanceText}
  accessibilityState={{
  checked: hasAcceptedLegalTerms,
  disabled: isLoading,
@@ -468,7 +468,7 @@ if (!hasAcceptedLegalTerms) {
  </View>
 
  <Text style={styles.acceptanceText}>
- He leído y acepto los documentos legales de LangBridge.
+{text.registerScreen.legalAcceptanceText}
  </Text>
  </TouchableOpacity>
 
@@ -478,10 +478,10 @@ if (!hasAcceptedLegalTerms) {
  activeOpacity={0.8}
  disabled={isLoading}
  accessibilityRole="link"
- accessibilityLabel="Abrir Términos y condiciones"
+ accessibilityLabel={text.registerScreen.termsLink}
  >
  <Text style={styles.legalLink}>
- Términos y condiciones
+ {text.registerScreen.termsLink}
  </Text>
  </TouchableOpacity>
 
@@ -492,10 +492,10 @@ if (!hasAcceptedLegalTerms) {
  activeOpacity={0.8}
  disabled={isLoading}
  accessibilityRole="link"
- accessibilityLabel="Abrir Política de privacidad"
+accessibilityLabel={text.registerScreen.privacyLink}
  >
  <Text style={styles.legalLink}>
- Política de privacidad
+ {text.registerScreen.privacyLink}
  </Text>
  </TouchableOpacity>
 
@@ -508,10 +508,12 @@ if (!hasAcceptedLegalTerms) {
  activeOpacity={0.8}
  disabled={isLoading}
  accessibilityRole="link"
- accessibilityLabel="Abrir Normas de la comunidad"
+ accessibilityLabel={
+ text.registerScreen.communityGuidelinesLink
+ }
  >
  <Text style={styles.legalLink}>
- Normas de la comunidad
+ {text.registerScreen.communityGuidelinesLink}
  </Text>
  </TouchableOpacity>
  </View>
