@@ -1116,6 +1116,24 @@
       'パスワードが弱すぎます。',
     networkError:
       'インターネット接続を確認して、もう一度お試しください。',
+    legalAcceptanceText:
+ 'LangBridgeの法的文書を読み、同意します。',
+ termsLink:
+ '利用規約',
+ privacyLink:
+ 'プライバシーポリシー',
+ communityGuidelinesLink:
+ 'コミュニティガイドライン',
+ legalAcceptanceRequiredTitle:
+ '同意が必要です',
+ legalAcceptanceRequiredEmail:
+ 'アカウントを作成する前に、LangBridgeの法的文書を読み、同意する必要があります。',
+ legalAcceptanceRequiredGoogle:
+ 'Googleで続行する前に、LangBridgeの法的文書を読み、同意する必要があります。',
+ legalLinkErrorTitle:
+ 'リンクを開けませんでした',
+ legalLinkErrorMessage:
+ 'インターネット接続を確認して、もう一度お試しください。',
   },
 };
 

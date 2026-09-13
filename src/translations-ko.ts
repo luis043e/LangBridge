@@ -1117,6 +1117,24 @@
       '비밀번호가 너무 약합니다.',
     networkError:
       '인터넷 연결을 확인하고 다시 시도하세요.',
+    legalAcceptanceText:
+ 'LangBridge의 법적 문서를 읽었으며 이에 동의합니다.',
+ termsLink:
+ '이용약관',
+ privacyLink:
+ '개인정보 처리방침',
+ communityGuidelinesLink:
+ '커뮤니티 가이드라인',
+ legalAcceptanceRequiredTitle:
+ '동의가 필요합니다',
+ legalAcceptanceRequiredEmail:
+ '계정을 만들기 전에 LangBridge의 법적 문서를 읽고 동의해야 합니다.',
+ legalAcceptanceRequiredGoogle:
+ 'Google로 계속하기 전에 LangBridge의 법적 문서를 읽고 동의해야 합니다.',
+ legalLinkErrorTitle:
+ '링크를 열 수 없습니다',
+ legalLinkErrorMessage:
+ '인터넷 연결을 확인하고 다시 시도하세요.',
   },
 };
 
