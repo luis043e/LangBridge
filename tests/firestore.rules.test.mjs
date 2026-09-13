@@ -1834,3 +1834,251 @@ test(
  );
  }
 );
+
+test(
+ "a legal acceptance cannot use an invalid method",
+ async () => {
+ const authenticatedContext =
+ testEnvironment.authenticatedContext(
+ "user-invalid-legal-method"
+ );
+
+ const firestore =
+ authenticatedContext.firestore();
+
+ await assertFails(
+ setDoc(
+ doc(
+ firestore,
+ "users",
+ "user-invalid-legal-method"
+ ),
+ {
+ uid: "user-invalid-legal-method",
+ fullName: "Invalid Legal Method User",
+ email: "invalid-method@example.com",
+ interfaceLanguage: "es",
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "manual",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ }
+ )
+ );
+ }
+);
+
+test(
+ "a legal acceptance cannot use an unsupported language",
+ async () => {
+ const authenticatedContext =
+ testEnvironment.authenticatedContext(
+ "user-invalid-legal-language"
+ );
+
+ const firestore =
+ authenticatedContext.firestore();
+
+ await assertFails(
+ setDoc(
+ doc(
+ firestore,
+ "users",
+ "user-invalid-legal-language"
+ ),
+ {
+ uid: "user-invalid-legal-language",
+ fullName: "Invalid Legal Language User",
+ email: "invalid-language@example.com",
+ interfaceLanguage: "es",
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "xx",
+ legalAcceptanceMethod: "email",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ }
+ )
+ );
+ }
+);
+
+test(
+ "a legal acceptance cannot use an invalid version",
+ async () => {
+ const context = testEnvironment.authenticatedContext("user-invalid-version");
+ const firestore = context.firestore();
+
+ await assertFails(
+ setDoc(doc(firestore, "users", "user-invalid-version"), {
+ uid: "user-invalid-version",
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "9.9",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "email",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ })
+ );
+ }
+);
+
+test(
+  "a legal acceptance cannot omit required fields",
+  async () => {
+    const context = testEnvironment.authenticatedContext("user-incomplete-legal");
+    const firestore = context.firestore();
+
+    await assertFails(
+      setDoc(doc(firestore, "users", "user-incomplete-legal"), {
+        uid: "user-incomplete-legal",
+        legalAcceptedAt: serverTimestamp(),
+        termsVersion: "0.1",
+        privacyVersion: "0.1",
+        legalAcceptanceLanguage: "es",
+        legalAcceptanceMethod: "email",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      })
+    );
+  }
+);
+
+test(
+ "a stored legal acceptance cannot be modified",
+ async () => {
+ await testEnvironment.withSecurityRulesDisabled(
+ async (context) => {
+ const firestore = context.firestore();
+
+ await setDoc(doc(firestore, "users", "user-immutable-legal"), {
+ uid: "user-immutable-legal",
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "email",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ });
+ }
+ );
+
+ const context = testEnvironment.authenticatedContext("user-immutable-legal");
+ const firestore = context.firestore();
+
+ await assertFails(
+ updateDoc(doc(firestore, "users", "user-immutable-legal"), {
+ termsVersion: "0.2",
+ updatedAt: serverTimestamp(),
+ })
+ );
+ }
+);
+
+test(
+  "a stored legal acceptance cannot be removed",
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(doc(firestore, "users", "user-remove-legal"), {
+          uid: "user-remove-legal",
+          fullName: "Protected Legal User",
+          email: "protected-legal@example.com",
+          legalAcceptedAt: serverTimestamp(),
+          termsVersion: "0.1",
+          privacyVersion: "0.1",
+          communityGuidelinesVersion: "0.1",
+          legalAcceptanceLanguage: "es",
+          legalAcceptanceMethod: "email",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
+    );
+
+    const context = testEnvironment.authenticatedContext("user-remove-legal");
+    const firestore = context.firestore();
+
+    await assertFails(
+      setDoc(doc(firestore, "users", "user-remove-legal"), {
+        uid: "user-remove-legal",
+        fullName: "Protected Legal User",
+        email: "protected-legal@example.com",
+        updatedAt: serverTimestamp(),
+      })
+    );
+  }
+);
+
+test(
+ "a user can create a Google profile with valid legal acceptance",
+ async () => {
+ const context = testEnvironment.authenticatedContext("user-legal-google");
+ const firestore = context.firestore();
+
+ await assertSucceeds(
+ setDoc(doc(firestore, "users", "user-legal-google"), {
+ fullName: "Legal Google User",
+ email: "legal-google@example.com",
+ authProvider: "google",
+ interfaceLanguage: "en",
+ isProfileVisible: true,
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "en",
+ legalAcceptanceMethod: "google",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ })
+ );
+ }
+);
+
+test(
+ "a historical user can add legal acceptance once",
+ async () => {
+ await testEnvironment.withSecurityRulesDisabled(
+ async (context) => {
+ const firestore = context.firestore();
+
+ await setDoc(doc(firestore, "users", "user-historical-legal"), {
+ uid: "user-historical-legal",
+ fullName: "Historical Legal User",
+ email: "historical-legal@example.com",
+ interfaceLanguage: "es",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ });
+ }
+ );
+
+ const context = testEnvironment.authenticatedContext("user-historical-legal");
+ const firestore = context.firestore();
+
+ await assertSucceeds(
+ updateDoc(doc(firestore, "users", "user-historical-legal"), {
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "email",
+ updatedAt: serverTimestamp(),
+ })
+ );
+ }
+);
