@@ -24,8 +24,14 @@ import {
   updateProfile,
 } from 'firebase/auth';
 
-import { auth } from '../firebaseConfig';
+import {
+  doc,
+  setDoc,
+} from 'firebase/firestore';
+
+import { auth, db } from '../firebaseConfig';
 import { signInWithGoogle } from '../googleAuth';
+import { createLegalAcceptanceData } from '../legalAcceptance';
 import { translations } from '../translations';
 const PRIVACY_URL =
  'https://langbridge-d048f.web.app/privacy';
@@ -146,7 +152,27 @@ Alert.alert(
       await updateProfile(userCredential.user, {
         displayName: cleanName,
       });
-
+    await setDoc(
+ doc(
+ db,
+ 'users',
+ userCredential.user.uid
+ ),
+ {
+ uid: userCredential.user.uid,
+ fullName: cleanName,
+ email: cleanEmail,
+ interfaceLanguage: language,
+ authProvider: 'email',
+ ...createLegalAcceptanceData(
+ language,
+ 'email'
+ ),
+ },
+ {
+ merge: true,
+ }
+ );
       Alert.alert(
   text.registerScreen.accountCreatedTitle,
   text.registerScreen.accountCreatedMessage,
