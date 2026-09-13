@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+﻿import { readFile } from 'node:fs/promises';
 import {
     after,
     afterEach,
@@ -1760,4 +1760,77 @@ test(
       )
     );
   }
+);
+test(
+ "a user can create an email profile with valid legal acceptance",
+ async () => {
+ const authenticatedContext =
+ testEnvironment.authenticatedContext(
+ "user-legal-email"
+ );
+
+ const firestore =
+ authenticatedContext.firestore();
+
+ await assertSucceeds(
+ setDoc(
+ doc(
+ firestore,
+ "users",
+ "user-legal-email"
+ ),
+ {
+ uid: "user-legal-email",
+ fullName: "Legal Email User",
+ email: "legal-email@example.com",
+ interfaceLanguage: "es",
+ legalAcceptedAt: serverTimestamp(),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "email",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ }
+ )
+ );
+ }
+);
+
+test(
+ "a legal acceptance cannot use a client timestamp",
+ async () => {
+ const authenticatedContext =
+ testEnvironment.authenticatedContext(
+ "user-invalid-legal-date"
+ );
+
+ const firestore =
+ authenticatedContext.firestore();
+
+ await assertFails(
+ setDoc(
+ doc(
+ firestore,
+ "users",
+ "user-invalid-legal-date"
+ ),
+ {
+ uid: "user-invalid-legal-date",
+ fullName: "Invalid Legal Date User",
+ email: "invalid-date@example.com",
+ interfaceLanguage: "es",
+ legalAcceptedAt: new Date("2026-01-01T00:00:00.000Z"),
+ termsVersion: "0.1",
+ privacyVersion: "0.1",
+ communityGuidelinesVersion: "0.1",
+ legalAcceptanceLanguage: "es",
+ legalAcceptanceMethod: "email",
+ createdAt: serverTimestamp(),
+ updatedAt: serverTimestamp(),
+ }
+ )
+ );
+ }
 );

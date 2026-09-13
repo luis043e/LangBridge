@@ -30,7 +30,89 @@ service cloud.firestore {
           /databases/$(database)/documents/conversations/$(conversationId)
         ).data.participants;
     }
+  function hasLegalAcceptance(data) {
+ return data.keys().hasAll([
+ 'legalAcceptedAt',
+ 'termsVersion',
+ 'privacyVersion',
+ 'communityGuidelinesVersion',
+ 'legalAcceptanceLanguage',
+ 'legalAcceptanceMethod'
+ ]);
+ }
 
+function hasAnyLegalAcceptance(data) {
+ return data.keys().hasAny([
+ 'legalAcceptedAt',
+ 'termsVersion',
+ 'privacyVersion',
+ 'communityGuidelinesVersion',
+ 'legalAcceptanceLanguage',
+ 'legalAcceptanceMethod'
+ ]);
+ }
+
+function isValidLegalAcceptance(data) {
+ return hasLegalAcceptance(data)
+ && data.legalAcceptedAt == request.time
+ && data.termsVersion == '0.1'
+ && data.privacyVersion == '0.1'
+ && data.communityGuidelinesVersion == '0.1'
+ && data.legalAcceptanceLanguage in [
+ 'en',
+ 'es',
+ 'fr',
+ 'pt',
+ 'de',
+ 'it',
+ 'ja',
+ 'ko',
+ 'zh',
+ 'ar',
+ 'ru',
+ 'tr',
+ 'hi',
+ 'bn',
+ 'nl',
+ 'pl'
+ ]
+ && data.legalAcceptanceMethod in [
+ 'email',
+ 'google'
+ ];
+ }
+
+function hasValidOrNoLegalAcceptance(data) {
+ return !hasAnyLegalAcceptance(data)
+ || isValidLegalAcceptance(data);
+ }
+
+function keepsLegalAcceptanceImmutable() {
+ return (
+ !hasAnyLegalAcceptance(resource.data)
+ && hasValidOrNoLegalAcceptance(
+ request.resource.data
+ )
+ )
+ || (
+ hasLegalAcceptance(resource.data)
+ && hasLegalAcceptance(
+ request.resource.data
+ )
+ && request.resource.data.legalAcceptedAt
+ == resource.data.legalAcceptedAt
+ && request.resource.data.termsVersion
+ == resource.data.termsVersion
+ && request.resource.data.privacyVersion
+ == resource.data.privacyVersion
+ && request.resource.data.communityGuidelinesVersion
+ == resource.data.communityGuidelinesVersion
+ && request.resource.data.legalAcceptanceLanguage
+ == resource.data.legalAcceptanceLanguage
+ && request.resource.data.legalAcceptanceMethod
+ == resource.data.legalAcceptanceMethod
+ );
+ }
     match /users/{userId} {
   allow read: if isAuthenticated();
 
@@ -58,13 +140,22 @@ service cloud.firestore {
       'isProfileVisible',
       'deletionRequested',
       'deletionRequestedAt',
+      'legalAcceptedAt',
+      'termsVersion',
+      'privacyVersion',
+      'communityGuidelinesVersion',
+      'legalAcceptanceLanguage',
+      'legalAcceptanceMethod',
       'createdAt',
       'updatedAt'
     ])
     && (
-      !request.resource.data.keys().hasAny(['uid'])
-      || request.resource.data.uid == userId
-    );
+ !request.resource.data.keys().hasAny(['uid'])
+ || request.resource.data.uid == userId
+ )
+ && hasValidOrNoLegalAcceptance(
+ request.resource.data
+ );
 
   allow update: if isAuthenticated()
     && request.auth.uid == userId
@@ -90,6 +181,12 @@ service cloud.firestore {
       'isProfileVisible',
       'deletionRequested',
       'deletionRequestedAt',
+      'legalAcceptedAt',
+      'termsVersion',
+      'privacyVersion',
+      'communityGuidelinesVersion',
+      'legalAcceptanceLanguage',
+      'legalAcceptanceMethod',
       'createdAt',
       'updatedAt'
     ])
@@ -98,9 +195,10 @@ service cloud.firestore {
       || request.resource.data.uid == userId
     )
     && (
-      !resource.data.keys().hasAny(['uid'])
-      || request.resource.data.uid == resource.data.uid
-    );
+ !resource.data.keys().hasAny(['uid'])
+ || request.resource.data.uid == resource.data.uid
+ )
+ && keepsLegalAcceptanceImmutable();
 
   allow delete: if false;
 }
