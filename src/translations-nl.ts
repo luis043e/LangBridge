@@ -1170,6 +1170,24 @@ registerScreen: {
     'Het wachtwoord is te zwak.',
   networkError:
     'Controleer je internetverbinding en probeer het opnieuw.',
+  legalAcceptanceText:
+ 'Ik heb de juridische documenten van LangBridge gelezen en ga ermee akkoord.',
+ termsLink:
+ 'Algemene voorwaarden',
+ privacyLink:
+ 'Privacybeleid',
+ communityGuidelinesLink:
+ 'Communityrichtlijnen',
+ legalAcceptanceRequiredTitle:
+ 'Akkoord vereist',
+ legalAcceptanceRequiredEmail:
+ 'Je moet de juridische documenten van LangBridge lezen en accepteren voordat je een account maakt.',
+ legalAcceptanceRequiredGoogle:
+ 'Je moet de juridische documenten van LangBridge lezen en accepteren voordat je doorgaat met Google.',
+ legalLinkErrorTitle:
+ 'De link kon niet worden geopend',
+ legalLinkErrorMessage:
+ 'Controleer je internetverbinding en probeer het opnieuw.',
 },
 };
 

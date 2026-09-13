@@ -1170,6 +1170,24 @@ registerScreen: {
     'Hasło jest zbyt słabe.',
   networkError:
     'Sprawdź połączenie z Internetem i spróbuj ponownie.',
+  legalAcceptanceText:
+ 'Przeczytałem(-am) dokumenty prawne LangBridge i akceptuję je.',
+ termsLink:
+ 'Regulamin',
+ privacyLink:
+ 'Polityka prywatności',
+ communityGuidelinesLink:
+ 'Zasady społeczności',
+ legalAcceptanceRequiredTitle:
+ 'Wymagana akceptacja',
+ legalAcceptanceRequiredEmail:
+ 'Przed utworzeniem konta musisz przeczytać i zaakceptować dokumenty prawne LangBridge.',
+ legalAcceptanceRequiredGoogle:
+ 'Przed kontynuowaniem przez Google musisz przeczytać i zaakceptować dokumenty prawne LangBridge.',
+ legalLinkErrorTitle:
+ 'Nie udało się otworzyć linku',
+ legalLinkErrorMessage:
+ 'Sprawdź połączenie z Internetem i spróbuj ponownie.',
 },
 };
 
