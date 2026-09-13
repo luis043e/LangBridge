@@ -1116,6 +1116,24 @@
       '密码强度太低。',
     networkError:
       '请检查互联网连接，然后重试。',
+    legalAcceptanceText:
+ '我已阅读并同意LangBridge的法律文件。',
+ termsLink:
+ '条款和条件',
+ privacyLink:
+ '隐私政策',
+ communityGuidelinesLink:
+ '社区准则',
+ legalAcceptanceRequiredTitle:
+ '需要同意',
+ legalAcceptanceRequiredEmail:
+ '创建账号前，你必须阅读并同意LangBridge的法律文件。',
+ legalAcceptanceRequiredGoogle:
+ '使用Google继续之前，你必须阅读并同意LangBridge的法律文件。',
+ legalLinkErrorTitle:
+ '无法打开链接',
+ legalLinkErrorMessage:
+ '请检查互联网连接，然后重试。',
   },
 };
 

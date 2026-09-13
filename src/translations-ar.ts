@@ -1116,6 +1116,24 @@
       'كلمة المرور ضعيفة جدًا.',
     networkError:
       'تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
+    legalAcceptanceText:
+ 'لقد قرأت المستندات القانونية الخاصة بـ LangBridge وأوافق عليها.',
+ termsLink:
+ 'الشروط والأحكام',
+ privacyLink:
+ 'سياسة الخصوصية',
+ communityGuidelinesLink:
+ 'إرشادات المجتمع',
+ legalAcceptanceRequiredTitle:
+ 'الموافقة مطلوبة',
+ legalAcceptanceRequiredEmail:
+ 'يجب قراءة المستندات القانونية الخاصة بـ LangBridge والموافقة عليها قبل إنشاء حساب.',
+ legalAcceptanceRequiredGoogle:
+ 'يجب قراءة المستندات القانونية الخاصة بـ LangBridge والموافقة عليها قبل المتابعة باستخدام Google.',
+ legalLinkErrorTitle:
+ 'تعذر فتح الرابط',
+ legalLinkErrorMessage:
+ 'تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
   },
 };
 
