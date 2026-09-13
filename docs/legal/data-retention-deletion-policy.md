@@ -273,22 +273,29 @@ Datos principales:
 - Identificadores de participantes.
 - Fechas.
 
-La eliminación de una cuenta puede afectar a otra persona que participa en la conversación.
+La eliminación de una cuenta afectará también el historial compartido disponible para las demás personas participantes.
 
-Antes de implementar la eliminación se deberá decidir entre:
+Tratamiento aprobado mediante DEL-A:
 
-- Eliminar por completo la conversación.
-- Conservar la conversación para la otra persona y anonimizar a la cuenta eliminada.
-- Conservar temporalmente una conversación asociada con un reporte de seguridad.
+- Al eliminar una cuenta, se eliminarán permanentemente todas las conversaciones donde su UID aparezca dentro de participants.
+- Antes de eliminar cada conversación, se eliminarán todos los mensajes de su subcolección.
+- No se conservará una copia anonimizada de la conversación en la primera versión.
+- La eliminación será irreversible.
+- Si la persona vuelve a LangBridge, comenzará desde cero.
 
-Criterio recomendado para evaluación:
+Orden técnico aprobado:
 
-- Si no existen mensajes ni reportes, eliminar la conversación.
-- Si existen mensajes y la conversación debe permanecer visible para la otra persona, sustituir la identidad eliminada por una referencia neutral.
-- Si existe un reporte activo, conservar una copia administrativa limitada durante el período aprobado.
-- Eliminar identificadores personales que no sean necesarios.
+- Localizar todas las conversaciones donde el UID de la cuenta aparezca dentro de participants.
 
-La solución final no deberá permitir que la cuenta eliminada recupere acceso.
+- Eliminar todos los mensajes almacenados en la subcolección de cada conversación.
+
+- Confirmar que los mensajes hayan sido procesados.
+
+- Eliminar el documento principal de cada conversación.
+
+- Registrar cualquier fallo parcial para permitir un reintento seguro.
+
+Esta decisión reduce la conservación de información, evita referencias huérfanas, libera almacenamiento e impide recuperar el historial eliminado.
 
 ## 14. Mensajes
 
@@ -303,60 +310,52 @@ Datos almacenados:
 - Fecha de creación.
 - Fecha de lectura.
 
-La decisión definitiva sobre mensajes está pendiente.
+Tratamiento aprobado mediante DEL-A:
 
-Las opciones evaluadas son:
 
-### Eliminación completa
 
-Ventajas:
+- Se eliminarán permanentemente todos los mensajes de las conversaciones relacionadas con la cuenta eliminada.
 
-- Reduce la información conservada.
-- Facilita el cumplimiento de la solicitud.
+- Se eliminarán los mensajes enviados por la cuenta eliminada y los enviados por las demás personas dentro de esas conversaciones.
 
-Riesgos:
+- No se conservarán el texto, el UID del remitente, la fecha de creación ni la fecha de lectura.
 
-- Elimina parte del historial perteneciente también a la otra persona.
-- Puede afectar investigaciones de seguridad o reportes activos.
+- No se utilizará anonimización en la primera versión del procedimiento.
 
-### Anonimización
+- Los mensajes deberán eliminarse antes de eliminar el documento principal de la conversación.
 
-Tratamiento posible:
+- Los mensajes eliminados no podrán recuperarse mediante las funciones ordinarias de LangBridge.
 
-- Sustituir el UID del remitente.
-- Eliminar el vínculo con el perfil.
-- Mostrar una etiqueta neutral como `Usuario eliminado`.
-- Conservar el texto únicamente cuando sea necesario para la continuidad de la conversación.
+- Si la persona vuelve a LangBridge, comenzará sin mensajes anteriores.
 
-### Conservación temporal por seguridad
+### Razones
 
-Podrá aplicarse cuando:
+- Evitar subcolecciones huérfanas.
 
-- Exista un reporte activo.
-- Sea necesario investigar abuso, fraude o amenazas.
-- Exista una disputa pendiente.
-- Una obligación aplicable requiera conservación limitada.
+- Eliminar identificadores almacenados en senderId.
 
-Decisión pendiente:
+- Reducir la información conservada.
 
-- Aprobar la opción principal.
-- Definir el período de conservación.
-- Diseñar la estructura de anonimización.
-- Crear pruebas automáticas.
-- Explicarlo en la Política de privacidad y los Términos.
+- Liberar almacenamiento.
+
+- Simplificar las comprobaciones del proceso de eliminación.
+
+### Advertencia obligatoria
+Antes de confirmar la eliminación, LangBridge deberá informar que los mensajes también desaparecerán para las demás personas participantes y que la acción será irreversible.
 
 ## 15. Usuarios bloqueados
 
 Los UID bloqueados pueden encontrarse en `blockedUserIds` dentro de documentos de otras personas.
 
-Al eliminar una cuenta deberá:
+Tratamiento aprobado mediante DEL-A:
 
-- Eliminarse la lista de bloqueos del perfil eliminado.
-- Buscarse y eliminarse el UID eliminado de las listas de otras personas, cuando sea técnicamente razonable.
-- Evitar que una referencia huérfana produzca errores.
-- Mantener, si fuera necesario, una protección administrativa separada contra cuentas abusivas reincidentes.
+- La lista blockedUserIds de la cuenta desaparecerá cuando se elimine su documento users/{uid}.
+- El UID de la cuenta eliminada se retirará de las listas blockedUserIds de las demás cuentas.
+- No se conservará una referencia ordinaria de bloqueo vinculada con la cuenta eliminada.
+- La operación deberá poder repetirse sin eliminar otros bloqueos ni afectar cuentas ajenas.
+- Si la persona vuelve a LangBridge con una cuenta nueva, comenzará sin su lista anterior de bloqueos.
 
-Una lista administrativa de seguridad no debe reutilizar la lista ordinaria de bloqueos del perfil.
+Esta limpieza evitará referencias huérfanas y conservará intactos los demás bloqueos almacenados por cada cuenta.
 
 ## 16. Reportes
 
@@ -373,30 +372,20 @@ Datos actuales:
 - Estado.
 - Fechas.
 
-Los reportes pueden contener información necesaria para soporte o seguridad.
+Tratamiento aprobado mediante DEL-R1:
 
-Tratamiento recomendado:
+- Al eliminar una cuenta, se eliminarán todos los reportes enviados por esa cuenta.
+- Los reportes se localizarán mediante el campo reporterId.
+- La eliminación incluirá el UID, correo electrónico, categoría, descripción, estado y fechas.
+- No se conservará una copia anonimizada de los reportes en la primera versión del procedimiento.
+- El modelo actual no almacena reportedUserId ni reportedMessageId.
+- No se aplicará una retención especial de reportes de seguridad en el modelo actual.
+- Los reportes deberán eliminarse antes de eliminar el perfil y la cuenta de Firebase Authentication.
+- Si la persona vuelve a LangBridge, no recuperará los reportes anteriores.
 
-### Reportes técnicos ordinarios
+### Revisión futura
 
-- Eliminar o anonimizar después de resolverlos y cumplir el período operativo aprobado.
-- Eliminar correos y UID cuando ya no sean necesarios.
-- Conservar información técnica no identificable solamente si aporta valor legítimo.
-
-### Reportes de abuso o seguridad
-
-- Conservar durante un período limitado aprobado.
-- Restringir el acceso al personal autorizado.
-- Mantener solamente los datos necesarios.
-- Documentar la razón de conservación.
-- Eliminar o anonimizar cuando finalice la necesidad.
-
-### Reportes pendientes al eliminar una cuenta
-
-- No eliminarlos automáticamente si la eliminación impide investigar un riesgo para otras personas.
-- Eliminar o anonimizar información que no sea necesaria.
-- Marcar internamente la relación con una cuenta eliminada.
-- Informar en la Política pública que determinados registros de seguridad pueden conservarse temporalmente.
+Si LangBridge incorpora denuncias específicas contra usuarios o mensajes, el tratamiento de esos reportes deberá revisarse antes de activar la función. La revisión deberá considerar seguridad, acceso restringido, minimización y un período definido de conservación.
 
 ## 17. Solicitudes de eliminación
 
