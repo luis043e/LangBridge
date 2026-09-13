@@ -1130,6 +1130,24 @@ registerScreen: {
     'পাসওয়ার্ডটি খুব দুর্বল।',
   networkError:
     'আপনার ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।',
+  legalAcceptanceText:
+ 'আমি LangBridge-এর আইনি নথিগুলো পড়েছি এবং সেগুলোতে সম্মত আছি।',
+ termsLink:
+ 'শর্তাবলি',
+ privacyLink:
+ 'গোপনীয়তা নীতি',
+ communityGuidelinesLink:
+ 'কমিউনিটি নির্দেশিকা',
+ legalAcceptanceRequiredTitle:
+ 'সম্মতি প্রয়োজন',
+ legalAcceptanceRequiredEmail:
+ 'অ্যাকাউন্ট তৈরি করার আগে আপনাকে LangBridge-এর আইনি নথিগুলো পড়তে এবং গ্রহণ করতে হবে।',
+ legalAcceptanceRequiredGoogle:
+ 'Google দিয়ে চালিয়ে যাওয়ার আগে আপনাকে LangBridge-এর আইনি নথিগুলো পড়তে এবং গ্রহণ করতে হবে।',
+ legalLinkErrorTitle:
+ 'লিঙ্কটি খোলা যায়নি',
+ legalLinkErrorMessage:
+ 'আপনার ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।',
 },
 };
 

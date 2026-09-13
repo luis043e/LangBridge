@@ -1100,6 +1100,24 @@ weakPassword:
   'पासवर्ड बहुत कमजोर है।',
 networkError:
   'अपना इंटरनेट कनेक्शन जाँचें और पुनः प्रयास करें।',
+legalAcceptanceText:
+ 'मैंने LangBridge के कानूनी दस्तावेज़ पढ़ लिए हैं और मैं उनसे सहमत हूँ।',
+ termsLink:
+ 'नियम और शर्तें',
+ privacyLink:
+ 'गोपनीयता नीति',
+ communityGuidelinesLink:
+ 'समुदाय दिशानिर्देश',
+ legalAcceptanceRequiredTitle:
+ 'सहमति आवश्यक है',
+ legalAcceptanceRequiredEmail:
+ 'खाता बनाने से पहले आपको LangBridge के कानूनी दस्तावेज़ पढ़ने और स्वीकार करने होंगे।',
+ legalAcceptanceRequiredGoogle:
+ 'Google के साथ जारी रखने से पहले आपको LangBridge के कानूनी दस्तावेज़ पढ़ने और स्वीकार करने होंगे।',
+ legalLinkErrorTitle:
+ 'लिंक नहीं खोला जा सका',
+ legalLinkErrorMessage:
+ 'अपना इंटरनेट कनेक्शन जाँचें और पुनः प्रयास करें।',
 },
 };
 
