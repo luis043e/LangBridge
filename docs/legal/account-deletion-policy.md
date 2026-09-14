@@ -279,15 +279,44 @@ Cloud Firestore no elimina automáticamente las subcolecciones cuando se elimina
 
 ## 15. Usuarios bloqueados
 
+### Tratamiento aprobado mediante DEL-A
+
 Al eliminar una cuenta:
 
-- Se eliminará la lista de bloqueos almacenada en su perfil.
-- Se limpiará su UID de las listas de bloqueo de otras personas cuando sea técnicamente razonable.
-- Se evitarán errores provocados por referencias huérfanas.
+- La lista `blockedUserIds` almacenada en el perfil eliminado desaparecerá al eliminar el documento `users/{uid}`.
+- El UID de la cuenta eliminada se retirará de las listas `blockedUserIds` de las demás cuentas.
+- No se conservará una referencia ordinaria de bloqueo vinculada con la cuenta eliminada.
+- Se evitarán referencias huérfanas en los perfiles de otras personas.
+- La limpieza deberá poder repetirse sin afectar otros bloqueos ni eliminar UID diferentes.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, comenzará sin su lista anterior de bloqueos.
 
-LangBridge podrá conservar una referencia administrativa limitada cuando resulte necesaria para impedir que una cuenta utilizada para abuso evada una medida de seguridad.
+### Alcance de la decisión
 
-Esta referencia no deberá conservar el perfil completo.
+Esta decisión se aplica al modelo actual de listas personales de bloqueo. LangBridge no conservará el UID eliminado dentro de esas listas con la finalidad de prevenir abusos o mantener una medida administrativa.
+
+Si en el futuro se implementa un sistema administrativo separado para prevenir fraude, abuso o evasión de medidas:
+
+- Deberá diseñarse como una función independiente de `blockedUserIds`.
+- Deberá aprobarse previamente su finalidad, base jurídica, información utilizada y período de conservación.
+- No deberá reutilizar automáticamente el UID eliminado.
+- No deberá conservar el perfil completo.
+- Deberá incorporarse al inventario de datos, las políticas aplicables y el procedimiento de eliminación antes de activarse.
+
+### Orden técnico obligatorio
+
+El procedimiento deberá:
+
+1. Localizar los perfiles ajenos que contengan el UID eliminado en `blockedUserIds`.
+2. Retirar únicamente el UID de la cuenta eliminada.
+3. Conservar intactos los demás UID bloqueados.
+4. Eliminar posteriormente el documento `users/{uid}` de la cuenta.
+
+### Estado de implementación
+
+- Decisión aprobada mediante DEL-A.
+- Implementación técnica pendiente.
+- Pruebas de limpieza idempotente con Firebase Emulator Suite pendientes.
+- Pruebas para comprobar que otros bloqueos permanecen intactos pendientes.
 
 ## 16. Reportes técnicos
 
