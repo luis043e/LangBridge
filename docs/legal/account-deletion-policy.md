@@ -767,30 +767,74 @@ La versión publicada deberá indicar la fecha de entrada en vigor y la última 
 
 ## 34. Información pendiente antes de publicación
 
-Esta política no está lista para publicación hasta completar:
+Esta política todavía no está lista para publicarse como procedimiento definitivo.
 
-- Nombre legal o comercial.
+### Decisiones de tratamiento ya aprobadas
+
+Las siguientes decisiones ya no están pendientes:
+
+- DEL-A: eliminación del perfil, solicitudes de conexión, conversaciones, mensajes y referencias en listas de bloqueo.
+- DEL-R1: eliminación de todos los reportes enviados por la cuenta en el modelo actual.
+- DEL-S2: sustitución de la solicitud identificable original por un recibo técnico mínimo y no identificable.
+- Conservación del recibo técnico durante 30 días desde la finalización.
+- Eliminación del recibo técnico al vencer su fecha de expiración.
+
+### Información institucional y pública pendiente
+
+Antes de la publicación definitiva deben completarse o verificarse:
+
+- Nombre legal o comercial definitivo.
 - Correos oficiales.
-- Sitio web.
+- Sitio web oficial.
 - URL pública de eliminación.
 - Formulario público.
-- Plazos de procesamiento.
-- Períodos de conservación.
-- Tratamiento definitivo de mensajes.
-- Tratamiento definitivo de conversaciones.
-- Tratamiento de reportes técnicos.
-- Tratamiento de reportes de seguridad.
-- Registro mínimo.
-- Copias de seguridad.
+- Datos de contacto.
+- Fecha de entrada en vigor.
+- Versión definitiva de la política.
+
+### Decisiones todavía pendientes
+
+Todavía deben aprobarse o cerrarse:
+
+- Plazo operativo objetivo para procesar una solicitud.
+- Plazo máximo que se informará públicamente.
+- Tratamiento de copias de seguridad.
 - Política de cancelación.
-- Canal de confirmación.
-- Eliminación efectiva de Firebase Authentication.
-- Eliminación efectiva de Cloud Firestore.
-- Eliminación futura de Firebase Storage.
-- Eliminación futura de datos de aprendizaje.
-- Pruebas automáticas.
-- Pruebas manuales.
+- Canal de confirmación de la eliminación.
+- Cualquier excepción legal específica de conservación.
 - Revisión jurídica final.
+
+### Implementación técnica pendiente
+
+Todavía debe implementarse y verificarse:
+
+- Reautenticación o verificación segura de identidad.
+- Procesamiento seguro de `accountDeletionRequests`.
+- Eliminación efectiva de Firebase Authentication.
+- Eliminación efectiva de `users/{uid}`.
+- Eliminación de solicitudes de conexión.
+- Eliminación de conversaciones y sus subcolecciones `messages`.
+- Limpieza del UID eliminado en listas `blockedUserIds` ajenas.
+- Eliminación de reportes enviados por la cuenta.
+- Creación del recibo técnico aprobado mediante DEL-S2.
+- Eliminación del recibo técnico después de 30 días.
+- Limpieza segura de la sesión local.
+- Eliminación futura de fotografías en Firebase Storage.
+- Eliminación futura de datos de aprendizaje y gamificación.
+- Manejo de fallos parciales y reintentos idempotentes.
+
+### Pruebas pendientes
+
+Antes de publicar deberán completarse:
+
+- Pruebas automáticas con Firebase Emulator Suite.
+- Pruebas manuales con cuentas y datos simulados.
+- Pruebas de reautenticación.
+- Pruebas de eliminación integral.
+- Pruebas de reintentos seguros.
+- Pruebas que comprueben que no se eliminan datos exclusivos de otras cuentas.
+- Pruebas de creación y expiración del recibo técnico.
+- Revisión de coherencia entre la aplicación, las políticas públicas y la información de Google Play.
 
 ## 35. Condiciones para publicar esta página
 
