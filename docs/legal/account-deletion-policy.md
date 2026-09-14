@@ -199,25 +199,56 @@ La eliminación deberá ejecutarse desde un entorno seguro y no depender exclusi
 
 ## 12. Perfil personal y lingüístico
 
-El documento de perfil correspondiente deberá eliminarse o anonimizarse cuando la solicitud sea procesada.
+### Tratamiento aprobado mediante DEL-A
 
-Entre los datos relacionados se encuentran:
+Al eliminar una cuenta, se eliminará permanentemente el documento `users/{uid}` correspondiente a la persona.
+
+La eliminación incluirá los datos personales, lingüísticos y técnicos almacenados en ese documento, entre ellos:
 
 - UID.
 - Nombre.
-- Correo.
+- Correo electrónico.
 - País.
-- Ciudad histórica.
+- Ciudad histórica, cuando exista.
 - Biografía.
-- Fotografía.
+- Fotografía o URL de fotografía almacenada.
 - Idioma de interfaz.
 - Idioma nativo.
 - Idioma de aprendizaje.
-- Nivel.
-- Visibilidad.
-- Fechas y estados técnicos.
+- Nivel lingüístico.
+- Preferencias de visibilidad.
+- Lista personal `blockedUserIds`.
+- Estado `deletionRequested`.
+- Fecha `deletionRequestedAt`.
+- Fechas y demás estados técnicos exclusivos del perfil.
 
-LangBridge no deberá conservar el perfil completo después de finalizar la eliminación, salvo que exista una obligación o razón legítima específica y limitada.
+### Condiciones del tratamiento
+
+- No se conservará una versión anonimizada ordinaria del documento `users/{uid}`.
+- No se conservarán el UID, el correo, el nombre, la biografía, los idiomas ni otros datos del perfil dentro del recibo técnico aprobado mediante DEL-S2.
+- Los datos relacionados que se encuentren en otras colecciones deberán procesarse antes de eliminar `users/{uid}` cuando el UID sea necesario para localizarlos.
+- La fotografía almacenada por LangBridge deberá eliminarse de Firebase Storage cuando esa función esté implementada.
+- La eliminación del perfil será irreversible.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, deberá crear un perfil nuevo y comenzará desde cero.
+
+### Orden técnico obligatorio
+
+El procedimiento deberá:
+
+1. Obtener el UID exclusivamente desde Firebase Authentication.
+2. Utilizar el UID para localizar y procesar los datos relacionados en otras colecciones.
+3. Eliminar o desvincular la fotografía almacenada por LangBridge cuando exista.
+4. Eliminar el documento `users/{uid}`.
+5. Eliminar posteriormente la cuenta de Firebase Authentication.
+6. Evitar conservar referencias huérfanas asociadas con el perfil eliminado.
+
+### Estado de implementación
+
+- Decisión aprobada mediante DEL-A.
+- Implementación técnica pendiente.
+- Eliminación en Firebase Storage pendiente hasta que la carga permanente de fotografías sea incorporada.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
+- Pruebas para comprobar que los perfiles de otras cuentas permanecen intactos pendientes.
 
 ## 13. Solicitudes de conexión
 
