@@ -221,16 +221,36 @@ LangBridge no deberá conservar el perfil completo después de finalizar la elim
 
 ## 13. Solicitudes de conexión
 
-Las solicitudes de conexión pendientes enviadas o recibidas por la cuenta deberán eliminarse.
+### Tratamiento aprobado mediante DEL-A
 
-Las solicitudes aceptadas deberán procesarse de manera que:
+Al eliminar una cuenta:
 
-- No permitan nuevas interacciones con una cuenta eliminada.
-- No mantengan nombres innecesarios.
-- No produzcan errores en conversaciones existentes.
-- No dejen referencias personales innecesarias.
+- Se eliminarán todas las solicitudes de conexión donde la cuenta aparezca como `senderId` o `recipientId`.
+- Se eliminarán las solicitudes con estado `pending`.
+- Se eliminarán las solicitudes con estado `accepted`.
+- Se eliminarán las solicitudes con estado `rejected`.
+- La eliminación incluirá los UID, nombres, estados y fechas almacenados dentro de esos documentos.
+- No se conservarán solicitudes de conexión anteriores asociadas con la cuenta eliminada.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, no recuperará solicitudes ni conexiones anteriores y comenzará desde cero.
 
-La solución técnica definitiva deberá probarse antes de publicar esta página.
+### Orden técnico obligatorio
+
+El procedimiento deberá:
+
+1. Localizar los documentos de `connectionRequests` donde el UID aparezca como `senderId`.
+2. Localizar los documentos de `connectionRequests` donde el UID aparezca como `recipientId`.
+3. Evitar procesar dos veces el mismo documento si aparece en más de un resultado.
+4. Eliminar las conversaciones y sus mensajes antes de eliminar las solicitudes aceptadas que les dieron origen.
+5. Eliminar completamente todas las solicitudes localizadas.
+6. Permitir reintentos seguros sin eliminar solicitudes pertenecientes exclusivamente a otras cuentas.
+
+### Estado de implementación
+
+- Decisión aprobada mediante DEL-A.
+- Implementación técnica pendiente.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
+- Pruebas para los estados `pending`, `accepted` y `rejected` pendientes.
+- Pruebas para comprobar que las solicitudes de otras cuentas permanecen intactas pendientes.
 
 ## 14. Conversaciones y mensajes
 
