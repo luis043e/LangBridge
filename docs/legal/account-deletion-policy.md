@@ -20,8 +20,8 @@ Esta página explica:
 - Cómo presentar una solicitud.
 - Cómo se verificará la identidad.
 - Qué datos se eliminarán.
-- Qué datos podrán anonimizarse.
-- Qué información podría conservarse temporalmente.
+- Qué datos se eliminarán permanentemente.
+- Qué información técnica mínima podrá conservarse temporalmente sin identificar a la persona.
 - Qué ocurrirá con mensajes, reportes, fotografías y progreso.
 - Cómo se comunicará la finalización del proceso.
 
@@ -140,7 +140,7 @@ Después de recibir una solicitud, LangBridge podrá:
 - Verificar la identidad.
 - Revisar los datos asociados.
 - Clasificar cualquier reporte o investigación pendiente.
-- Iniciar la eliminación o anonimización.
+- Iniciar la eliminación segura de la cuenta y los datos asociados.
 - Confirmar la finalización mediante un canal seguro.
 
 Ocultar el perfil no equivale a eliminar completamente la cuenta.
@@ -152,10 +152,11 @@ La solicitud podrá tener estados internos como:
 - `pending`: solicitud recibida.
 - `verified`: identidad verificada.
 - `processing`: eliminación en proceso.
-- `completed`: proceso principal completado.
+- `completed`: proceso principal completado y solicitud identificable lista para ser sustituida por el recibo técnico separado aprobado mediante DEL-S2.
 - `rejected`: solicitud no procesada por una razón documentada.
 - `cancelled`: solicitud cancelada antes de una operación irreversible.
-- `partially_retained`: eliminación completada con conservación temporal limitada.
+
+El recibo técnico de DEL-S2 no será un estado de la solicitud original. Será un documento separado, mínimo y no identificable, creado después de completar satisfactoriamente la eliminación. La solicitud identificable original deberá eliminarse después de crear correctamente el recibo.
 
 La aplicación móvil no deberá poder marcar directamente una solicitud como completada.
 
