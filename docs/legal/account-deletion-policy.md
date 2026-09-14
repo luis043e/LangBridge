@@ -378,20 +378,56 @@ Cualquier conservación deberá:
 - No utilizarse para publicidad.
 - No utilizarse para mantener activo el perfil eliminado.
 
-## 22. Registro mínimo de la solicitud
+## 22. Recibo técnico mínimo de eliminación
 
-Después de completar la eliminación, LangBridge podrá conservar un registro mínimo que indique:
+Después de completar satisfactoriamente la eliminación de la cuenta y sus datos:
 
-- Fecha de recepción.
-- Fecha de finalización.
-- Resultado general.
-- Existencia de una retención limitada.
-- Fecha prevista de revisión o eliminación.
-- Razón general de la retención.
+- La solicitud identificable original será eliminada.
+- La solicitud original será sustituida por un recibo técnico mínimo y no identificable.
+- El recibo técnico se conservará durante 30 días desde la fecha de finalización del procedimiento.
+- El recibo técnico será eliminado al vencer su fecha de expiración.
+- El recibo no permitirá reconstruir la identidad de la cuenta ni recuperar los datos eliminados.
 
-El UID y el correo completos deberán eliminarse, transformarse o limitarse cuando ya no sean necesarios.
+El recibo técnico contendrá únicamente:
 
-Período de conservación del registro mínimo: [PENDIENTE].
+- Identificador aleatorio no reutilizable.
+- Fecha de recepción de la solicitud.
+- Fecha de finalización del procedimiento.
+- Estado general `completed`.
+- Versión del procedimiento de eliminación.
+- Conteos generales de documentos eliminados por categoría.
+- Fecha de expiración del recibo.
+
+El recibo técnico no contendrá:
+
+- UID de Firebase Authentication.
+- Correo electrónico.
+- Nombre.
+- Biografía.
+- Fotografía.
+- País.
+- Información lingüística.
+- Contenido o fragmentos de mensajes.
+- Descripciones o contenido de reportes.
+- Identificadores de conversaciones.
+- Identificadores de solicitudes de conexión.
+- Identificadores de documentos eliminados.
+- Cualquier otro dato que permita identificar, reconocer o reconstruir la cuenta eliminada.
+
+La conservación temporal tendrá únicamente las siguientes finalidades:
+
+- Comprobar la finalización general del procedimiento.
+- Facilitar la revisión de fallos técnicos.
+- Permitir reintentos seguros cuando correspondan.
+- Registrar conteos generales de los documentos eliminados.
+
+El recibo no se utilizará para identificar a la persona, restaurar la cuenta, recuperar contenido eliminado ni crear un historial permanente de cuentas eliminadas.
+
+Período aprobado:
+
+- Conservación durante 30 días desde la fecha de finalización.
+- Eliminación al vencer la fecha de expiración.
+- Implementación técnica y pruebas todavía pendientes.
 
 ## 23. Copias de seguridad
 
