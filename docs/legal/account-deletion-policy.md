@@ -161,26 +161,55 @@ La aplicación móvil no deberá poder marcar directamente una solicitud como co
 
 ## 10. Datos que se eliminarán
 
-Cuando el proceso efectivo esté implementado, LangBridge tendrá previsto eliminar los datos que ya no sean necesarios, incluyendo:
+### Tratamiento aprobado
 
-- Cuenta de Firebase Authentication.
-- Nombre y correo almacenados en el perfil.
-- País.
-- Ciudad histórica, cuando exista.
-- Biografía.
-- Idiomas del perfil.
-- Nivel lingüístico.
-- Preferencias de visibilidad.
-- Lista personal de usuarios bloqueados.
-- Solicitudes de conexión pendientes.
-- Fotografía de perfil almacenada por LangBridge.
-- URL de la fotografía almacenada.
-- Futuros datos de aprendizaje.
-- Puntos, vidas y rachas.
-- Progreso de lecciones.
-- Configuraciones asociadas exclusivamente con la cuenta.
+Cuando el procedimiento efectivo esté implementado, LangBridge eliminará permanentemente los datos asociados con la cuenta conforme a DEL-A y DEL-R1.
 
-La lista definitiva deberá verificarse contra todas las colecciones y servicios existentes en el momento de procesar la solicitud.
+La eliminación incluirá:
+
+- La cuenta de Firebase Authentication.
+- El documento de perfil `users/{uid}`.
+- El UID, nombre, correo electrónico, país, biografía e información lingüística del perfil.
+- El nivel lingüístico y las preferencias de visibilidad.
+- La lista personal `blockedUserIds`.
+- El UID de la cuenta eliminada almacenado en listas `blockedUserIds` de otras cuentas.
+- Todas las solicitudes de conexión donde la cuenta aparezca como `senderId` o `recipientId`.
+- Las solicitudes de conexión con estado `pending`, `accepted` o `rejected`.
+- Todas las conversaciones donde el UID aparezca en `participants`.
+- Todos los mensajes almacenados en las subcolecciones `messages` de esas conversaciones.
+- Los mensajes enviados por la cuenta eliminada.
+- Los mensajes enviados por las demás personas dentro del historial compartido que será eliminado.
+- Todos los reportes cuyo campo `reporterId` corresponda al UID de la cuenta eliminada.
+- El UID, correo, categoría, descripción, estado y fechas contenidos en esos reportes.
+- La solicitud identificable original almacenada en `accountDeletionRequests`.
+- La fotografía de perfil y su URL cuando el almacenamiento permanente mediante Firebase Storage esté implementado.
+- Los futuros datos exclusivos de aprendizaje y gamificación cuando existan.
+- El progreso, los resultados, los puntos, las vidas, las rachas y las configuraciones asociadas exclusivamente con la cuenta cuando esas funciones estén implementadas.
+- Los datos locales relacionados con la sesión, cuando sea técnicamente aplicable.
+
+### Recibo técnico temporal
+
+Conforme a DEL-S2, la solicitud identificable original será sustituida, después de completar satisfactoriamente la eliminación, por un recibo técnico mínimo y no identificable.
+
+Este recibo:
+
+- No contendrá UID, correo, nombre, idiomas, mensajes, reportes ni identificadores relacionados.
+- Se conservará durante 30 días desde la fecha de finalización.
+- Se eliminará al vencer su fecha de expiración.
+- No permitirá reconstruir la cuenta ni recuperar los datos eliminados.
+
+### Verificación del alcance
+
+Antes de procesar una eliminación, el procedimiento deberá verificar todas las colecciones, subcolecciones, servicios y ubicaciones de almacenamiento existentes.
+
+Si LangBridge incorpora nuevas funciones o categorías de datos, estas deberán añadirse al inventario y al procedimiento de eliminación antes de activarse.
+
+### Estado de implementación
+
+- Tratamiento aprobado mediante DEL-A, DEL-R1 y DEL-S2.
+- Implementación técnica pendiente.
+- Verificación automatizada de colecciones y datos futuros pendiente.
+- Pruebas integrales con Firebase Emulator Suite y datos simulados pendientes.
 
 ## 11. Cuenta de Firebase Authentication
 
