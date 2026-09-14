@@ -318,34 +318,85 @@ El procedimiento deberá:
 - Pruebas de limpieza idempotente con Firebase Emulator Suite pendientes.
 - Pruebas para comprobar que otros bloqueos permanecen intactos pendientes.
 
-## 16. Reportes técnicos
+## 16. Reportes enviados por la cuenta
 
-Los reportes técnicos ordinarios podrán:
+### Modelo de datos actual
 
-- Eliminarse después de resolverse.
-- Anonimizarse.
-- Conservarse temporalmente durante el período operativo aprobado.
+La colección `reports` almacena actualmente reportes enviados por las personas usuarias.
 
-Cuando ya no sea necesario identificar a la persona, deberán eliminarse o anonimizarse el UID y el correo.
+Cada reporte puede contener:
 
-Período definitivo de conservación de reportes técnicos: [PENDIENTE].
+- `reporterId`.
+- `reporterEmail`.
+- `category`.
+- `description`.
+- `status`.
+- `createdAt`.
+- `updatedAt`.
+
+El modelo actual no contiene:
+
+- `reportedUserId`.
+- `reportedMessageId`.
+
+Por tanto, los reportes actuales permiten identificar a la cuenta que envía el reporte, pero no están vinculados mediante campos específicos con una cuenta o un mensaje reportado.
+
+### Tratamiento aprobado mediante DEL-R1
+
+Al eliminar una cuenta:
+
+- Se eliminarán todos los reportes cuyo campo `reporterId` corresponda al UID de la cuenta eliminada.
+- La eliminación incluirá el UID almacenado en `reporterId`.
+- La eliminación incluirá el correo almacenado en `reporterEmail`.
+- También se eliminarán la categoría, la descripción, el estado y las fechas del reporte.
+- No se conservará una copia anonimizada de esos reportes en la primera versión del procedimiento.
+- No se aplicará un período especial de conservación a esos reportes.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, no recuperará los reportes anteriores.
+
+### Orden técnico obligatorio
+
+El procedimiento deberá:
+
+1. Obtener el UID exclusivamente desde Firebase Authentication.
+2. Localizar los documentos de `reports` cuyo campo `reporterId` coincida con ese UID.
+3. Eliminar completamente cada reporte localizado.
+4. Completar esta operación antes de eliminar el perfil y la cuenta de Firebase Authentication.
+5. Permitir reintentos seguros sin eliminar reportes enviados por otras cuentas.
+
+### Estado de implementación
+
+- Decisión aprobada mediante DEL-R1.
+- Implementación técnica pendiente.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
+- Pruebas para comprobar que los reportes de otras cuentas permanecen intactos pendientes.
 
 ## 17. Reportes de seguridad y moderación
 
-Algunos reportes relacionados con seguridad, fraude, abuso o disputas podrán conservarse temporalmente aunque se solicite la eliminación de la cuenta.
+### Tratamiento aplicable al modelo actual
 
-En esos casos, LangBridge deberá:
+En el modelo actual, la colección `reports` no almacena `reportedUserId` ni `reportedMessageId`. Por esta razón:
 
-- Conservar únicamente la información necesaria.
-- Restringir el acceso.
-- Documentar la razón.
-- Establecer una fecha de revisión.
-- Eliminar o anonimizar los datos cuando dejen de ser necesarios.
-- Evitar utilizar la información para una finalidad incompatible.
+- No existe actualmente una categoría técnica separada de evidencia vinculada con una cuenta o un mensaje reportado.
+- Los reportes actuales también se eliminarán cuando `reporterId` corresponda a la cuenta eliminada.
+- No se conservarán temporalmente reportes completos bajo una excepción general de seguridad o moderación.
+- No se conservarán el UID, el correo, la descripción ni otros campos de esos reportes después de su eliminación.
+- La decisión vigente corresponde a DEL-R1.
 
-La eliminación del perfil público y de la cuenta no obliga necesariamente a destruir inmediatamente evidencia limitada de un reporte activo.
+### Revisión obligatoria si cambia el modelo
 
-Período definitivo de conservación de reportes de seguridad: [PENDIENTE].
+Si LangBridge incorpora en el futuro reportes específicos contra personas, mensajes, conversaciones o contenido:
+
+- Esta decisión deberá revisarse antes de activar esos nuevos campos o funciones.
+- Deberá definirse si existe evidencia que necesite conservación limitada.
+- Deberán aprobarse la finalidad, los datos utilizados, el acceso y el período de conservación.
+- Deberán actualizarse el inventario de datos, las políticas aplicables, las reglas de seguridad y el procedimiento de eliminación.
+- Deberán crearse pruebas específicas antes de utilizar el nuevo modelo en producción.
+
+### Estado de implementación
+
+- Decisión aprobada para el modelo actual mediante DEL-R1.
+- La eliminación efectiva de reportes todavía no está implementada.
+- Las pruebas automáticas y manuales permanecen pendientes.
 
 ## 18. Fotografías de perfil
 
