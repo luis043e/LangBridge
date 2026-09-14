@@ -721,10 +721,13 @@ Cerrar sesión:
 
 Eliminar la cuenta:
 
-- Inicia un proceso para eliminar o anonimizar la cuenta y sus datos asociados.
-- Puede ser irreversible.
-- Requiere verificación.
-- Puede incluir una retención temporal limitada.
+- Inicia un proceso para eliminar permanentemente la cuenta y los datos asociados conforme a DEL-A y DEL-R1.
+- Requiere verificar que la solicitud procede de la persona que controla la cuenta.
+- Es irreversible una vez iniciadas las operaciones que eliminan datos.
+- Elimina el perfil, las solicitudes de conexión, las conversaciones, los mensajes, las referencias de bloqueo relacionadas y los reportes enviados por la cuenta.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, comenzará desde cero.
+- Después de completar satisfactoriamente la eliminación, la solicitud identificable original se sustituirá por el recibo técnico mínimo y no identificable aprobado mediante DEL-S2.
+- El recibo técnico se conservará durante 30 días y se eliminará al vencer su fecha de expiración.
 
 ## 31. Solicitudes incompletas o no verificadas
 
