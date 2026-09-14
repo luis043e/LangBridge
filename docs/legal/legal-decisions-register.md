@@ -558,30 +558,55 @@ No se utilizará una retención de seguridad para conservar indefinidamente el p
 
 ### Estado
 
-- Propuesta.
+- Aprobada.
 
-### Datos propuestos
+### Decisión aprobada
 
-- Identificador interno no reutilizable.
-- Fecha de recepción.
-- Fecha de finalización.
-- Resultado general.
-- Existencia de retención limitada.
-- Razón general de retención.
-- Fecha prevista de revisión.
+- Se adopta DEL-S2.
+- Después de completar la eliminación de una cuenta, la solicitud identificable original será eliminada y sustituida por un recibo técnico mínimo y no identificable.
+- El recibo técnico se conservará durante 30 días contados desde la fecha de finalización del procedimiento.
+- Al vencer el período de 30 días, el recibo técnico deberá eliminarse.
+- El recibo no se utilizará para reconstruir la identidad de la cuenta ni para recuperar los datos eliminados.
+- La conservación temporal tendrá como finalidad comprobar la finalización general del procedimiento, facilitar la revisión de fallos técnicos y permitir reintentos seguros cuando correspondan.
+- Esta decisión deberá implementarse mediante un proceso que pueda repetirse sin duplicar recibos ni afectar datos ajenos.
 
-### Datos que deberán reducirse
+### Datos permitidos en el recibo técnico
 
-- UID completo.
-- Correo completo.
+- Identificador aleatorio no reutilizable.
+- Fecha de recepción de la solicitud.
+- Fecha de finalización del procedimiento.
+- Estado general `completed`.
+- Versión del procedimiento de eliminación.
+- Conteos generales de documentos eliminados por categoría.
+- Fecha de expiración del recibo.
+
+### Datos prohibidos en el recibo técnico
+
+- UID de Firebase Authentication.
+- Correo electrónico.
 - Nombre.
 - Biografía.
 - Fotografía.
+- País.
 - Información lingüística.
+- Contenido o fragmentos de mensajes.
+- Descripciones o contenido de reportes.
+- Identificadores de conversaciones.
+- Identificadores de solicitudes de conexión.
+- Identificadores de documentos eliminados.
+- Cualquier otro dato que permita identificar, reconocer o reconstruir la cuenta eliminada.
 
 ### Período aprobado
 
-- [PENDIENTE]
+- 30 días desde la fecha de finalización del procedimiento.
+- Eliminación del recibo técnico al vencer su fecha de expiración.
+
+### Estado de implementación
+
+- Pendiente de implementación técnica.
+- Pendiente de pruebas con Firebase Emulator Suite y datos simulados.
+- Pendiente de incorporación coherente en las políticas internas y públicas correspondientes.
+- No se considerará publicable hasta que el proceso de creación y expiración del recibo haya sido implementado y probado.
 
 ## 21. Decisión LEG-017: copias de seguridad
 
