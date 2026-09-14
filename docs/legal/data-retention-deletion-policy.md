@@ -389,30 +389,72 @@ Si LangBridge incorpora denuncias específicas contra usuarios o mensajes, el tr
 
 ## 17. Solicitudes de eliminación
 
-Colección:
+Colección original:
 
 - `accountDeletionRequests`
 
-La solicitud original contiene:
+La solicitud identificable original contiene actualmente:
 
 - UID.
-- Correo.
-- Estado.
-- Fechas.
+- Correo electrónico.
+- Estado del procedimiento.
+- Fechas de creación y actualización.
 
-Después de completar la eliminación, LangBridge deberá evitar conservar indefinidamente el UID y el correo completos.
+### Tratamiento aprobado mediante DEL-S2
 
-Registro mínimo recomendado:
+Después de completar satisfactoriamente la eliminación de la cuenta y sus datos:
 
-- Identificador interno no reutilizable.
-- Fecha de recepción.
-- Fecha de finalización.
-- Resultado general.
-- Categoría de datos retenidos, si existe.
-- Fecha prevista para eliminar cualquier retención.
-- Motivo general de retención.
+- La solicitud identificable original será eliminada.
+- El UID y el correo electrónico no se conservarán en el recibo técnico.
+- La solicitud original será sustituida por un recibo técnico mínimo y no identificable.
+- El recibo técnico se conservará durante 30 días contados desde la fecha de finalización del procedimiento.
+- El recibo técnico será eliminado al vencer su fecha de expiración.
+- El recibo no permitirá reconstruir la identidad de la cuenta ni recuperar los datos eliminados.
+- El proceso deberá poder repetirse sin duplicar recibos ni afectar datos ajenos.
 
-El correo y el UID deberán eliminarse, transformarse o limitarse una vez que dejen de ser necesarios para demostrar que la solicitud fue atendida.
+### Datos permitidos en el recibo técnico
+
+- Identificador aleatorio no reutilizable.
+- Fecha de recepción de la solicitud.
+- Fecha de finalización del procedimiento.
+- Estado general `completed`.
+- Versión del procedimiento de eliminación.
+- Conteos generales de documentos eliminados por categoría.
+- Fecha de expiración del recibo.
+
+### Datos prohibidos en el recibo técnico
+
+- UID de Firebase Authentication.
+- Correo electrónico.
+- Nombre.
+- Biografía.
+- Fotografía.
+- País.
+- Información lingüística.
+- Contenido o fragmentos de mensajes.
+- Descripciones o contenido de reportes.
+- Identificadores de conversaciones.
+- Identificadores de solicitudes de conexión.
+- Identificadores de documentos eliminados.
+- Cualquier otro dato que permita identificar, reconocer o reconstruir la cuenta eliminada.
+
+### Finalidad y limitaciones
+
+La conservación temporal del recibo tendrá únicamente las siguientes finalidades:
+
+- Comprobar la finalización general del procedimiento.
+- Facilitar la revisión de fallos técnicos.
+- Permitir reintentos seguros cuando correspondan.
+- Registrar conteos generales de los documentos eliminados.
+
+El recibo técnico no se utilizará para identificar a la persona, restaurar la cuenta, recuperar contenido eliminado ni crear un historial permanente de cuentas eliminadas.
+
+### Estado de implementación
+
+- Decisión aprobada.
+- Implementación técnica pendiente.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
+- Publicación condicionada a que la creación y la expiración del recibo funcionen correctamente.
 
 ## 18. Fotografías de perfil
 
@@ -526,9 +568,12 @@ La siguiente estructura deberá completarse antes de la publicación:
 
 - Después de resolución: [PENDIENTE].
 
-### Registro mínimo de eliminación
+### Recibo técnico mínimo de eliminación
 
-- Conservación: [PENDIENTE].
+- Conservación: 30 días desde la fecha de finalización del procedimiento.
+- Eliminación: al vencer la fecha de expiración.
+- Contenido: exclusivamente los datos no identificables aprobados mediante DEL-S2.
+- Estado técnico: implementación y pruebas pendientes.
 
 ### Fotografías sustituidas
 
