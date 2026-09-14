@@ -234,30 +234,48 @@ La solución técnica definitiva deberá probarse antes de publicar esta página
 
 ## 14. Conversaciones y mensajes
 
-El tratamiento definitivo de conversaciones y mensajes todavía está pendiente.
+### Tratamiento aprobado mediante DEL-A
 
-LangBridge deberá seleccionar y documentar una solución coherente.
+Al eliminar una cuenta de LangBridge:
 
-Las opciones consideradas son:
+- Se eliminarán permanentemente todas las conversaciones en las que participe la cuenta.
+- Antes de eliminar cada conversación, se eliminarán todos los mensajes almacenados en su subcolección `messages`.
+- Se eliminarán los mensajes enviados por la cuenta eliminada.
+- También se eliminarán los mensajes enviados por las demás personas dentro de esas conversaciones.
+- Las demás personas participantes perderán el historial compartido correspondiente.
+- No se conservarán el texto de los mensajes, el UID de quien los envió, la fecha de creación ni la fecha de lectura.
+- No se aplicará anonimización ni se sustituirá la identidad por referencias como `Usuario eliminado` en la primera versión del procedimiento.
+- Después de eliminar los mensajes, se eliminará el documento principal de cada conversación.
+- La eliminación será irreversible.
+- Si la persona vuelve a LangBridge mediante una cuenta nueva, no recuperará conversaciones ni mensajes anteriores y comenzará desde cero.
 
-- Eliminar completamente los mensajes de la cuenta.
-- Anonimizar a la persona remitente.
-- Mantener determinados mensajes para la otra persona sin conservar la identidad del remitente.
-- Conservar temporalmente mensajes relacionados con investigaciones de seguridad.
+### Efectos para las demás personas participantes
 
-Cuando se aplique anonimización, la identidad podrá sustituirse por una referencia neutral, como `Usuario eliminado`.
+La eliminación de una conversación afecta el historial compartido de todas las personas que participaron en ella. Por tanto:
 
-La decisión final deberá proteger:
+- La otra persona dejará de ver la conversación eliminada.
+- Los mensajes enviados por la otra persona dentro de ese historial también serán eliminados.
+- LangBridge deberá informar claramente este efecto antes de que la persona confirme la eliminación de su cuenta.
+- La confirmación deberá advertir que la eliminación del historial compartido no puede deshacerse.
 
-- Los derechos de la persona que solicita la eliminación.
-- La información perteneciente a otras personas participantes.
-- La integridad de reportes activos.
-- La prevención de fraude o abuso.
-- La minimización de datos.
+### Orden técnico obligatorio
 
-Tratamiento definitivo de conversaciones: [PENDIENTE].
+El procedimiento deberá:
 
-Tratamiento definitivo de mensajes: [PENDIENTE].
+1. Localizar las conversaciones donde el UID de la cuenta aparezca en `participants`.
+2. Eliminar todos los documentos de cada subcolección `messages`.
+3. Eliminar el documento principal de cada conversación.
+4. Continuar con los demás datos relacionados con la cuenta.
+
+Cloud Firestore no elimina automáticamente las subcolecciones cuando se elimina el documento principal. Por esta razón, los mensajes deberán eliminarse antes que la conversación.
+
+### Estado de implementación
+
+- Decisión aprobada mediante DEL-A.
+- Implementación técnica pendiente.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
+- Textos de advertencia y confirmación en la aplicación pendientes.
+- Publicación condicionada a que la eliminación integral pueda ejecutarse y repetirse de forma segura.
 
 ## 15. Usuarios bloqueados
 
