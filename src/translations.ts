@@ -449,49 +449,49 @@ deleteAccountScreen: {
   incorrectConfirmationMessage:
     'Type DELETE to confirm the request.',
   confirmRequestTitle:
-    'Confirm request',
+    'Confirm deletion request',
   confirmRequestMessage:
-    'Your profile will be hidden and an account deletion request will be created.',
+    'Your profile will be hidden immediately and an account deletion request will be submitted. When the secure process is completed, the deletion will be irreversible and the shared conversation history will also be removed.',
   cancel: 'Cancel',
-  continue: 'Continue',
+  continue: 'Submit request',
   requestSubmittedTitle:
     'Request submitted',
   requestSubmittedMessage:
-    'Your profile was hidden and the request was submitted.',
+    'Your profile was hidden and the deletion request was submitted. This confirmation does not mean that the permanent deletion has already been completed.',
   submitErrorTitle:
-    'Could not submit',
+    'Could not submit request',
   connectionError:
     'Check your connection and try again.',
   back: '‹ Back',
   title: 'Delete account',
   subtitle:
-    'Request the permanent deletion of your LangBridge account.',
+    'Submit a request to permanently delete your LangBridge account and associated data.',
   warningTitle:
-    'Before continuing',
+    'Read before continuing',
   warningText:
-    'This request will immediately hide your profile while the deletion is processed.',
+    'Submitting this request will immediately hide your profile. Permanent deletion requires secure identity verification and processing.',
   consequencesTitle:
-    'Deletion may affect:',
+    'When deletion is completed:',
   profileConsequence:
-    '• Your profile and preferences.',
+    '• Your profile, preferences, and account data will be permanently deleted.',
   connectionsConsequence:
-    '• Your requests and connections.',
+    '• Your connection requests, connections, and related blocking references will be deleted.',
   conversationsConsequence:
-    '• Your conversations and messages.',
+    '• All related conversations and messages will be deleted, including messages sent by other people within the shared history.',
   accessConsequence:
-    '• Your future access to LangBridge.',
+    '• You will lose access to the account. If you return, you will start again with a new account.',
   confirmationLabel:
-    'To confirm, type DELETE',
+    'To submit the request, type DELETE',
   helperText:
     'The word must be typed exactly as shown above.',
   processing:
-    'Processing request...',
+    'Submitting request...',
   requestDeletion:
-    'Request deletion',
+    'Submit deletion request',
   cancelAndKeepAccount:
     'Cancel and keep my account',
   securityNote:
-    'For security, permanent deletion will require additional identity verification.',
+  'After deletion is completed, a minimal, non-identifiable technical receipt will be retained for 30 days and then deleted.',
 },
 privacySecurityScreen: {
   emailUnavailableTitle:
@@ -1352,49 +1352,49 @@ deleteAccountScreen: {
   incorrectConfirmationMessage:
     'Escribe ELIMINAR para confirmar la solicitud.',
   confirmRequestTitle:
-    'Confirmar solicitud',
+    'Confirmar solicitud de eliminación',
   confirmRequestMessage:
-    'Tu perfil se ocultará y se registrará una solicitud de eliminación.',
+    'Tu perfil se ocultará inmediatamente y se registrará una solicitud de eliminación. Cuando el proceso seguro finalice, la eliminación será irreversible y también desaparecerá el historial compartido de las conversaciones.',
   cancel: 'Cancelar',
-  continue: 'Continuar',
+  continue: 'Enviar solicitud',
   requestSubmittedTitle:
     'Solicitud registrada',
   requestSubmittedMessage:
-    'Tu perfil fue ocultado y la solicitud quedó registrada.',
+    'Tu perfil fue ocultado y la solicitud de eliminación quedó registrada. Esta confirmación no significa que la eliminación permanente ya haya finalizado.',
   submitErrorTitle:
-    'No se pudo registrar',
+    'No se pudo registrar la solicitud',
   connectionError:
     'Revisa tu conexión e inténtalo nuevamente.',
   back: '‹ Atrás',
   title: 'Eliminar cuenta',
   subtitle:
-    'Solicita la eliminación permanente de tu cuenta de LangBridge.',
+    'Envía una solicitud para eliminar permanentemente tu cuenta de LangBridge y los datos asociados.',
   warningTitle:
-    'Antes de continuar',
+    'Lee antes de continuar',
   warningText:
-    'Esta solicitud ocultará inmediatamente tu perfil mientras se procesa la eliminación.',
+    'Enviar esta solicitud ocultará inmediatamente tu perfil. La eliminación permanente requiere verificación segura de identidad y procesamiento.',
   consequencesTitle:
-    'La eliminación puede afectar:',
+    'Cuando finalice la eliminación:',
   profileConsequence:
-    '• Tu perfil y preferencias.',
+    '• Tu perfil, tus preferencias y los datos de tu cuenta se eliminarán permanentemente.',
   connectionsConsequence:
-    '• Tus solicitudes y conexiones.',
+    '• Tus solicitudes, conexiones y referencias de bloqueo relacionadas serán eliminadas.',
   conversationsConsequence:
-    '• Tus conversaciones y mensajes.',
+    '• Se eliminarán todas las conversaciones y sus mensajes, incluidos los mensajes enviados por otras personas dentro del historial compartido.',
   accessConsequence:
-    '• Tu acceso futuro a LangBridge.',
+    '• Perderás el acceso a la cuenta. Si vuelves, comenzarás desde cero con una cuenta nueva.',
   confirmationLabel:
-    'Para confirmar, escribe ELIMINAR',
+    'Para enviar la solicitud, escribe ELIMINAR',
   helperText:
     'La palabra debe escribirse exactamente como aparece arriba.',
   processing:
-    'Procesando solicitud...',
+    'Registrando solicitud...',
   requestDeletion:
-    'Solicitar eliminación',
+    'Enviar solicitud de eliminación',
   cancelAndKeepAccount:
-    'Cancelar y conservar mi cuenta',
-  securityNote:
-    'Por seguridad, la eliminación definitiva requerirá una verificación adicional de identidad.',
+  'Cancelar y conservar mi cuenta',
+securityNote:
+  'Después de finalizar la eliminación, se conservará durante 30 días un recibo técnico mínimo y no identificable, que luego será eliminado.',
 },
 privacySecurityScreen: {
   emailUnavailableTitle:
