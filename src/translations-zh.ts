@@ -377,19 +377,19 @@
     incorrectConfirmationMessage:
       '请输入“删除”以确认请求。',
     confirmRequestTitle:
-      '确认请求',
+      '确认账号删除请求',
     confirmRequestMessage:
-      '你的个人资料将被隐藏，并将创建账号删除请求。',
+      '你的个人资料将立即被隐藏，并会提交账号删除请求。安全处理完成后，删除操作将无法撤销，共享的对话记录也会被删除。',
     cancel:
       '取消',
     continue:
-      '继续',
+      '提交请求',
     requestSubmittedTitle:
       '请求已提交',
     requestSubmittedMessage:
-      '你的个人资料已被隐藏，删除请求已登记。',
+      '你的个人资料已被隐藏，账号删除请求也已提交。此确认并不表示永久删除已经完成。',
     submitErrorTitle:
-      '无法提交',
+      '无法提交请求',
     connectionError:
       '请检查网络连接，然后重试。',
     back:
@@ -397,33 +397,33 @@
     title:
       '删除账号',
     subtitle:
-      '请求永久删除你的 LangBridge 账号。',
+      '提交请求，以永久删除你的 LangBridge 账号及相关数据。',
     warningTitle:
-      '继续之前',
+      '继续前请阅读',
     warningText:
-      '处理删除请求期间，你的个人资料将立即被隐藏。',
+      '提交此请求后，你的个人资料将立即被隐藏。永久删除需要进行安全的身份验证和进一步处理。',
     consequencesTitle:
-      '删除账号可能会影响：',
+      '删除完成后：',
     profileConsequence:
-      '• 你的个人资料和偏好设置。',
+      '• 你的个人资料、偏好设置和账号数据将被永久删除。',
     connectionsConsequence:
-      '• 你的请求和连接。',
+      '• 你的连接请求、连接关系和相关的屏蔽记录将被删除。',
     conversationsConsequence:
-      '• 你的对话和消息。',
+      '• 所有相关对话和消息都将被删除，包括其他人在共享对话记录中发送的消息。',
     accessConsequence:
-      '• 你今后对 LangBridge 的访问。',
+      '• 你将无法再访问该账号。如果重新使用 LangBridge，需要通过新账号从头开始。',
     confirmationLabel:
-      '请输入“删除”以确认',
+      '要提交请求，请输入“删除”',
     helperText:
       '必须完全按照上方显示的内容输入。',
     processing:
-      '正在处理请求...',
+      '正在提交请求...',
     requestDeletion:
-      '请求删除',
+      '提交账号删除请求',
     cancelAndKeepAccount:
       '取消并保留我的账号',
     securityNote:
-      '出于安全考虑，永久删除账号需要进行额外的身份验证。',
+      '删除完成后，将保留一份无法识别个人身份的最小技术收据，保存30天后删除。',
   },
   privacySecurityScreen: {
     emailUnavailableTitle:
