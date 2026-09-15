@@ -365,7 +365,7 @@
     },
   },
 
-  deleteAccountScreen: {
+    deleteAccountScreen: {
     requiredConfirmation:
       '삭제',
     sessionUnavailableTitle:
@@ -377,19 +377,19 @@
     incorrectConfirmationMessage:
       '요청을 확인하려면 삭제를 입력하세요.',
     confirmRequestTitle:
-      '요청 확인',
+      '계정 삭제 요청 확인',
     confirmRequestMessage:
-      '프로필이 숨겨지고 계정 삭제 요청이 생성됩니다.',
+      '프로필이 즉시 숨겨지고 계정 삭제 요청이 제출됩니다. 안전한 처리가 완료되면 삭제를 되돌릴 수 없으며 공유된 대화 기록도 함께 삭제됩니다.',
     cancel:
       '취소',
     continue:
-      '계속',
+      '요청 제출',
     requestSubmittedTitle:
       '요청이 제출되었습니다',
     requestSubmittedMessage:
-      '프로필이 숨겨졌으며 요청이 등록되었습니다.',
+      '프로필이 숨겨지고 계정 삭제 요청이 제출되었습니다. 이 확인은 영구 삭제가 이미 완료되었다는 의미가 아닙니다.',
     submitErrorTitle:
-      '제출할 수 없습니다',
+      '요청을 제출할 수 없습니다',
     connectionError:
       '연결을 확인하고 다시 시도하세요.',
     back:
@@ -397,33 +397,33 @@
     title:
       '계정 삭제',
     subtitle:
-      'LangBridge 계정의 영구 삭제를 요청합니다.',
+      'LangBridge 계정과 관련 데이터를 영구적으로 삭제하기 위한 요청을 제출합니다.',
     warningTitle:
-      '계속하기 전에',
+      '계속하기 전에 읽어 주세요',
     warningText:
-      '삭제가 처리되는 동안 이 요청으로 인해 프로필이 즉시 숨겨집니다.',
+      '이 요청을 제출하면 프로필이 즉시 숨겨집니다. 영구 삭제를 위해서는 안전한 본인 확인과 추가 처리가 필요합니다.',
     consequencesTitle:
-      '계정 삭제는 다음 항목에 영향을 줄 수 있습니다:',
+      '삭제가 완료되면:',
     profileConsequence:
-      '• 프로필 및 환경설정',
+      '• 프로필, 환경설정 및 계정 데이터가 영구적으로 삭제됩니다.',
     connectionsConsequence:
-      '• 요청 및 연결',
+      '• 연결 요청, 연결 및 관련 차단 정보가 삭제됩니다.',
     conversationsConsequence:
-      '• 대화 및 메시지',
+      '• 관련된 모든 대화와 메시지가 삭제되며, 공유 기록에서 다른 사람이 보낸 메시지도 포함됩니다.',
     accessConsequence:
-      '• 향후 LangBridge 이용',
+      '• 계정에 접근할 수 없게 됩니다. 다시 이용하려면 새 계정으로 처음부터 시작해야 합니다.',
     confirmationLabel:
-      '확인하려면 삭제를 입력하세요',
+      '요청을 제출하려면 삭제를 입력하세요',
     helperText:
       '위에 표시된 단어를 정확하게 입력하세요.',
     processing:
-      '요청을 처리하는 중...',
+      '요청을 제출하는 중...',
     requestDeletion:
-      '삭제 요청',
+      '계정 삭제 요청 제출',
     cancelAndKeepAccount:
       '취소하고 계정 유지',
     securityNote:
-      '보안을 위해 영구 삭제 시 추가 본인 확인이 필요합니다.',
+      '삭제가 완료된 후 개인을 식별할 수 없는 최소한의 기술 영수증이 30일 동안 보관된 다음 삭제됩니다.',
   },
 
   privacySecurityScreen: {
