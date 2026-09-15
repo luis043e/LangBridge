@@ -378,27 +378,50 @@ El público seleccionado deberá coincidir con:
 
 ### Estado
 
-- En análisis.
+- Aprobada.
 
-### Criterios
+### Decisión aprobada
 
-- Verificación de identidad.
-- Eliminación de Authentication.
-- Limpieza o anonimización de Firestore.
-- Eliminación de Storage.
-- Tratamiento de mensajes y reportes.
-- Fallos parciales y reintentos.
-- Capacidad administrativa real.
+- El procesamiento comenzará después de verificar la identidad de la persona y confirmar una sesión reciente.
+- LangBridge intentará completar la eliminación tan pronto como sea técnicamente posible.
+- El plazo operativo objetivo será de 7 días calendario desde la verificación de identidad.
+- El plazo máximo informado será de 30 días calendario desde la verificación de identidad.
+- El objetivo de 7 días no impedirá que la eliminación se complete antes cuando todos los servicios estén disponibles.
+- El plazo máximo permitirá gestionar fallos temporales, verificaciones y reintentos seguros.
+- La eliminación no se marcará como `completed` hasta que hayan concluido todas las operaciones previstas.
 
-### Valores pendientes
+### Fallos parciales y reintentos
 
-- Inicio del procesamiento: [PENDIENTE]
-- Plazo objetivo: [PENDIENTE]
-- Plazo máximo informado: [PENDIENTE]
+Si alguna operación falla:
 
-### Regla
+- La solicitud permanecerá en estado `processing`.
+- No se mostrará una confirmación falsa de finalización.
+- El procedimiento registrará de forma limitada la etapa pendiente.
+- Se permitirán reintentos idempotentes.
+- No se repetirán de manera perjudicial las operaciones ya completadas.
+- No se eliminarán datos exclusivos de otras cuentas.
+- La solicitud solo pasará a `completed` después de completar correctamente todas las operaciones.
 
-No publicar un plazo que no pueda cumplirse técnicamente.
+### Relación con DEL-S2
+
+- El período de conservación del recibo técnico DEL-S2 no comenzará cuando se envíe la solicitud.
+- El período de 30 días de DEL-S2 comenzará desde la fecha efectiva de finalización del procedimiento.
+- El recibo técnico se eliminará cuando venza su propia fecha de expiración.
+- El plazo máximo de procesamiento y el plazo de conservación del recibo técnico son períodos separados.
+
+### Condiciones de publicación
+
+- Los plazos no deberán publicarse como definitivos hasta comprobar que pueden cumplirse técnicamente.
+- La implementación deberá probarse con Firebase Emulator Suite y datos simulados.
+- La política definitiva permanecerá sujeta a revisión jurídica.
+- Cualquier cambio en la capacidad técnica o en los requisitos aplicables deberá motivar una revisión de esta decisión.
+
+### Estado de implementación
+
+- Decisión aprobada.
+- Implementación técnica pendiente.
+- Pruebas automáticas y manuales pendientes.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 14. Decisión LEG-010: tratamiento de conversaciones
 
