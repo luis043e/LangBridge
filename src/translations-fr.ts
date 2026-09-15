@@ -362,21 +362,21 @@ requestsScreen: {
     incorrectConfirmationTitle:
       'Confirmation incorrecte',
     incorrectConfirmationMessage:
-      'Tapez SUPPRIMER pour confirmer la demande.',
+      'Saisissez SUPPRIMER pour confirmer la demande.',
     confirmRequestTitle:
-      'Confirmer la demande',
+      'Confirmer la demande de suppression',
     confirmRequestMessage:
-      'Votre profil sera masqué et une demande de suppression de compte sera créée.',
+      'Votre profil sera immédiatement masqué et une demande de suppression de compte sera envoyée. Une fois le processus sécurisé terminé, la suppression sera irréversible et l’historique partagé des conversations sera également supprimé.',
     cancel:
       'Annuler',
     continue:
-      'Continuer',
+      'Envoyer la demande',
     requestSubmittedTitle:
       'Demande envoyée',
     requestSubmittedMessage:
-      'Votre profil a été masqué et la demande a été enregistrée.',
+      'Votre profil a été masqué et la demande de suppression a été envoyée. Cette confirmation ne signifie pas que la suppression définitive est déjà terminée.',
     submitErrorTitle:
-      "Impossible d'envoyer",
+      'Impossible d’envoyer la demande',
     connectionError:
       'Vérifiez votre connexion et réessayez.',
     back:
@@ -384,33 +384,33 @@ requestsScreen: {
     title:
       'Supprimer le compte',
     subtitle:
-      'Demandez la suppression définitive de votre compte LangBridge.',
+      'Envoyez une demande pour supprimer définitivement votre compte LangBridge et les données associées.',
     warningTitle:
-      'Avant de continuer',
+      'À lire avant de continuer',
     warningText:
-      'Cette demande masquera immédiatement votre profil pendant le traitement de la suppression.',
+      'L’envoi de cette demande masquera immédiatement votre profil. La suppression définitive nécessite une vérification sécurisée de l’identité et un traitement supplémentaire.',
     consequencesTitle:
-      'La suppression peut affecter :',
+      'Une fois la suppression terminée :',
     profileConsequence:
-      '• Votre profil et vos préférences.',
+      '• Votre profil, vos préférences et les données de votre compte seront définitivement supprimés.',
     connectionsConsequence:
-      '• Vos demandes et connexions.',
+      '• Vos demandes de connexion, vos connexions et les références de blocage associées seront supprimées.',
     conversationsConsequence:
-      '• Vos conversations et messages.',
+      '• Toutes les conversations associées et leurs messages seront supprimés, y compris les messages envoyés par d’autres personnes dans l’historique partagé.',
     accessConsequence:
-      '• Votre accès futur à LangBridge.',
+      '• Vous perdrez l’accès au compte. Si vous revenez, vous recommencerez depuis le début avec un nouveau compte.',
     confirmationLabel:
-      'Pour confirmer, tapez SUPPRIMER',
+      'Pour envoyer la demande, saisissez SUPPRIMER',
     helperText:
       'Le mot doit être saisi exactement comme indiqué ci-dessus.',
     processing:
-      'Traitement de la demande...',
+      'Envoi de la demande...',
     requestDeletion:
-      'Demander la suppression',
+      'Envoyer la demande de suppression',
     cancelAndKeepAccount:
       'Annuler et conserver mon compte',
     securityNote:
-      "Pour des raisons de sécurité, la suppression définitive nécessitera une vérification supplémentaire de l’identité.",
+      'Une fois la suppression terminée, un reçu technique minimal et non identifiable sera conservé pendant 30 jours, puis supprimé.',
   },
   privacySecurityScreen: {
     emailUnavailableTitle:

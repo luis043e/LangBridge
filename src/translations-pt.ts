@@ -366,7 +366,7 @@ export const ptTranslations = {
     },
   },
 
-  deleteAccountScreen: {
+    deleteAccountScreen: {
     requiredConfirmation:
       'EXCLUIR',
     sessionUnavailableTitle:
@@ -378,19 +378,19 @@ export const ptTranslations = {
     incorrectConfirmationMessage:
       'Digite EXCLUIR para confirmar a solicitação.',
     confirmRequestTitle:
-      'Confirmar solicitação',
+      'Confirmar solicitação de exclusão',
     confirmRequestMessage:
-      'Seu perfil será ocultado e uma solicitação de exclusão da conta será criada.',
+      'Seu perfil será ocultado imediatamente e uma solicitação de exclusão da conta será enviada. Quando o processo seguro for concluído, a exclusão será irreversível e o histórico compartilhado das conversas também será excluído.',
     cancel:
       'Cancelar',
     continue:
-      'Continuar',
+      'Enviar solicitação',
     requestSubmittedTitle:
       'Solicitação enviada',
     requestSubmittedMessage:
-      'Seu perfil foi ocultado e a solicitação foi registrada.',
+      'Seu perfil foi ocultado e a solicitação de exclusão foi enviada. Esta confirmação não significa que a exclusão permanente já foi concluída.',
     submitErrorTitle:
-      'Não foi possível enviar',
+      'Não foi possível enviar a solicitação',
     connectionError:
       'Verifique sua conexão e tente novamente.',
     back:
@@ -398,33 +398,33 @@ export const ptTranslations = {
     title:
       'Excluir conta',
     subtitle:
-      'Solicite a exclusão permanente da sua conta do LangBridge.',
+      'Envie uma solicitação para excluir permanentemente sua conta do LangBridge e os dados associados.',
     warningTitle:
-      'Antes de continuar',
+      'Leia antes de continuar',
     warningText:
-      'Esta solicitação ocultará imediatamente seu perfil enquanto a exclusão é processada.',
+      'O envio desta solicitação ocultará imediatamente seu perfil. A exclusão permanente requer verificação segura de identidade e processamento adicional.',
     consequencesTitle:
-      'A exclusão pode afetar:',
+      'Quando a exclusão for concluída:',
     profileConsequence:
-      '• Seu perfil e suas preferências.',
+      '• Seu perfil, suas preferências e os dados da sua conta serão excluídos permanentemente.',
     connectionsConsequence:
-      '• Suas solicitações e conexões.',
+      '• Suas solicitações de conexão, conexões e referências de bloqueio relacionadas serão excluídas.',
     conversationsConsequence:
-      '• Suas conversas e mensagens.',
+      '• Todas as conversas relacionadas e suas mensagens serão excluídas, incluindo as mensagens enviadas por outras pessoas no histórico compartilhado.',
     accessConsequence:
-      '• Seu acesso futuro ao LangBridge.',
+      '• Você perderá o acesso à conta. Se voltar, começará do zero com uma nova conta.',
     confirmationLabel:
-      'Para confirmar, digite EXCLUIR',
+      'Para enviar a solicitação, digite EXCLUIR',
     helperText:
       'A palavra deve ser digitada exatamente como aparece acima.',
     processing:
-      'Processando solicitação...',
+      'Enviando solicitação...',
     requestDeletion:
-      'Solicitar exclusão',
+      'Enviar solicitação de exclusão',
     cancelAndKeepAccount:
       'Cancelar e manter minha conta',
     securityNote:
-      'Por segurança, a exclusão definitiva exigirá uma verificação adicional de identidade.',
+      'Após a conclusão da exclusão, um recibo técnico mínimo e não identificável será mantido por 30 dias e depois será excluído.',
   },
 
   privacySecurityScreen: {
