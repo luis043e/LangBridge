@@ -377,53 +377,53 @@ deleteAccountScreen: {
   incorrectConfirmationMessage:
     'İsteği onaylamak için SİL yazın.',
   confirmRequestTitle:
-    'İsteği Onayla',
+    'Hesap silme talebini onayla',
   confirmRequestMessage:
-    'Profiliniz gizlenecek ve hesap silme talebi oluşturulacaktır.',
+    'Profiliniz hemen gizlenecek ve hesap silme talebi gönderilecektir. Güvenli işlem tamamlandığında silme işlemi geri alınamaz ve paylaşılan konuşma geçmişi de silinir.',
   cancel:
     'İptal',
   continue:
-    'Devam Et',
+    'Talebi gönder',
   requestSubmittedTitle:
     'Talep gönderildi',
   requestSubmittedMessage:
-    'Profiliniz gizlendi ve silme talebiniz kaydedildi.',
+    'Profiliniz gizlendi ve hesap silme talebiniz gönderildi. Bu onay, kalıcı silme işleminin zaten tamamlandığı anlamına gelmez.',
   submitErrorTitle:
-    'Gönderilemedi',
+    'Talep gönderilemedi',
   connectionError:
     'Bağlantınızı kontrol edip tekrar deneyin.',
   back:
     '‹ Geri',
   title:
-    'Hesabı Sil',
+    'Hesabı sil',
   subtitle:
-    'LangBridge hesabınızın kalıcı olarak silinmesini talep edin.',
+    'LangBridge hesabınızı ve ilişkili verileri kalıcı olarak silmek için bir talep gönderin.',
   warningTitle:
-    'Devam Etmeden Önce',
+    'Devam etmeden önce okuyun',
   warningText:
-    'Talep gönderildiğinde profiliniz silme işlemi tamamlanana kadar gizlenecektir.',
+    'Bu talebin gönderilmesi profilinizi hemen gizler. Kalıcı silme için güvenli kimlik doğrulaması ve ek işlem gerekir.',
   consequencesTitle:
-    'Hesap silme işlemi şunları etkileyebilir:',
+    'Silme işlemi tamamlandığında:',
   profileConsequence:
-    '• Profiliniz ve tercihleriniz.',
+    '• Profiliniz, tercihleriniz ve hesap verileriniz kalıcı olarak silinir.',
   connectionsConsequence:
-    '• İstekleriniz ve bağlantılarınız.',
+    '• Bağlantı talepleriniz, bağlantılarınız ve ilişkili engelleme kayıtlarınız silinir.',
   conversationsConsequence:
-    '• Konuşmalarınız ve mesajlarınız.',
+    '• İlişkili tüm konuşmalar ve mesajlar, paylaşılan geçmişte diğer kişilerin gönderdiği mesajlar da dahil olmak üzere silinir.',
   accessConsequence:
-    '• LangBridge’e gelecekteki erişiminiz.',
+    '• Hesaba erişiminizi kaybedersiniz. Geri dönerseniz yeni bir hesapla sıfırdan başlarsınız.',
   confirmationLabel:
-    'Onaylamak için SİL yazın',
+    'Talebi göndermek için SİL yazın',
   helperText:
     'Kelimeyi yukarıda gösterildiği şekilde girmeniz gerekir.',
   processing:
-    'Talep işleniyor...',
+    'Talep gönderiliyor...',
   requestDeletion:
-    'Silme Talep Et',
+    'Hesap silme talebini gönder',
   cancelAndKeepAccount:
-    'İptal Et ve Hesabı Koru',
+    'İptal et ve hesabımı koru',
   securityNote:
-    'Güvenlik nedeniyle nihai silme işlemi için ek kimlik doğrulaması gerekebilir.',
+    'Silme işlemi tamamlandıktan sonra kimliği belirlemeyen asgari bir teknik makbuz 30 gün boyunca saklanır ve ardından silinir.',
 },
 privacySecurityScreen: {
   emailUnavailableTitle:
