@@ -546,9 +546,14 @@ La siguiente estructura deberá completarse antes de la publicación:
 
 ### Solicitud de eliminación
 
-- Inicio del procesamiento: [PENDIENTE].
-- Plazo operativo objetivo: [PENDIENTE].
-- Plazo máximo informado: [PENDIENTE].
+- Inicio del procesamiento: después de verificar la identidad de la persona y confirmar una sesión reciente.
+- Ejecución ordinaria: tan pronto como sea técnicamente posible.
+- Plazo operativo objetivo: 7 días calendario desde la verificación de identidad.
+- Plazo máximo informado: 30 días calendario desde la verificación de identidad.
+- Fallos parciales: la solicitud permanecerá en estado `processing` y admitirá reintentos seguros.
+- Finalización: la solicitud solo pasará a `completed` cuando hayan concluido correctamente todas las operaciones previstas.
+- Relación con DEL-S2: los 30 días de conservación del recibo técnico comenzarán desde la fecha efectiva de finalización y no desde la presentación de la solicitud.
+- Estado técnico: implementación y pruebas pendientes.
 
 ### Solicitudes de conexión pendientes
 
