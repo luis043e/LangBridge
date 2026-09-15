@@ -626,15 +626,56 @@ Tratamiento definitivo de copias de seguridad: [PENDIENTE].
 
 ## 24. Plazo de procesamiento
 
-LangBridge todavía debe aprobar y probar el plazo definitivo.
+### Tratamiento aprobado mediante LEG-009
 
-- Inicio operativo previsto: [PENDIENTE].
-- Plazo objetivo: [PENDIENTE].
-- Plazo máximo informado: [PENDIENTE].
+El procesamiento comenzará después de verificar la identidad de la persona y confirmar una sesión reciente.
 
-No se publicará un plazo exacto hasta comprobar que puede cumplirse de forma fiable.
+LangBridge intentará completar la eliminación tan pronto como sea técnicamente posible.
 
-Cuando exista una retención legítima, LangBridge deberá informar el criterio aplicable sin afirmar que todos los datos fueron eliminados inmediatamente.
+### Plazos aprobados
+
+- Plazo operativo objetivo: 7 días calendario desde la verificación de identidad.
+- Plazo máximo informado: 30 días calendario desde la verificación de identidad.
+- La eliminación podrá completarse antes del objetivo de 7 días cuando todos los servicios estén disponibles.
+- El plazo máximo permitirá gestionar fallos temporales, verificaciones adicionales y reintentos seguros.
+
+### Condiciones para considerar finalizado el proceso
+
+La solicitud solamente pasará al estado `completed` cuando hayan concluido correctamente todas las operaciones previstas, incluyendo:
+
+- La eliminación de las conversaciones y sus mensajes.
+- La eliminación de las solicitudes de conexión relacionadas.
+- La limpieza del UID eliminado en listas `blockedUserIds` ajenas.
+- La eliminación de los reportes enviados por la cuenta.
+- La eliminación del documento `users/{uid}`.
+- La eliminación de la cuenta de Firebase Authentication.
+- La creación correcta del recibo técnico mínimo aprobado mediante DEL-S2.
+- La limpieza segura de la sesión local cuando corresponda.
+
+Si alguna operación falla, la solicitud permanecerá en estado `processing` y admitirá reintentos seguros. No se mostrará una confirmación falsa de finalización.
+
+### Relación con DEL-S2
+
+El plazo de procesamiento de la solicitud y el período de conservación del recibo técnico son períodos separados:
+
+- El plazo de procesamiento comienza después de verificar la identidad y confirmar una sesión reciente.
+- El período de 30 días de DEL-S2 comienza desde la fecha efectiva de finalización.
+- El recibo técnico se eliminará al vencer su propia fecha de expiración.
+- El período de DEL-S2 no comenzará mientras la solicitud permanezca en estado `processing`.
+
+### Condiciones de publicación
+
+- Los plazos no se publicarán como definitivos hasta comprobar que pueden cumplirse técnicamente.
+- La implementación deberá probarse mediante Firebase Emulator Suite y datos simulados.
+- La política definitiva permanecerá sujeta a revisión jurídica.
+- Si cambia la capacidad técnica o algún requisito aplicable, estos plazos deberán revisarse.
+
+### Estado de implementación
+
+- Decisión aprobada mediante LEG-009.
+- Implementación técnica pendiente.
+- Pruebas automáticas y manuales pendientes.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 25. Fallos parciales
 
