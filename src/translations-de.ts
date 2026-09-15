@@ -377,19 +377,19 @@
     incorrectConfirmationMessage:
       'Gib LÖSCHEN ein, um die Anfrage zu bestätigen.',
     confirmRequestTitle:
-      'Anfrage bestätigen',
+      'Löschanfrage bestätigen',
     confirmRequestMessage:
-      'Dein Profil wird ausgeblendet und eine Anfrage zur Kontolöschung wird erstellt.',
+      'Dein Profil wird sofort ausgeblendet und eine Anfrage zur Kontolöschung wird gesendet. Sobald der sichere Vorgang abgeschlossen ist, kann die Löschung nicht rückgängig gemacht werden und der gemeinsame Chatverlauf wird ebenfalls gelöscht.',
     cancel:
       'Abbrechen',
     continue:
-      'Weiter',
+      'Anfrage senden',
     requestSubmittedTitle:
       'Anfrage gesendet',
     requestSubmittedMessage:
-      'Dein Profil wurde ausgeblendet und die Anfrage wurde übermittelt.',
+      'Dein Profil wurde ausgeblendet und die Löschanfrage wurde gesendet. Diese Bestätigung bedeutet nicht, dass die dauerhafte Löschung bereits abgeschlossen ist.',
     submitErrorTitle:
-      'Senden fehlgeschlagen',
+      'Anfrage konnte nicht gesendet werden',
     connectionError:
       'Überprüfe deine Verbindung und versuche es erneut.',
     back:
@@ -397,33 +397,33 @@
     title:
       'Konto löschen',
     subtitle:
-      'Beantrage die dauerhafte Löschung deines LangBridge-Kontos.',
+      'Sende eine Anfrage, um dein LangBridge-Konto und die zugehörigen Daten dauerhaft zu löschen.',
     warningTitle:
-      'Vor dem Fortfahren',
+      'Vor dem Fortfahren lesen',
     warningText:
-      'Diese Anfrage blendet dein Profil sofort aus, während die Löschung bearbeitet wird.',
+      'Durch das Senden dieser Anfrage wird dein Profil sofort ausgeblendet. Die dauerhafte Löschung erfordert eine sichere Identitätsprüfung und weitere Verarbeitung.',
     consequencesTitle:
-      'Die Löschung kann Folgendes betreffen:',
+      'Nach Abschluss der Löschung:',
     profileConsequence:
-      '• Dein Profil und deine Einstellungen.',
+      '• Dein Profil, deine Einstellungen und deine Kontodaten werden dauerhaft gelöscht.',
     connectionsConsequence:
-      '• Deine Anfragen und Verbindungen.',
+      '• Deine Verbindungsanfragen, Verbindungen und zugehörigen Blockierungsverweise werden gelöscht.',
     conversationsConsequence:
-      '• Deine Unterhaltungen und Nachrichten.',
+      '• Alle zugehörigen Unterhaltungen und Nachrichten werden gelöscht, einschließlich der Nachrichten anderer Personen im gemeinsamen Verlauf.',
     accessConsequence:
-      '• Deinen zukünftigen Zugriff auf LangBridge.',
+      '• Du verlierst den Zugriff auf das Konto. Wenn du zurückkehrst, beginnst du mit einem neuen Konto von vorn.',
     confirmationLabel:
-      'Gib zur Bestätigung LÖSCHEN ein',
+      'Gib LÖSCHEN ein, um die Anfrage zu senden',
     helperText:
       'Das Wort muss genau wie oben angezeigt eingegeben werden.',
     processing:
-      'Anfrage wird bearbeitet...',
+      'Anfrage wird gesendet...',
     requestDeletion:
-      'Löschung beantragen',
+      'Löschanfrage senden',
     cancelAndKeepAccount:
       'Abbrechen und mein Konto behalten',
     securityNote:
-      'Aus Sicherheitsgründen ist für die endgültige Löschung eine zusätzliche Identitätsprüfung erforderlich.',
+      'Nach Abschluss der Löschung wird ein minimaler, nicht identifizierbarer technischer Beleg 30 Tage lang aufbewahrt und anschließend gelöscht.',
   },
   privacySecurityScreen: {
     emailUnavailableTitle:

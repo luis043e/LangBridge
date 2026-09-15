@@ -365,7 +365,7 @@
     },
   },
 
-  deleteAccountScreen: {
+    deleteAccountScreen: {
     requiredConfirmation:
       'ELIMINA',
     sessionUnavailableTitle:
@@ -377,19 +377,19 @@
     incorrectConfirmationMessage:
       'Digita ELIMINA per confermare la richiesta.',
     confirmRequestTitle:
-      'Conferma richiesta',
+      'Conferma la richiesta di eliminazione',
     confirmRequestMessage:
-      "Il tuo profilo verrà nascosto e sarà creata una richiesta di eliminazione dell'account.",
+      "Il tuo profilo verrà nascosto immediatamente e verrà inviata una richiesta di eliminazione dell'account. Al termine del processo sicuro, l'eliminazione sarà irreversibile e verrà eliminata anche la cronologia condivisa delle conversazioni.",
     cancel:
       'Annulla',
     continue:
-      'Continua',
+      'Invia richiesta',
     requestSubmittedTitle:
       'Richiesta inviata',
     requestSubmittedMessage:
-      'Il tuo profilo è stato nascosto e la richiesta è stata inviata.',
+      "Il tuo profilo è stato nascosto e la richiesta di eliminazione è stata inviata. Questa conferma non significa che l'eliminazione permanente sia già stata completata.",
     submitErrorTitle:
-      'Impossibile inviare',
+      'Impossibile inviare la richiesta',
     connectionError:
       'Controlla la connessione e riprova.',
     back:
@@ -397,33 +397,33 @@
     title:
       'Elimina account',
     subtitle:
-      'Richiedi la cancellazione permanente del tuo account LangBridge.',
+      'Invia una richiesta per eliminare definitivamente il tuo account LangBridge e i dati associati.',
     warningTitle:
-      'Prima di continuare',
+      'Leggi prima di continuare',
     warningText:
-      'Questa richiesta nasconderà immediatamente il tuo profilo mentre viene elaborata la cancellazione.',
+      "L'invio di questa richiesta nasconderà immediatamente il tuo profilo. L'eliminazione permanente richiede una verifica sicura dell'identità e un'ulteriore elaborazione.",
     consequencesTitle:
-      'La cancellazione può influire su:',
+      "Al termine dell'eliminazione:",
     profileConsequence:
-      '• Il tuo profilo e le tue preferenze.',
+      '• Il tuo profilo, le tue preferenze e i dati del tuo account verranno eliminati definitivamente.',
     connectionsConsequence:
-      '• Le tue richieste e connessioni.',
+      '• Le tue richieste di connessione, le connessioni e i riferimenti di blocco associati verranno eliminati.',
     conversationsConsequence:
-      '• Le tue conversazioni e i tuoi messaggi.',
+      '• Tutte le conversazioni associate e i relativi messaggi verranno eliminati, compresi i messaggi inviati da altre persone nella cronologia condivisa.',
     accessConsequence:
-      '• Il tuo accesso futuro a LangBridge.',
+      "• Perderai l'accesso all'account. Se torni, ricomincerai da zero con un nuovo account.",
     confirmationLabel:
-      'Per confermare, digita ELIMINA',
+      'Per inviare la richiesta, digita ELIMINA',
     helperText:
       'La parola deve essere digitata esattamente come mostrato sopra.',
     processing:
-      'Elaborazione della richiesta...',
+      'Invio della richiesta...',
     requestDeletion:
-      'Richiedi cancellazione',
+      'Invia richiesta di eliminazione',
     cancelAndKeepAccount:
       'Annulla e conserva il mio account',
     securityNote:
-      "Per motivi di sicurezza, la cancellazione definitiva richiederà un'ulteriore verifica dell'identità.",
+      "Al termine dell'eliminazione, una ricevuta tecnica minima e non identificabile verrà conservata per 30 giorni e poi eliminata.",
   },
   privacySecurityScreen: {
     emailUnavailableTitle:
