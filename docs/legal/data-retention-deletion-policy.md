@@ -679,15 +679,105 @@ La confirmación no debe exponer información sensible.
 
 ## 27. Cancelación de una solicitud
 
-La posibilidad de cancelar una solicitud deberá definirse antes de publicar.
+### Tratamiento aprobado mediante LEG-018
 
-Si se permite cancelar:
+LangBridge permitirá cancelar una solicitud de eliminación después de verificar nuevamente la identidad de la persona, siempre que no haya comenzado ninguna operación irreversible.
 
-- Solo será posible antes de iniciar la eliminación irreversible.
-- La identidad deberá verificarse.
-- La cancelación deberá registrarse.
-- El perfil podrá restaurarse solamente si los datos todavía existen.
-- No se prometerá recuperar información ya eliminada.
+### Estados que permiten solicitar la cancelación
+
+- En estado `pending`, la cancelación estará permitida después de verificar nuevamente la identidad.
+- En estado `verified`, la cancelación estará permitida si todavía no comenzó ninguna operación irreversible.
+- En estado `processing`, la cancelación solo estará permitida si el backend confirma que todavía no se alcanzó el punto técnico de no retorno.
+- En estado `completed`, la cancelación no estará permitida.
+- Una solicitud en estado `rejected` no requerirá cancelación.
+- Una solicitud en estado `cancelled` ya se considerará cancelada.
+
+### Verificación requerida
+
+Antes de completar una cancelación, el procedimiento deberá:
+
+1. Comprobar que la persona continúa autenticada.
+2. Verificar nuevamente su identidad mediante una sesión reciente.
+3. Obtener el UID exclusivamente desde Firebase Authentication.
+4. Consultar el estado real de la solicitud desde un entorno seguro.
+5. Confirmar que aún no se ejecutó ninguna operación irreversible.
+6. Evitar que el cliente móvil pueda marcar directamente la solicitud como `cancelled`.
+
+### Punto técnico de no retorno
+
+El futuro backend deberá mantener un indicador inequívoco para determinar si la cancelación todavía es posible.
+
+El punto de no retorno se considerará alcanzado cuando comience cualquiera de estas operaciones:
+
+- Eliminación de mensajes.
+- Eliminación de conversaciones.
+- Eliminación de solicitudes de conexión.
+- Eliminación de referencias en listas `blockedUserIds` ajenas.
+- Eliminación de reportes.
+- Eliminación del documento `users/{uid}`.
+- Eliminación de la cuenta de Firebase Authentication.
+
+Después de alcanzar el punto de no retorno:
+
+- La cancelación será rechazada.
+- La solicitud permanecerá en estado `processing`.
+- No se prometerá recuperar información eliminada.
+- El procedimiento continuará de forma idempotente hasta completar las operaciones restantes.
+- La persona deberá recibir una explicación clara de que la eliminación ya no puede detenerse.
+
+### Efectos de una cancelación válida
+
+Cuando la solicitud se cancele antes del punto de no retorno:
+
+- La solicitud pasará al estado `cancelled`.
+- La cuenta continuará activa.
+- No se eliminarán los datos asociados con la cuenta.
+- Se retirará `deletionRequested`.
+- Se limpiará `deletionRequestedAt`.
+- Se restaurará la configuración de visibilidad existente antes de enviar la solicitud.
+- La persona podrá continuar utilizando LangBridge.
+- No se creará el recibo técnico aprobado mediante DEL-S2.
+
+### Restauración de la configuración anterior
+
+El procedimiento no establecerá automáticamente `isProfileVisible: true`, porque el perfil podría haber estado oculto voluntariamente antes de solicitar la eliminación.
+
+Antes de ocultar el perfil por una solicitud, LangBridge deberá conservar temporalmente solo el valor necesario para restaurar la configuración anterior en caso de cancelación.
+
+Este valor temporal:
+
+- No se utilizará para otras finalidades.
+- Se eliminará cuando deje de ser necesario.
+- No se conservará en el recibo técnico DEL-S2.
+
+### Conservación de una solicitud cancelada
+
+Mientras la cuenta continúe existiendo, la solicitud cancelada podrá conservar temporalmente:
+
+- Estado `cancelled`.
+- Fecha de cancelación.
+- Versión del procedimiento.
+- Método general de verificación.
+- Razón técnica general, cuando corresponda.
+
+No se añadirá información personal innecesaria.
+
+El período definitivo de conservación de una solicitud cancelada continúa pendiente de aprobación y deberá definirse antes de publicar la política definitiva.
+
+### Relación con DEL-S2
+
+- DEL-S2 se aplicará únicamente después de completar efectivamente una eliminación.
+- Una solicitud cancelada no generará un recibo técnico DEL-S2.
+- El período de 30 días de DEL-S2 no comenzará para una solicitud cancelada.
+
+### Estado de implementación
+
+- Decisión aprobada mediante LEG-018.
+- Implementación técnica pendiente.
+- Indicador del punto de no retorno pendiente.
+- Pruebas automáticas y manuales pendientes.
+- Textos visibles y traducciones de cancelación pendientes.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 28. Eliminación iniciada fuera de la aplicación
 
