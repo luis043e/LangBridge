@@ -377,17 +377,17 @@ deleteAccountScreen: {
   incorrectConfirmationMessage:
     'Typ VERWIJDEREN om het verzoek te bevestigen.',
   confirmRequestTitle:
-    'Verzoek bevestigen',
+    'Verzoek tot accountverwijdering bevestigen',
   confirmRequestMessage:
-    'Je profiel wordt verborgen en er wordt een verzoek tot accountverwijdering aangemaakt.',
+    'Je profiel wordt onmiddellijk verborgen en er wordt een verzoek tot accountverwijdering verzonden. Zodra de beveiligde verwerking is voltooid, kan de verwijdering niet meer ongedaan worden gemaakt en wordt ook de gedeelde gespreksgeschiedenis verwijderd.',
   cancel:
     'Annuleren',
   continue:
-    'Doorgaan',
+    'Verzoek verzenden',
   requestSubmittedTitle:
     'Verzoek verzonden',
   requestSubmittedMessage:
-    'Je profiel is verborgen en het verzoek tot accountverwijdering is opgeslagen.',
+    'Je profiel is verborgen en het verzoek tot accountverwijdering is verzonden. Deze bevestiging betekent niet dat de permanente verwijdering al is voltooid.',
   submitErrorTitle:
     'Het verzoek kon niet worden verzonden',
   connectionError:
@@ -397,33 +397,33 @@ deleteAccountScreen: {
   title:
     'Account verwijderen',
   subtitle:
-    'Vraag de permanente verwijdering van je LangBridge-account aan.',
+    'Verzend een verzoek om je LangBridge-account en de bijbehorende gegevens permanent te verwijderen.',
   warningTitle:
-    'Voordat je doorgaat',
+    'Lees dit voordat je doorgaat',
   warningText:
-    'Nadat je het verzoek hebt verzonden, blijft je profiel verborgen totdat het verwijderingsproces is voltooid.',
+    'Door dit verzoek te verzenden, wordt je profiel onmiddellijk verborgen. Permanente verwijdering vereist een beveiligde identiteitscontrole en aanvullende verwerking.',
   consequencesTitle:
-    'Het verwijderen van je account kan gevolgen hebben voor:',
+    'Wanneer de verwijdering is voltooid:',
   profileConsequence:
-    '• Je profiel en voorkeuren.',
+    '• Je profiel, voorkeuren en accountgegevens worden permanent verwijderd.',
   connectionsConsequence:
-    '• Je verzoeken en contacten.',
+    '• Je verbindingsverzoeken, verbindingen en bijbehorende blokkeringsverwijzingen worden verwijderd.',
   conversationsConsequence:
-    '• Je gesprekken en berichten.',
+    '• Alle bijbehorende gesprekken en berichten worden verwijderd, inclusief berichten die andere personen in de gedeelde geschiedenis hebben verzonden.',
   accessConsequence:
-    '• Je toekomstige toegang tot LangBridge.',
+    '• Je verliest de toegang tot het account. Als je terugkeert, begin je opnieuw met een nieuw account.',
   confirmationLabel:
-    'Typ VERWIJDEREN om te bevestigen',
+    'Typ VERWIJDEREN om het verzoek te verzenden',
   helperText:
     'Typ het hierboven weergegeven woord precies hetzelfde.',
   processing:
-    'Verzoek verwerken...',
+    'Verzoek wordt verzonden...',
   requestDeletion:
-    'Verwijdering aanvragen',
+    'Verzoek tot accountverwijdering verzenden',
   cancelAndKeepAccount:
     'Annuleren en account behouden',
   securityNote:
-    'Om veiligheidsredenen kan aanvullende identiteitscontrole nodig zijn voordat je account definitief wordt verwijderd.',
+    'Nadat de verwijdering is voltooid, wordt een minimaal en niet-identificeerbaar technisch ontvangstbewijs 30 dagen bewaard en daarna verwijderd.',
 },
 
 privacySecurityScreen: {

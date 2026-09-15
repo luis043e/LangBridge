@@ -377,17 +377,17 @@ deleteAccountScreen: {
   incorrectConfirmationMessage:
     'Wpisz USUŃ, aby potwierdzić prośbę.',
   confirmRequestTitle:
-    'Potwierdź prośbę',
+    'Potwierdź prośbę o usunięcie konta',
   confirmRequestMessage:
-    'Twój profil zostanie ukryty i zostanie utworzona prośba o usunięcie konta.',
+    'Twój profil zostanie natychmiast ukryty, a prośba o usunięcie konta zostanie wysłana. Po zakończeniu bezpiecznego procesu usunięcia nie będzie można cofnąć, a wspólna historia rozmów również zostanie usunięta.',
   cancel:
     'Anuluj',
   continue:
-    'Kontynuuj',
+    'Wyślij prośbę',
   requestSubmittedTitle:
     'Prośba została wysłana',
   requestSubmittedMessage:
-    'Twój profil został ukryty, a prośba o usunięcie konta została zapisana.',
+    'Twój profil został ukryty, a prośba o usunięcie konta została wysłana. To potwierdzenie nie oznacza, że trwałe usunięcie zostało już zakończone.',
   submitErrorTitle:
     'Nie udało się wysłać prośby',
   connectionError:
@@ -397,33 +397,33 @@ deleteAccountScreen: {
   title:
     'Usuń konto',
   subtitle:
-    'Poproś o trwałe usunięcie swojego konta LangBridge.',
+    'Wyślij prośbę o trwałe usunięcie konta LangBridge i powiązanych z nim danych.',
   warningTitle:
-    'Zanim przejdziesz dalej',
+    'Przeczytaj przed kontynuowaniem',
   warningText:
-    'Po wysłaniu prośby Twój profil pozostanie ukryty do czasu zakończenia procesu usuwania.',
+    'Wysłanie tej prośby spowoduje natychmiastowe ukrycie profilu. Trwałe usunięcie wymaga bezpiecznego potwierdzenia tożsamości i dodatkowego przetwarzania.',
   consequencesTitle:
-    'Usunięcie konta może wpłynąć na:',
+    'Po zakończeniu usuwania:',
   profileConsequence:
-    '• Twój profil i preferencje.',
+    '• Twój profil, preferencje i dane konta zostaną trwale usunięte.',
   connectionsConsequence:
-    '• Twoje prośby i kontakty.',
+    '• Twoje prośby o połączenie, połączenia i powiązane informacje o blokadach zostaną usunięte.',
   conversationsConsequence:
-    '• Twoje rozmowy i wiadomości.',
+    '• Wszystkie powiązane rozmowy i wiadomości zostaną usunięte, w tym wiadomości wysłane przez inne osoby we wspólnej historii.',
   accessConsequence:
-    '• Twój przyszły dostęp do LangBridge.',
+    '• Utracisz dostęp do konta. Jeśli wrócisz, rozpoczniesz od początku z nowym kontem.',
   confirmationLabel:
-    'Wpisz USUŃ, aby potwierdzić',
+    'Aby wysłać prośbę, wpisz USUŃ',
   helperText:
     'Wpisz dokładnie słowo pokazane powyżej.',
   processing:
-    'Przetwarzanie prośby...',
+    'Wysyłanie prośby...',
   requestDeletion:
-    'Poproś o usunięcie konta',
+    'Wyślij prośbę o usunięcie konta',
   cancelAndKeepAccount:
     'Anuluj i zachowaj konto',
   securityNote:
-    'Ze względów bezpieczeństwa przed ostatecznym usunięciem konta może być wymagane dodatkowe potwierdzenie tożsamości.',
+    'Po zakończeniu usuwania minimalne i nieidentyfikujące potwierdzenie techniczne będzie przechowywane przez 30 dni, a następnie zostanie usunięte.',
 },
 
 privacySecurityScreen: {
