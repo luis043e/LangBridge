@@ -764,24 +764,135 @@ No se añadirá información personal innecesaria. El período definitivo de con
 
 ### Estado
 
-- Pendiente.
+- Aprobada.
 
-### Canal propuesto
+### Decisión aprobada
 
-- Correo asociado con la solicitud.
+LangBridge enviará comunicaciones diferenciadas sobre el estado del procedimiento al correo asociado con la solicitud y validado antes de eliminar la cuenta de Firebase Authentication.
 
-### Contenido mínimo
+### Canal principal
 
-- Fecha de finalización.
-- Confirmación de cierre.
-- Categorías generales eliminadas.
-- Existencia de retención limitada.
-- Razón general.
-- Canal de consulta.
+- Correo electrónico asociado con la solicitud.
+- La dirección deberá obtenerse y validarse antes de eliminar Firebase Authentication.
+- No se enviará información a un correo alternativo sin verificarlo previamente.
+- El correo utilizado para la comunicación no se conservará dentro del recibo técnico DEL-S2.
 
-### Canal aprobado
+### Tipos de comunicación
 
-- [PENDIENTE]
+LangBridge podrá enviar comunicaciones distintas para:
+
+- Confirmar la recepción de una solicitud.
+- Confirmar una cancelación válida.
+- Informar que la cancelación ya no es posible porque se alcanzó el punto técnico de no retorno.
+- Confirmar la finalización efectiva de la eliminación.
+
+Cada comunicación deberá identificar claramente el estado real del procedimiento y no deberá afirmar que la eliminación terminó mientras existan operaciones pendientes.
+
+### Momento de la confirmación final
+
+La confirmación final de eliminación solamente se enviará cuando:
+
+- Todas las operaciones previstas hayan concluido correctamente.
+- La solicitud haya alcanzado el estado `completed`.
+- No exista ningún fallo parcial pendiente.
+- Se haya creado correctamente el recibo técnico mínimo y no identificable aprobado mediante DEL-S2.
+
+Una solicitud en estado `processing` no recibirá una confirmación que afirme que la cuenta ya fue eliminada.
+
+### Contenido permitido en la confirmación final
+
+La comunicación podrá incluir:
+
+- Confirmación general de que la cuenta fue eliminada.
+- Fecha efectiva de finalización.
+- Categorías generales de datos eliminadas.
+- Indicación de que la eliminación es irreversible.
+- Explicación de que, si la persona vuelve a LangBridge, comenzará desde cero con una cuenta nueva.
+- Información general sobre el recibo técnico DEL-S2.
+- Indicación de que el recibo técnico no identifica a la persona.
+- Período de conservación de 30 días del recibo técnico.
+- Fecha prevista de eliminación del recibo, cuando resulte técnicamente disponible.
+- Canal oficial para consultas.
+- Número de referencia no identificable, únicamente cuando resulte necesario para soporte.
+
+### Información prohibida
+
+La comunicación no incluirá:
+
+- UID de Firebase Authentication.
+- Identificadores de documentos eliminados.
+- Identificadores de conversaciones.
+- Identificadores de solicitudes de conexión.
+- Contenido o fragmentos de mensajes.
+- Contenido o descripciones de reportes.
+- Nombres o información de otras personas.
+- Contraseñas.
+- Credenciales.
+- Tokens.
+- Copias de los datos eliminados.
+- Información técnica que permita reconstruir la cuenta eliminada.
+
+### Confirmación de una cancelación válida
+
+Cuando una solicitud sea cancelada antes del punto técnico de no retorno, la comunicación correspondiente podrá indicar:
+
+- Que la solicitud fue cancelada.
+- Que la cuenta continúa activa.
+- Que no comenzó ninguna operación irreversible.
+- Que la configuración anterior del perfil fue restaurada.
+- Que no se creó un recibo técnico DEL-S2.
+
+La comunicación no afirmará que se recuperaron datos, porque una cancelación válida deberá producirse antes de eliminar información de forma irreversible.
+
+### Aviso posterior al punto de no retorno
+
+Si la persona intenta cancelar después de alcanzar el punto técnico de no retorno, LangBridge deberá comunicar de manera general que:
+
+- La cancelación ya no puede completarse.
+- Comenzaron operaciones irreversibles.
+- No se garantiza la recuperación de información.
+- El procedimiento continuará de forma segura hasta finalizar.
+- Se enviará una confirmación distinta cuando la eliminación termine.
+
+El aviso no detallará innecesariamente qué documentos específicos fueron eliminados.
+
+### Correo no disponible o no verificable
+
+Si la cuenta no tiene un correo utilizable o el correo no puede verificarse:
+
+- LangBridge no enviará la confirmación a otra dirección sin verificarla.
+- Podrá ofrecerse un canal oficial de consulta.
+- Cualquier dirección alternativa deberá verificarse antes de utilizarse.
+- La imposibilidad de entregar el mensaje no revertirá una eliminación completada.
+- No se conservarán indefinidamente datos personales con la única finalidad de seguir intentando entregar la confirmación.
+
+### Fallo al enviar la confirmación
+
+Si falla el envío después de completar la eliminación:
+
+- La eliminación continuará considerándose completada.
+- La cuenta no será restaurada.
+- Podrán realizarse reintentos limitados, seguros e idempotentes.
+- El recibo técnico podrá registrar únicamente el resultado general del envío, sin volver a almacenar el correo.
+- Los reintentos deberán finalizar al vencer el período autorizado o al alcanzar el límite técnico aprobado.
+- El fallo de entrega no cambiará el estado `completed` de la eliminación.
+
+### Relación con DEL-S2
+
+- DEL-S2 deberá crearse correctamente antes de emitir la confirmación final.
+- El correo no formará parte del recibo técnico.
+- La confirmación podrá explicar que el recibo se conservará durante 30 días y después se eliminará.
+- La comunicación no permitirá relacionar públicamente el recibo con la identidad eliminada.
+
+### Estado de implementación
+
+- Decisión aprobada mediante LEG-019.
+- Servicio de envío de correo pendiente de selección e implementación.
+- Plantillas y traducciones pendientes.
+- Gestión de reintentos pendiente.
+- Canal alternativo pendiente de definición.
+- Pruebas automáticas y manuales pendientes.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 24. Decisión LEG-020: fotografías de perfil
 
