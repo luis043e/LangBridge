@@ -795,21 +795,136 @@ El período definitivo de conservación de una solicitud cancelada todavía debe
 
 ## 27. Confirmación
 
-Cuando el proceso finalice, LangBridge deberá enviar una confirmación mediante un canal seguro.
+### Tratamiento aprobado mediante LEG-019
 
-La confirmación podrá indicar:
+LangBridge enviará comunicaciones diferenciadas sobre el procedimiento al correo asociado con la solicitud y validado antes de eliminar la cuenta de Firebase Authentication.
 
-- Que la cuenta fue eliminada.
-- Fecha de finalización.
-- Categorías eliminadas.
-- Existencia de alguna conservación limitada.
-- Razón general de la conservación.
-- Período o criterio aplicable.
-- Canal para consultas.
+### Canal principal
 
-La confirmación no deberá incluir contraseñas, credenciales u otra información sensible.
+- El canal principal será el correo electrónico asociado con la solicitud.
+- La dirección deberá obtenerse y validarse antes de eliminar Firebase Authentication.
+- LangBridge no enviará información a una dirección alternativa sin verificarla previamente.
+- El correo utilizado para la comunicación no se conservará dentro del recibo técnico DEL-S2.
 
-Canal definitivo de confirmación: [PENDIENTE].
+### Comunicaciones posibles
+
+LangBridge podrá enviar comunicaciones diferentes para:
+
+- Confirmar la recepción de una solicitud.
+- Confirmar una cancelación válida.
+- Informar que una cancelación ya no es posible porque se alcanzó el punto técnico de no retorno.
+- Confirmar la finalización efectiva de la eliminación.
+
+Cada comunicación reflejará el estado real del procedimiento.
+
+Una solicitud en estado `processing` no recibirá una confirmación que afirme que la cuenta ya fue eliminada.
+
+### Confirmación final de eliminación
+
+La confirmación final solamente se enviará cuando:
+
+- Todas las operaciones previstas hayan concluido correctamente.
+- La solicitud haya alcanzado el estado `completed`.
+- No exista ningún fallo parcial pendiente.
+- Se haya creado correctamente el recibo técnico mínimo y no identificable aprobado mediante DEL-S2.
+
+LangBridge no enviará una confirmación falsa o anticipada de finalización.
+
+### Contenido permitido
+
+La confirmación final podrá incluir:
+
+- Confirmación general de que la cuenta fue eliminada.
+- Fecha efectiva de finalización.
+- Categorías generales de datos eliminadas.
+- Indicación de que la eliminación es irreversible.
+- Explicación de que, si la persona vuelve a LangBridge, comenzará desde cero con una cuenta nueva.
+- Información general sobre el recibo técnico DEL-S2.
+- Indicación de que el recibo técnico no identifica a la persona.
+- Período de conservación de 30 días del recibo técnico.
+- Fecha prevista de eliminación del recibo, cuando esté disponible.
+- Canal oficial para consultas.
+- Número de referencia no identificable, únicamente cuando resulte necesario para soporte.
+
+### Información que no se incluirá
+
+La confirmación no contendrá:
+
+- UID de Firebase Authentication.
+- Identificadores de documentos eliminados.
+- Identificadores de conversaciones.
+- Identificadores de solicitudes de conexión.
+- Contenido o fragmentos de mensajes.
+- Contenido o descripciones de reportes.
+- Nombres o información de otras personas.
+- Contraseñas.
+- Credenciales.
+- Tokens.
+- Copias de los datos eliminados.
+- Información que permita identificar o reconstruir la cuenta eliminada.
+
+### Confirmación de una cancelación válida
+
+Cuando una solicitud sea cancelada antes del punto técnico de no retorno, la comunicación correspondiente podrá indicar:
+
+- Que la solicitud fue cancelada.
+- Que la cuenta continúa activa.
+- Que no comenzó ninguna operación irreversible.
+- Que la configuración anterior del perfil fue restaurada.
+- Que no se creó un recibo técnico DEL-S2.
+
+La comunicación no afirmará que se recuperaron datos, porque una cancelación válida deberá completarse antes de eliminar información de forma irreversible.
+
+### Intento de cancelación posterior al punto de no retorno
+
+Si la persona intenta cancelar después de alcanzar el punto técnico de no retorno, LangBridge comunicará de forma general que:
+
+- La cancelación ya no puede completarse.
+- Comenzaron operaciones irreversibles.
+- No se garantiza la recuperación de información.
+- El procedimiento continuará de forma segura hasta finalizar.
+- Se enviará una confirmación diferente cuando la eliminación termine.
+
+La comunicación no detallará innecesariamente qué documentos específicos fueron eliminados.
+
+### Correo no disponible o no verificable
+
+Si el correo no está disponible o no puede verificarse:
+
+- No se enviará la confirmación a otra dirección sin verificarla.
+- Podrá ofrecerse un canal oficial de consulta.
+- Cualquier dirección alternativa deberá verificarse antes de utilizarse.
+- La imposibilidad de entregar el mensaje no revertirá una eliminación completada.
+- LangBridge no conservará indefinidamente datos personales para continuar intentando entregar la confirmación.
+
+### Fallo de entrega
+
+Si falla el envío después de completar la eliminación:
+
+- La eliminación continuará considerándose completada.
+- La cuenta no será restaurada.
+- Podrán realizarse reintentos limitados, seguros e idempotentes.
+- El recibo técnico podrá registrar únicamente el resultado general del envío.
+- El recibo técnico no almacenará nuevamente el correo.
+- Los reintentos finalizarán al vencer el período autorizado o al alcanzar el límite técnico aprobado.
+- El fallo de entrega no cambiará el estado `completed`.
+
+### Relación con DEL-S2
+
+- DEL-S2 deberá crearse correctamente antes de emitir la confirmación final.
+- El correo no formará parte del recibo técnico.
+- La confirmación podrá explicar que el recibo se conservará durante 30 días y después se eliminará.
+- La comunicación no permitirá relacionar públicamente el recibo con la identidad eliminada.
+
+### Estado de implementación
+
+- Decisión aprobada mediante LEG-019.
+- Servicio de envío de correo pendiente de selección e implementación.
+- Plantillas y traducciones pendientes.
+- Gestión de reintentos pendiente.
+- Canal alternativo pendiente de definición.
+- Pruebas automáticas y manuales pendientes.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 28. Efectos de la eliminación
 
