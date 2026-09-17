@@ -91,15 +91,30 @@ La eliminación deberá considerar todas las ubicaciones donde existan datos aso
 
 Las solicitudes de eliminación podrán utilizar los siguientes estados internos:
 
-- `pending`: solicitud recibida y pendiente de revisión.
-- `verified`: identidad o control de la cuenta verificado.
-- `processing`: eliminación o anonimización en proceso.
-- `completed`: proceso principal completado.
-- `rejected`: solicitud rechazada por no poder verificarse o por otra razón documentada.
-- `cancelled`: solicitud cancelada de manera válida antes de ejecutarse.
-- `partially_retained`: eliminación completada, con conservación limitada de información expresamente justificada.
+- `pending`: solicitud recibida y pendiente de verificación.
+- `verified`: identidad y control de la cuenta verificados mediante un procedimiento seguro.
+- `processing`: eliminación efectiva en proceso o pendiente de completar después de un fallo parcial.
+- `completed`: todas las operaciones previstas concluyeron correctamente y se creó el recibo técnico mínimo aprobado mediante DEL-S2.
+- `rejected`: solicitud rechazada porque no fue posible verificar la identidad, el control de la cuenta o algún requisito necesario.
+- `cancelled`: solicitud cancelada válidamente después de verificar nuevamente la identidad y antes de alcanzar el punto técnico de no retorno.
 
-Estos estados deberán ser administrados desde un entorno seguro. El cliente móvil no debe poder marcar directamente una solicitud como completada.
+### Reglas de transición
+
+- `pending` podrá pasar a `verified`, `rejected` o `cancelled`.
+- `verified` podrá pasar a `processing`, `rejected` o `cancelled`.
+- `processing` podrá pasar a `completed`.
+- `processing` solo podrá pasar a `cancelled` si el backend confirma que todavía no se alcanzó el punto técnico de no retorno.
+- `completed`, `rejected` y `cancelled` serán estados terminales para esa solicitud.
+- Un fallo parcial no cambiará la solicitud a `completed`; permanecerá en `processing` y admitirá reintentos seguros e idempotentes.
+- La existencia temporal del recibo técnico DEL-S2 no requerirá un estado alternativo como `partially_retained`.
+
+### Administración segura
+
+- Los estados deberán administrarse desde un entorno servidor o administrativo autorizado.
+- El cliente móvil no podrá establecer directamente `verified`, `processing`, `completed`, `rejected` o `cancelled`.
+- El estado `completed` solo podrá establecerse después de terminar todas las operaciones previstas y crear correctamente DEL-S2.
+- La solicitud identificable original deberá sustituirse por el recibo técnico DEL-S2 después de completar la eliminación.
+- Cualquier conservación excepcional legítima deberá documentarse y comunicarse de manera general cuando corresponda, sin utilizar `partially_retained` como estado operativo.
 
 ## 5. Situación técnica actual
 
