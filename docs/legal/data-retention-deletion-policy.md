@@ -586,9 +586,14 @@ La siguiente estructura deberá completarse antes de la publicación:
 
 ### Copias de seguridad administradas por proveedores
 
-- Tratamiento y ciclo de eliminación: [PENDIENTE].
+- Estado actual: no se identificaron respaldos propios, exportaciones automáticas ni procedimientos propios de restauración configurados en el repositorio.
+- Verificación externa: pendiente de comprobar en Firebase Console y Google Cloud Console que no exista una configuración activa creada fuera del repositorio.
+- Ciclo de eliminación actual: no aplica mientras no existan respaldos propios o externos confirmados.
+- Respaldos futuros: cualquier frecuencia, período de retención, ciclo de eliminación y procedimiento de restauración deberán aprobarse antes de activar el servicio.
+- Facturación: LEG-017 no autoriza la activación del plan Blaze, servicios de pago ni facturación.
+- Restauraciones futuras: los datos restaurados deberán permanecer aislados hasta comprobar que no reaparezcan cuentas ni datos eliminados.
 
-Ningún plazo deberá publicarse hasta comprobar que puede cumplirse técnicamente.
+No deberá publicarse un plazo de retención o eliminación de copias hasta completar la verificación externa o aprobar una futura configuración de respaldos.
 
 ## 22. Excepciones limitadas
 
