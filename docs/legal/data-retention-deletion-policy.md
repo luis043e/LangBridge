@@ -613,15 +613,102 @@ Toda excepción deberá:
 
 ## 23. Copias de seguridad
 
-Antes de publicar se deberá confirmar:
+### Tratamiento aprobado para el modelo actual mediante LEG-017
 
-- Si Firebase o cualquier proveedor mantiene copias de seguridad.
-- El período de rotación.
-- Si es posible eliminar registros individuales inmediatamente.
-- Cuándo desaparecen los datos de las copias.
-- Qué medidas impiden restaurar permanentemente una cuenta eliminada.
+La configuración y el repositorio actuales de LangBridge no contienen mecanismos propios de respaldo o restauración de Cloud Firestore.
 
-Si la eliminación de copias no puede ser inmediata, la Política pública deberá explicar que los datos pueden permanecer temporalmente en copias protegidas hasta completar el ciclo normal de eliminación.
+En el modelo actual:
+
+- No existen copias programadas propias configuradas desde el repositorio.
+- No existen exportaciones automáticas propias.
+- No existen scripts propios de importación o restauración.
+- `firebase.json` solamente configura reglas, índices de Cloud Firestore y Firebase Hosting.
+- `package.json` no contiene comandos de respaldo, exportación, importación o restauración.
+- No se identificaron comandos `gcloud` ni usos de `exportDocuments`, `importDocuments`, `backupSchedules` o recuperación en un momento determinado.
+- La eliminación efectiva deberá ejecutarse sobre los datos activos administrados por LangBridge.
+- Esta decisión no activa respaldos, exportaciones, restauraciones, servicios de pago ni facturación.
+- La activación del plan Blaze no está autorizada mediante LEG-017.
+
+### Verificación externa pendiente
+
+Antes de publicar la política definitiva, LangBridge deberá comprobar que no exista una configuración externa activa creada fuera del repositorio.
+
+La revisión deberá verificar, mediante acceso de solo lectura cuando sea posible:
+
+- Programaciones de respaldos de Cloud Firestore.
+- Exportaciones configuradas desde Google Cloud.
+- Recuperación en un momento determinado.
+- Copias manuales conocidas.
+- Ubicaciones de almacenamiento utilizadas.
+- Períodos de retención configurados.
+- Personas o cuentas de servicio con acceso.
+- Procedimientos existentes de restauración.
+
+Esta revisión no deberá activar el plan Blaze ni crear una copia nueva.
+
+### Requisitos para respaldos futuros
+
+Antes de habilitar respaldos, LangBridge deberá aprobar:
+
+- Proveedor y servicio exactos.
+- Finalidad.
+- Datos incluidos.
+- Frecuencia.
+- Ubicación.
+- Acceso autorizado.
+- Costo y plan de facturación.
+- Período máximo de retención.
+- Eliminación de las copias.
+- Procedimiento de restauración.
+- Tratamiento de cuentas y datos eliminados.
+- Pruebas de recuperación y eliminación posterior.
+
+También deberán actualizarse el inventario de datos, las políticas aplicables y la información correspondiente de Google Play antes de activar el servicio.
+
+### Protección frente a restauraciones
+
+Una futura restauración no podrá reactivar cuentas ni volver a poner en uso ordinario datos eliminados.
+
+Antes de permitir que la aplicación utilice datos restaurados, el procedimiento deberá:
+
+1. Ejecutar la restauración en un entorno aislado o administrativo controlado.
+2. Identificar la fecha efectiva de la copia utilizada.
+3. Identificar las eliminaciones completadas después de esa fecha.
+4. Volver a aplicar las eliminaciones correspondientes.
+5. Comprobar que no reaparezcan perfiles eliminados.
+6. Comprobar que no reaparezcan solicitudes de conexión eliminadas.
+7. Comprobar que no reaparezcan conversaciones ni mensajes eliminados.
+8. Comprobar que no reaparezcan referencias de bloqueo eliminadas.
+9. Comprobar que no reaparezcan reportes eliminados.
+10. Evitar la recreación de cuentas eliminadas de Firebase Authentication.
+11. Completar las pruebas antes de permitir el acceso ordinario.
+
+### Relación con DEL-S2
+
+El recibo técnico DEL-S2 no identifica a la persona y se elimina después de 30 días. No deberá utilizarse para reconstruir la identidad de una cuenta eliminada.
+
+Antes de habilitar respaldos, LangBridge deberá diseñar y aprobar un mecanismo compatible con la minimización de datos que permita respetar las eliminaciones después de una restauración.
+
+Ese mecanismo podrá considerar:
+
+- Limitar la antigüedad y rotación de las copias.
+- Restaurar copias únicamente dentro de un período controlado.
+- Mantener los datos restaurados aislados hasta volver a aplicar las eliminaciones vigentes.
+- Utilizar controles técnicos temporales y protegidos.
+- Evitar la conservación indefinida de perfiles o datos personales completos.
+- Impedir que DEL-S2 se utilice para reconstruir identidades eliminadas.
+
+### Estado de implementación
+
+- Decisión aprobada para el modelo actual mediante LEG-017.
+- Verificación externa en Firebase Console y Google Cloud Console pendiente.
+- Respaldos propios no configurados.
+- Exportaciones automáticas no configuradas.
+- Procedimiento de restauración no implementado.
+- Activación del plan Blaze no autorizada mediante esta decisión.
+- Diseño para impedir la reaparición de datos eliminados pendiente.
+- Pruebas de restauración pendientes para una futura implementación.
+- Publicación definitiva pendiente de validación técnica y revisión jurídica.
 
 ## 24. Proceso técnico recomendado
 
