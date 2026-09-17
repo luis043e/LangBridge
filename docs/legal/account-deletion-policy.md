@@ -1106,12 +1106,16 @@ Las siguientes decisiones ya no están pendientes:
 - DEL-A: eliminación del perfil, solicitudes de conexión, conversaciones, mensajes y referencias en listas de bloqueo.
 - DEL-R1: eliminación de todos los reportes enviados por la cuenta en el modelo actual.
 - DEL-S2: sustitución de la solicitud identificable original por un recibo técnico mínimo y no identificable.
-- Conservación del recibo técnico durante 30 días desde la finalización.
+- Conservación del recibo técnico durante 30 días desde la finalización efectiva.
 - Eliminación del recibo técnico al vencer su fecha de expiración.
+- LEG-009: inicio del procesamiento después de verificar la identidad y una sesión reciente, objetivo operativo de 7 días calendario y plazo máximo informado de 30 días calendario.
+- LEG-017: tratamiento de copias de seguridad aprobado para el modelo actual, con verificación externa todavía pendiente.
+- LEG-018: cancelación permitida después de verificar nuevamente la identidad y antes del punto técnico de no retorno.
+- LEG-019: comunicaciones diferenciadas mediante el correo asociado con la solicitud y validado antes de eliminar Firebase Authentication.
 
 ### Información institucional y pública pendiente
 
-Antes de la publicación definitiva deben completarse o verificarse:
+Antes de la publicación definitiva deberán completarse o verificarse:
 
 - Nombre legal o comercial definitivo.
 - Correos oficiales.
@@ -1121,17 +1125,20 @@ Antes de la publicación definitiva deben completarse o verificarse:
 - Datos de contacto.
 - Fecha de entrada en vigor.
 - Versión definitiva de la política.
+- Coherencia con la información declarada en Google Play.
 
 ### Decisiones todavía pendientes
 
 Todavía deben aprobarse o cerrarse:
 
-- Plazo operativo objetivo para procesar una solicitud.
-- Plazo máximo que se informará públicamente.
-- Tratamiento de copias de seguridad.
-- Política de cancelación.
-- Canal de confirmación de la eliminación.
+- Período de conservación de las solicitudes canceladas.
+- Períodos de conservación aplicables a cuentas y datos mientras permanezcan activos.
+- Retención de reportes técnicos y de seguridad después de su resolución.
+- Tratamiento técnico de fotografías cuando Firebase Storage sea implementado.
+- Tratamiento de futuros datos de aprendizaje y gamificación.
+- Canal alternativo cuando el correo asociado no esté disponible o no pueda verificarse.
 - Cualquier excepción legal específica de conservación.
+- Procedimiento de moderación.
 - Revisión jurídica final.
 
 ### Implementación técnica pendiente
@@ -1140,6 +1147,7 @@ Todavía debe implementarse y verificarse:
 
 - Reautenticación o verificación segura de identidad.
 - Procesamiento seguro de `accountDeletionRequests`.
+- Entorno servidor o administrativo autorizado.
 - Eliminación efectiva de Firebase Authentication.
 - Eliminación efectiva de `users/{uid}`.
 - Eliminación de solicitudes de conexión.
@@ -1147,23 +1155,35 @@ Todavía debe implementarse y verificarse:
 - Limpieza del UID eliminado en listas `blockedUserIds` ajenas.
 - Eliminación de reportes enviados por la cuenta.
 - Creación del recibo técnico aprobado mediante DEL-S2.
-- Eliminación del recibo técnico después de 30 días.
+- Eliminación automática del recibo técnico después de 30 días.
 - Limpieza segura de la sesión local.
+- Punto técnico de no retorno.
+- Cancelación segura antes del punto de no retorno.
+- Restauración de la configuración anterior del perfil después de una cancelación válida.
+- Servicio de envío de las comunicaciones aprobadas mediante LEG-019.
+- Gestión limitada y segura de reintentos de entrega.
 - Eliminación futura de fotografías en Firebase Storage.
 - Eliminación futura de datos de aprendizaje y gamificación.
 - Manejo de fallos parciales y reintentos idempotentes.
+- Prevención de la reaparición de datos eliminados después de una futura restauración.
 
-### Pruebas pendientes
+### Verificaciones y pruebas pendientes
 
 Antes de publicar deberán completarse:
 
+- Verificación externa de respaldos en Firebase Console y Google Cloud Console.
 - Pruebas automáticas con Firebase Emulator Suite.
 - Pruebas manuales con cuentas y datos simulados.
 - Pruebas de reautenticación.
 - Pruebas de eliminación integral.
-- Pruebas de reintentos seguros.
+- Pruebas de fallos parciales y reintentos seguros.
+- Pruebas del punto técnico de no retorno.
+- Pruebas de cancelación en `pending`, `verified` y `processing`.
 - Pruebas que comprueben que no se eliminan datos exclusivos de otras cuentas.
 - Pruebas de creación y expiración del recibo técnico.
+- Pruebas de las comunicaciones de recepción, cancelación, punto de no retorno y finalización.
+- Pruebas de fallos y reintentos limitados del servicio de correo.
+- Pruebas que comprueben que una futura restauración no reactive datos eliminados.
 - Revisión de coherencia entre la aplicación, las políticas públicas y la información de Google Play.
 
 ## 35. Condiciones para publicar esta página
