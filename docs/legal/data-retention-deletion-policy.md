@@ -260,21 +260,21 @@ Datos relacionados:
 - Estado.
 - Fechas.
 
-Tratamiento previsto al eliminar una cuenta:
+Tratamiento aprobado mediante DEL-A:
 
-- Eliminar las solicitudes pendientes enviadas por la cuenta.
-- Eliminar las solicitudes pendientes recibidas por la cuenta.
-- Evaluar las solicitudes aceptadas que funcionen como relación histórica.
-- Eliminar nombres personales que ya no sean necesarios.
-- Evitar que otra cuenta pueda aceptar o responder una solicitud perteneciente a una cuenta eliminada.
+- Se eliminarán todas las solicitudes de conexión donde la cuenta aparezca como remitente o destinataria.
+- Se eliminarán las solicitudes con estado `pending`, `accepted` o `rejected`.
+- La eliminación incluirá los nombres, UID, estados y fechas almacenados dentro de esos documentos.
+- Las conversaciones relacionadas se procesarán y eliminarán antes de eliminar las solicitudes aceptadas que les dieron origen.
+- No se conservarán relaciones aceptadas mediante referencias anonimizadas en la primera versión del procedimiento.
+- Otra cuenta no podrá aceptar ni responder una solicitud perteneciente a una cuenta eliminada.
+- Si la persona vuelve a LangBridge con una cuenta nueva, no recuperará solicitudes ni conexiones anteriores.
 
-Criterio inicial recomendado:
+Estado de implementación:
 
-- Solicitudes pendientes: eliminación.
-- Solicitudes rechazadas o canceladas: eliminación después del período operativo aprobado.
-- Relaciones aceptadas: eliminación o sustitución por una referencia anonimizada si resulta necesaria para conservar la integridad de una conversación.
-
-El criterio final deberá probarse técnicamente antes de aprobarlo.
+- Decisión aprobada mediante DEL-A.
+- Implementación técnica pendiente.
+- Pruebas con Firebase Emulator Suite y datos simulados pendientes.
 
 ## 13. Conversaciones
 
@@ -732,27 +732,44 @@ Ese mecanismo podrá considerar:
 
 ## 24. Proceso técnico recomendado
 
-La eliminación efectiva deberá ejecutarse desde un entorno seguro.
+La eliminación efectiva deberá ejecutarse desde un entorno servidor o administrativo autorizado.
 
-Orden preliminar recomendado:
+Orden técnico recomendado:
 
-- Verificar la solicitud.
-- Marcar la cuenta como en procesamiento.
-- Impedir nuevas interacciones.
-- Obtener las referencias necesarias.
-- Eliminar o anonimizar solicitudes de conexión.
-- Eliminar o anonimizar conversaciones y mensajes.
-- Limpiar referencias de bloqueo.
-- Procesar reportes según su categoría.
-- Eliminar futuros datos de aprendizaje.
-- Eliminar fotografías y archivos asociados.
-- Eliminar el documento de usuario.
-- Eliminar o reducir el registro de solicitud.
-- Eliminar Firebase Authentication.
-- Registrar el resultado mínimo.
-- Confirmar la finalización.
+1. Verificar nuevamente la identidad y confirmar una sesión reciente.
+2. Consultar el estado real de la solicitud.
+3. Comprobar si existe una cancelación válida antes del punto técnico de no retorno.
+4. Obtener y validar temporalmente el correo necesario para las comunicaciones aprobadas mediante LEG-019.
+5. Marcar la solicitud como `processing`.
+6. Impedir nuevas interacciones con la cuenta.
+7. Obtener las referencias necesarias para localizar todos los datos relacionados.
+8. Alcanzar el punto técnico de no retorno inmediatamente antes de comenzar la primera operación irreversible.
+9. Eliminar los mensajes de las conversaciones relacionadas.
+10. Eliminar los documentos principales de las conversaciones.
+11. Eliminar todas las solicitudes de conexión relacionadas.
+12. Retirar el UID de la cuenta eliminada de las listas `blockedUserIds` ajenas.
+13. Eliminar todos los reportes enviados por la cuenta conforme a DEL-R1.
+14. Eliminar futuros datos de aprendizaje y gamificación cuando existan.
+15. Eliminar fotografías y archivos asociados cuando Firebase Storage sea implementado.
+16. Eliminar el documento `users/{uid}`.
+17. Eliminar la cuenta de Firebase Authentication.
+18. Crear el recibo técnico mínimo y no identificable aprobado mediante DEL-S2.
+19. Sustituir y eliminar la solicitud identificable original.
+20. Marcar el procedimiento como `completed` únicamente después de concluir correctamente todas las operaciones.
+21. Enviar la confirmación final aprobada mediante LEG-019.
+22. Limpiar de forma segura la sesión y los datos locales cuando corresponda.
+23. Eliminar automáticamente el recibo DEL-S2 al vencer su período de 30 días.
 
-El orden definitivo deberá evitar que la eliminación temprana de Authentication impida identificar o limpiar los datos asociados.
+Reglas obligatorias:
+
+- No se aplicará anonimización a solicitudes, conexiones, conversaciones, mensajes o reportes en la primera versión.
+- Un fallo parcial mantendrá el procedimiento en estado `processing`.
+- Las operaciones deberán ser idempotentes y admitir reintentos seguros.
+- No se eliminarán datos exclusivos de otras cuentas.
+- No se establecerá `completed` antes de crear correctamente DEL-S2.
+- Un fallo al enviar la confirmación no restaurará la cuenta ni cambiará el estado `completed`.
+- El correo utilizado temporalmente para la confirmación no formará parte de DEL-S2.
+- La eliminación de Firebase Authentication no deberá ocurrir antes de obtener todas las referencias necesarias y preparar la comunicación final.
 
 ## 25. Fallos parciales y reintentos
 
