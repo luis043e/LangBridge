@@ -1069,24 +1069,84 @@ Esta Política deberá revisarse:
 
 ## 32. Información pendiente
 
-Antes de aprobar esta Política se debe definir:
+Esta Política todavía no está lista para aprobarse o publicarse como documento definitivo.
+
+### Decisiones ya aprobadas
+
+Las siguientes decisiones ya no están pendientes:
+
+- DEL-A: eliminación del perfil, solicitudes de conexión, conversaciones, mensajes y referencias relacionadas en listas de bloqueo.
+- DEL-R1: eliminación de todos los reportes enviados por la cuenta en el modelo actual.
+- DEL-S2: sustitución de la solicitud identificable por un recibo técnico mínimo y no identificable.
+- Conservación del recibo técnico DEL-S2 durante 30 días desde la finalización efectiva.
+- LEG-009: objetivo operativo de 7 días calendario y plazo máximo informado de 30 días calendario.
+- LEG-017: tratamiento de copias de seguridad aprobado para el modelo actual.
+- LEG-018: cancelación permitida después de verificar nuevamente la identidad y antes del punto técnico de no retorno.
+- LEG-019: comunicaciones diferenciadas mediante el correo asociado y validado.
+
+### Decisiones que continúan pendientes
+
+Todavía deben definirse o aprobarse:
 
 - Edad mínima y público objetivo.
-- Períodos exactos de conservación.
-- Tratamiento definitivo de mensajes.
-- Tratamiento definitivo de conversaciones.
-- Retención de reportes técnicos.
-- Retención de reportes de seguridad.
-- Conservación del registro mínimo de eliminación.
-- Tratamiento de copias de seguridad.
-- Posibilidad de cancelar una solicitud.
+- Períodos de conservación de las cuentas inactivas.
+- Conservación sin respuesta de las solicitudes de conexión.
+- Períodos aplicables a conversaciones y mensajes mientras la cuenta permanezca activa.
+- Retención de reportes técnicos y de seguridad después de su resolución.
+- Período de conservación de las solicitudes de eliminación canceladas.
+- Tratamiento técnico de fotografías sustituidas cuando Firebase Storage sea implementado.
+- Cualquier excepción legal específica de conservación.
+- Canal alternativo cuando el correo asociado no esté disponible o no pueda verificarse.
+- Procedimiento de moderación.
+- Revisión jurídica final.
+
+### Información institucional y pública pendiente
+
+Antes de la publicación definitiva deberán completarse o verificarse:
+
 - Correo oficial de privacidad.
 - Correo oficial de soporte.
 - URL pública de eliminación.
-- Procedimiento administrativo.
-- Entorno servidor o administrativo.
-- Método de confirmación.
-- Revisión jurídica final.
+- Datos de contacto.
+- Fecha de entrada en vigor.
+- Versión definitiva de las políticas.
+- Coherencia con la información declarada en Google Play.
+
+### Implementación técnica pendiente
+
+Todavía debe implementarse y verificarse:
+
+- Reautenticación o verificación segura de identidad.
+- Procesamiento seguro de `accountDeletionRequests`.
+- Entorno servidor o administrativo autorizado.
+- Eliminación efectiva de Firebase Authentication.
+- Eliminación efectiva de los datos relacionados en Cloud Firestore.
+- Eliminación futura de fotografías en Firebase Storage.
+- Eliminación futura de datos de aprendizaje y gamificación.
+- Creación y expiración automática del recibo técnico DEL-S2.
+- Cancelación segura antes del punto técnico de no retorno.
+- Restauración de la configuración anterior del perfil después de una cancelación válida.
+- Envío de las comunicaciones aprobadas mediante LEG-019.
+- Gestión limitada y segura de reintentos.
+- Prevención de la reaparición de datos eliminados después de una futura restauración.
+
+### Verificaciones y pruebas pendientes
+
+Antes de declarar completo el bloque deberán realizarse:
+
+- Verificación externa de respaldos en Firebase Console y Google Cloud Console.
+- Pruebas automáticas mediante Firebase Emulator Suite.
+- Pruebas manuales con cuentas y datos simulados.
+- Pruebas de reautenticación.
+- Pruebas de eliminación integral.
+- Pruebas de fallos parciales y reintentos idempotentes.
+- Pruebas del punto técnico de no retorno.
+- Pruebas de cancelación en `pending`, `verified` y `processing`.
+- Pruebas de creación y expiración del recibo DEL-S2.
+- Pruebas de envío y fallo de las comunicaciones de LEG-019.
+- Pruebas que comprueben que no se eliminan datos exclusivos de otras cuentas.
+- Pruebas que comprueben que una restauración futura no reactive datos eliminados.
+- Revisión de coherencia entre la aplicación, las políticas públicas y Google Play.
 
 ## 33. Condiciones para declarar el bloque completado
 
