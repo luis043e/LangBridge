@@ -2082,3 +2082,182 @@ test(
  );
  }
 );
+test(
+  'an account deletion request owner cannot read the request',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionRequests',
+            'protected-deletion-request'
+          ),
+          {
+            userId: 'user-one',
+            userEmail: 'user-one@example.com',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'protected-deletion-request'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'another user cannot read an account deletion request',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionRequests',
+            'protected-deletion-request'
+          ),
+          {
+            userId: 'user-one',
+            userEmail: 'user-one@example.com',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-two'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'protected-deletion-request'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'an account deletion request owner cannot cancel the request directly',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionRequests',
+            'protected-deletion-request'
+          ),
+          {
+            userId: 'user-one',
+            userEmail: 'user-one@example.com',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'protected-deletion-request'
+        ),
+        {
+          status: 'cancelled',
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'an account deletion request owner cannot delete the request directly',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionRequests',
+            'protected-deletion-request'
+          ),
+          {
+            userId: 'user-one',
+            userEmail: 'user-one@example.com',
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      deleteDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'protected-deletion-request'
+        )
+      )
+    );
+  }
+);
