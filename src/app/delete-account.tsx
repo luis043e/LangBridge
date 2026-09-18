@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   doc,
+  getDoc,
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore';
@@ -74,16 +75,35 @@ export default function DeleteAccountScreen() {
             try {
               setIsSubmitting(true);
 
-              const batch = writeBatch(db);
-              const deletionRequestReference = doc(
-                db,
-                'accountDeletionRequests',
-                currentUser.uid
-              );
-
               const userReference = doc(
                 db,
                 'users',
+                currentUser.uid
+              );
+
+              const userSnapshot = await getDoc(
+                userReference
+              );
+
+              if (!userSnapshot.exists()) {
+                throw new Error(
+                  'User profile does not exist.'
+                );
+              }
+
+              const userData = userSnapshot.data();
+
+              const previousProfileVisibility =
+                typeof userData.isProfileVisible ===
+                'boolean'
+                  ? userData.isProfileVisible
+                  : true;
+
+              const batch = writeBatch(db);
+
+              const deletionRequestReference = doc(
+                db,
+                'accountDeletionRequests',
                 currentUser.uid
               );
 
@@ -96,6 +116,7 @@ export default function DeleteAccountScreen() {
                   userId: currentUser.uid,
                   userEmail: currentUser.email || '',
                   status: 'pending',
+                  previousProfileVisibility,
                   createdAt: requestTimestamp,
                   updatedAt: requestTimestamp,
                 }
