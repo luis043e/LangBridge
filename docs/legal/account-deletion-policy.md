@@ -355,7 +355,7 @@ Cloud Firestore no elimina automáticamente las subcolecciones cuando se elimina
 - Decisión aprobada mediante DEL-A.
 - Implementación técnica pendiente.
 - Pruebas con Firebase Emulator Suite y datos simulados pendientes.
-- Textos de advertencia y confirmación en la aplicación pendientes.
+- Textos de advertencia y confirmación incorporados en los 16 idiomas activos y comprobados visualmente en la aplicación.
 - Publicación condicionada a que la eliminación integral pueda ejecutarse y repetirse de forma segura.
 
 ## 15. Usuarios bloqueados
