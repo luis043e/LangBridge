@@ -19,6 +19,7 @@ import {
     serverTimestamp,
     setDoc,
     updateDoc,
+    writeBatch,
 } from 'firebase/firestore';
 
 const projectId = 'langbridge-d048f';
@@ -1578,7 +1579,7 @@ test(
   }
 );
 test(
-  'an authenticated user can create a valid account deletion request',
+  'an account deletion request cannot be created without hiding the profile',
   async () => {
     const authenticatedContext =
       testEnvironment.authenticatedContext(
@@ -1588,7 +1589,7 @@ test(
     const firestore =
       authenticatedContext.firestore();
 
-    await assertSucceeds(
+    await assertFails(
       setDoc(
         doc(
           firestore,
@@ -1729,7 +1730,73 @@ test(
     );
   }
 );
+test(
+  'a deletion request and profile hiding can be submitted atomically',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
 
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-atomic-deletion'
+          ),
+          {
+            uid: 'user-atomic-deletion',
+            fullName: 'Atomic Deletion User',
+            email: 'atomic-deletion@example.com',
+            isProfileVisible: true,
+            deletionRequested: false,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-atomic-deletion'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    const batch = writeBatch(firestore);
+
+    batch.set(
+      doc(
+        firestore,
+        'accountDeletionRequests',
+        'user-atomic-deletion'
+      ),
+      {
+        userId: 'user-atomic-deletion',
+        userEmail: 'atomic-deletion@example.com',
+        status: 'pending',
+        previousProfileVisibility: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+    );
+
+    batch.update(
+      doc(
+        firestore,
+        'users',
+        'user-atomic-deletion'
+      ),
+      {
+        isProfileVisible: false,
+        deletionRequested: true,
+        deletionRequestedAt: serverTimestamp(),
+      }
+    );
+
+    await assertSucceeds(batch.commit());
+  }
+);
 test(
   'a historical user profile with city can be updated',
   async () => {

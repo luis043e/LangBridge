@@ -377,29 +377,56 @@ allow update, delete: if false;
     }
 
     match /accountDeletionRequests/{requestId} {
-      allow create: if isAuthenticated()
-        && requestId == request.auth.uid
-        && request.resource.data.userId
-          == request.auth.uid
-        && request.resource.data.userEmail
-          is string
-        && request.resource.data.status
-          == 'pending'
-        && request.resource.data.createdAt
-          == request.time
-        && request.resource.data.updatedAt
-          == request.time
-        && request.resource.data.keys().hasOnly([
-          'userId',
-          'userEmail',
-          'status',
-          'createdAt',
-          'updatedAt'
-        ]);
+  allow create: if isAuthenticated()
+    && requestId == request.auth.uid
+    && request.resource.data.userId
+      == request.auth.uid
+    && request.resource.data.userEmail
+      is string
+    && request.resource.data.status
+      == 'pending'
+    && request.resource.data.previousProfileVisibility
+      is bool
+    && exists(
+      /databases/$(database)/documents/users/$(request.auth.uid)
+    )
+    && request.resource.data.previousProfileVisibility
+      == (
+        get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.keys().hasAny(['isProfileVisible'])
+          ? get(
+              /databases/$(database)/documents/users/$(request.auth.uid)
+            ).data.isProfileVisible
+          : true
+      )
+    && getAfter(
+      /databases/$(database)/documents/users/$(request.auth.uid)
+    ).data.isProfileVisible
+      == false
+    && getAfter(
+      /databases/$(database)/documents/users/$(request.auth.uid)
+    ).data.deletionRequested
+      == true
+    && getAfter(
+      /databases/$(database)/documents/users/$(request.auth.uid)
+    ).data.deletionRequestedAt
+      == request.time
+    && request.resource.data.createdAt
+      == request.time
+    && request.resource.data.updatedAt
+      == request.time
+    && request.resource.data.keys().hasOnly([
+      'userId',
+      'userEmail',
+      'status',
+      'previousProfileVisibility',
+      'createdAt',
+      'updatedAt'
+    ]);
 
-      allow read, update, delete: if false;
-    }
-
+  allow read, update, delete: if false;
+}
     match /{document=**} {
       allow read, write: if false;
     }
