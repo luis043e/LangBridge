@@ -1,11 +1,9 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-  addDoc,
-  collection,
   doc,
   serverTimestamp,
-  setDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { useState } from 'react';
 import {
@@ -76,29 +74,47 @@ export default function DeleteAccountScreen() {
             try {
               setIsSubmitting(true);
 
-              await addDoc(
-                collection(db, 'accountDeletionRequests'),
+              const batch = writeBatch(db);
+              const deletionRequestReference = doc(
+                db,
+                'accountDeletionRequests',
+                currentUser.uid
+              );
+
+              const userReference = doc(
+                db,
+                'users',
+                currentUser.uid
+              );
+
+              const requestTimestamp =
+                serverTimestamp();
+
+              batch.set(
+                deletionRequestReference,
                 {
                   userId: currentUser.uid,
                   userEmail: currentUser.email || '',
                   status: 'pending',
-                  createdAt: serverTimestamp(),
-                  updatedAt: serverTimestamp(),
+                  createdAt: requestTimestamp,
+                  updatedAt: requestTimestamp,
                 }
               );
 
-              await setDoc(
-                doc(db, 'users', currentUser.uid),
+              batch.set(
+                userReference,
                 {
                   isProfileVisible: false,
                   deletionRequested: true,
                   deletionRequestedAt:
-                    serverTimestamp(),
+                    requestTimestamp,
                 },
                 {
                   merge: true,
                 }
               );
+
+              await batch.commit();
 
               Alert.alert(
   text.deleteAccountScreen.requestSubmittedTitle,
