@@ -1593,7 +1593,7 @@ test(
         doc(
           firestore,
           'accountDeletionRequests',
-          'deletion-request-one'
+          'user-one'
         ),
         {
           userId: 'user-one',
@@ -1623,7 +1623,7 @@ test(
         doc(
           firestore,
           'accountDeletionRequests',
-          'deletion-request-one'
+          'user-one'
         ),
         {
           userId: 'user-two',
@@ -1654,7 +1654,7 @@ test(
         doc(
           firestore,
           'accountDeletionRequests',
-          'deletion-request-one'
+          'user-one'
         ),
         {
           userId: 'user-one',
@@ -1685,7 +1685,7 @@ test(
         doc(
           firestore,
           'accountDeletionRequests',
-          'deletion-request-one'
+          'user-one'
         ),
         {
           userId: 'user-one',
@@ -1700,6 +1700,36 @@ test(
     );
   }
 );
+test(
+  'an account deletion request document id must match the authenticated uid',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionRequests',
+          'random-deletion-request'
+        ),
+        {
+          userId: 'user-one',
+          userEmail: 'user-one@example.com',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
 test(
   'a historical user profile with city can be updated',
   async () => {

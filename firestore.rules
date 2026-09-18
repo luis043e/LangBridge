@@ -378,6 +378,7 @@ allow update, delete: if false;
 
     match /accountDeletionRequests/{requestId} {
       allow create: if isAuthenticated()
+        && requestId == request.auth.uid
         && request.resource.data.userId
           == request.auth.uid
         && request.resource.data.userEmail
