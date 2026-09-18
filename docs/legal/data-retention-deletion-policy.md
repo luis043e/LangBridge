@@ -994,17 +994,81 @@ Este valor temporal:
 
 ### Conservación de una solicitud cancelada
 
-Mientras la cuenta continúe existiendo, la solicitud cancelada podrá conservar temporalmente:
+Después de completar una cancelación válida, LangBridge conservará la solicitud cancelada durante 30 días calendario contados desde la fecha efectiva de cancelación.
+
+La conservación tendrá como finalidades limitadas:
+
+- Comprobar que la cancelación se completó correctamente.
+- Gestionar fallos técnicos inmediatos.
+- Verificar la restauración de la configuración anterior del perfil.
+- Evitar inconsistencias en el estado del procedimiento.
+- Facilitar reintentos seguros cuando resulten necesarios.
+
+### Datos mínimos permitidos
+
+Durante los 30 días, la solicitud cancelada podrá conservar únicamente:
 
 - Estado `cancelled`.
-- Fecha de cancelación.
+- Fecha efectiva de cancelación `cancelledAt`.
+- Fecha de expiración calculada 30 días calendario después de `cancelledAt`.
 - Versión del procedimiento.
 - Método general de verificación.
-- Razón técnica general, cuando corresponda.
+- Razón técnica general, únicamente cuando sea necesaria.
+- Resultado general de la restauración de la configuración anterior del perfil.
 
-No se añadirá información personal innecesaria.
+No se añadirán ni conservarán innecesariamente:
 
-El período definitivo de conservación de una solicitud cancelada continúa pendiente de aprobación y deberá definirse antes de publicar la política definitiva.
+- Contenido o fragmentos de mensajes.
+- Conversaciones.
+- Reportes.
+- Contraseñas.
+- Credenciales.
+- Tokens.
+- Datos de otras personas.
+- Copias del perfil.
+- La palabra utilizada para confirmar la solicitud.
+- Información nueva que no sea necesaria para comprobar la cancelación.
+
+### Eliminación al vencer el plazo
+
+- La solicitud cancelada deberá eliminarse completamente cuando se cumplan 30 días calendario desde `cancelledAt`.
+- La eliminación deberá ejecutarse automáticamente desde un entorno servidor o administrativo autorizado.
+- El procedimiento deberá admitir reintentos seguros e idempotentes.
+- La expiración de la solicitud cancelada no deberá afectar la cuenta activa ni sus datos ordinarios.
+- La solicitud cancelada no podrá convertirse posteriormente en `pending`, `verified` o `processing`.
+
+### Datos temporales de restauración
+
+Los datos utilizados temporalmente para restaurar la configuración anterior del perfil deberán eliminarse inmediatamente después de completar y verificar la restauración.
+
+En particular:
+
+- No se conservará `previousProfileVisibility` después de verificar la restauración.
+- No se copiarán los datos temporales de restauración al registro cancelado.
+- No se conservarán esos datos dentro de DEL-S2.
+- Un fallo de restauración se registrará únicamente mediante un resultado técnico general.
+- Los fallos de restauración admitirán reintentos seguros.
+
+### Nueva solicitud de eliminación
+
+La existencia de una solicitud cancelada durante su período de conservación:
+
+- No impedirá presentar una nueva solicitud de eliminación.
+- No permitirá reactivar la solicitud cancelada.
+- No reutilizará sus fechas, estado ni verificación.
+- No evitará que la nueva solicitud requiera otra verificación de identidad.
+- No permitirá dos solicitudes activas simultáneamente para la misma cuenta.
+
+Cada nueva solicitud tendrá sus propios estados, fechas, controles de seguridad y ciclo de procesamiento.
+
+### Estado de implementación de la retención
+
+- Período aprobado: 30 días calendario desde `cancelledAt`.
+- Datos mínimos permitidos aprobados.
+- Eliminación automática pendiente de implementación.
+- Prevención de solicitudes activas simultáneas pendiente de implementación.
+- Limpieza de datos temporales de restauración pendiente de implementación.
+- Pruebas automáticas y manuales pendientes.
 
 ### Relación con DEL-S2
 
