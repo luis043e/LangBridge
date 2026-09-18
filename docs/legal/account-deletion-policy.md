@@ -1195,7 +1195,6 @@ Antes de la publicación definitiva deberán completarse o verificarse:
 
 Todavía deben aprobarse o cerrarse:
 
-- Período de conservación de las solicitudes canceladas.
 - Períodos de conservación aplicables a cuentas y datos mientras permanezcan activos.
 - Retención de reportes técnicos y de seguridad después de su resolución.
 - Tratamiento técnico de fotografías cuando Firebase Storage sea implementado.
