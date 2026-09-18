@@ -134,10 +134,10 @@ La implementación actual todavía no realiza automáticamente:
 - La eliminación de Firebase Authentication.
 - La eliminación del documento de `users`.
 - La eliminación de solicitudes de conexión.
-- La eliminación o anonimización de conversaciones.
-- La eliminación o anonimización de mensajes.
-- La limpieza de listas de bloqueo.
-- La eliminación o retención controlada de reportes.
+- La eliminación completa de las conversaciones relacionadas, conforme a DEL-A.
+- La eliminación completa de los mensajes relacionados, conforme a DEL-A.
+- La limpieza de las referencias de la cuenta en las listas de bloqueo, conforme a DEL-A.
+- La eliminación de todos los reportes enviados por la cuenta, conforme a DEL-R1.
 - La eliminación de fotografías de Firebase Storage.
 - La eliminación de futuros datos de aprendizaje.
 - La limpieza local dentro del dispositivo.
