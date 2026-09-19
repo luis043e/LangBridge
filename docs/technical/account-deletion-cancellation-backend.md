@@ -131,17 +131,31 @@ Si la cancelación es válida, el backend deberá ejecutar de forma atómica o m
 13. Permitir una nueva solicitud futura.
 14. No crear DEL-S2.
 
-## 9. Registro cancelado mínimo
+## 9. Contrato del registro cancelado mínimo
 
-La colección propuesta para el registro temporal es:
+### Ruta propuesta
+
+El registro temporal de una cancelación completada utilizará la colección:
 
 ```text
-cancelledDeletionRequests/{requestId}
+cancelledDeletionRequests/{cancellationRecordId}
 ```
 
-La estructura todavía no está implementada.
+`cancellationRecordId` deberá:
 
-El registro cancelado podrá contener únicamente datos mínimos, por ejemplo:
+- ser generado exclusivamente desde el backend autorizado;
+- ser aleatorio y opaco;
+- no contener el UID;
+- no derivarse directamente del UID o del correo;
+- no permitir reconstruir la identidad;
+- no reutilizarse para otra cancelación;
+- no coincidir con el identificador de DEL-S2.
+
+La aplicación móvil no podrá seleccionar, crear ni modificar este identificador.
+
+### Campos obligatorios
+
+El registro cancelado mínimo deberá contener:
 
 ```text
 status: cancelled
@@ -150,22 +164,131 @@ expiresAt
 procedureVersion
 verificationMethod
 restorationResult
+```
+
+Los campos deberán cumplir:
+
+- `status` será exactamente `cancelled`.
+- `cancelledAt` utilizará la hora del servidor.
+- `expiresAt` representará exactamente 30 días calendario después de `cancelledAt`.
+- `procedureVersion` identificará la versión general del procedimiento aplicado.
+- `verificationMethod` describirá únicamente el método general de verificación.
+- `restorationResult` contendrá únicamente un resultado técnico general.
+
+### Campo opcional
+
+El registro podrá incluir:
+
+```text
 technicalReason
 ```
 
-El diseño final deberá evitar conservar innecesariamente:
+`technicalReason` será opcional y solo podrá utilizar valores generales previamente permitidos.
 
-- UID.
-- Correo.
-- Mensajes.
-- Conversaciones.
-- Reportes.
-- Tokens.
-- Credenciales.
-- Copias del perfil.
-- `previousProfileVisibility`.
-- Datos de otras personas.
-- La palabra empleada para confirmar la eliminación.
+No deberá contener mensajes libres, datos personales ni información administrativa detallada.
+
+### Valores generales previstos
+
+Los futuros valores permitidos deberán definirse mediante listas cerradas.
+
+Ejemplos preliminares:
+
+```text
+verificationMethod:
+  recent-session
+  credential-reauthentication
+  federated-reauthentication
+
+restorationResult:
+  restored
+  already-restored
+  restoration-completed-after-retry
+
+technicalReason:
+  user-requested
+  verified-cancellation
+  processing-cancelled-before-no-return
+```
+
+Estos valores son preliminares y deberán validarse antes de la implementación.
+
+### Campos y contenidos prohibidos
+
+El registro cancelado no podrá conservar:
+
+```text
+userId
+uid
+userEmail
+email
+requestId
+activeRequestId
+previousProfileVisibility
+deletionRequestedAt
+createdAt de la solicitud activa
+updatedAt de la solicitud activa
+authentication tokens
+session tokens
+credentials
+confirmation text
+profile data
+message content
+conversation content
+report content
+DEL-S2 identifiers
+```
+
+Tampoco podrá conservar:
+
+- copias del perfil;
+- fotografías;
+- nombres;
+- país o ciudad;
+- idiomas del perfil;
+- listas de bloqueos;
+- datos de conexiones;
+- razones escritas libremente por la persona;
+- información de otras cuentas;
+- detalles internos que permitan eludir controles de seguridad.
+
+### Separación respecto de la solicitud activa
+
+La solicitud activa identificable:
+
+```text
+accountDeletionRequests/{uid}
+```
+
+deberá eliminarse después de completar y verificar la restauración.
+
+El registro cancelado mínimo:
+
+```text
+cancelledDeletionRequests/{cancellationRecordId}
+```
+
+no sustituirá una solicitud activa ni podrá reactivarse.
+
+La existencia del registro cancelado:
+
+- no impedirá crear una solicitud nueva;
+- no reutilizará estados o fechas anteriores;
+- no reutilizará la verificación anterior;
+- no permitirá dos solicitudes activas simultáneas;
+- no conservará los datos temporales usados para restaurar el perfil.
+
+### Separación respecto de DEL-S2
+
+El registro cancelado mínimo no será un recibo DEL-S2.
+
+Una cancelación:
+
+- no creará DEL-S2;
+- no iniciará el plazo de retención de DEL-S2;
+- no reutilizará identificadores de DEL-S2;
+- no se convertirá posteriormente en DEL-S2.
+
+DEL-S2 solo podrá existir después de completar efectivamente una eliminación.
 
 ## 10. Retención
 
