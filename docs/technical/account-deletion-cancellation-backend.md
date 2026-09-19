@@ -1253,26 +1253,189 @@ Las medidas contra abuso no deberán impedir que una persona legítimamente aute
 
 ## 14. Pruebas futuras
 
-Antes de implementar producción deberán existir pruebas para comprobar:
+Antes de implementar en producción deberá existir cobertura automatizada para el backend, las reglas de seguridad y la integración controlada con la aplicación.
+
+### Autenticación y reautenticación
+
+Las pruebas deberán comprobar:
+
+1. Aceptación de una llamada autenticada con reautenticación reciente válida.
+2. Rechazo de una llamada no autenticada.
+3. Rechazo de un token inválido, vencido o revocado.
+4. Rechazo cuando falta `auth_time`.
+5. Rechazo cuando `auth_time` no es válido.
+6. Rechazo cuando la ventana de reautenticación reciente ha vencido.
+7. Obtención del `uid` exclusivamente desde el contexto autenticado.
+8. Rechazo de un `uid` libre enviado por el cliente.
+9. Rechazo cuando el contexto autenticado no coincide con la solicitud activa.
+10. Ausencia de contraseñas, credenciales y tokens en registros técnicos.
+
+### Estados y posibilidad de cancelación
+
+Las pruebas deberán comprobar:
 
 1. Cancelación válida en `pending`.
 2. Cancelación válida en `verified`.
-3. Cancelación condicional en `processing`.
-4. Rechazo después del punto de no retorno.
+3. Cancelación condicional en `processing` antes del punto de no retorno.
+4. Rechazo en `processing` después del punto de no retorno.
 5. Rechazo en `completed`.
-6. Restauración de un perfil originalmente visible.
-7. Conservación de un perfil originalmente oculto.
-8. Compatibilidad con perfiles históricos.
-9. Rechazo de `previousProfileVisibility` falsificado.
-10. Eliminación de la solicitud activa.
-11. Creación de un único registro cancelado.
-12. Ausencia de DEL-S2.
-13. Posibilidad de presentar una nueva solicitud.
-14. Prevención de dos solicitudes activas.
-15. Reintentos idempotentes.
-16. Eliminación del registro cancelado después de 30 días.
-17. Protección contra acceso directo desde el cliente.
-18. Ausencia de efectos sobre conversaciones, mensajes y reportes de una cuenta activa.
+6. Rechazo de estados desconocidos o malformados.
+7. Rechazo cuando la solicitud activa no existe.
+8. Rechazo cuando `userId` no coincide con el `uid` autenticado.
+9. Imposibilidad de reactivar una solicitud cancelada.
+10. Posibilidad de presentar una nueva solicitud después de completar la cancelación.
+
+### Concurrencia y punto de no retorno
+
+Las pruebas deberán comprobar:
+
+1. Carrera entre la cancelación y el establecimiento de `pointOfNoReturnAt`.
+2. Victoria única de la cancelación cuando confirma primero.
+3. Victoria única del procesador de eliminación cuando confirma primero.
+4. Rechazo de la cancelación cuando `pointOfNoReturnAt` ya existe.
+5. Imposibilidad de establecer el punto de no retorno después de confirmar la cancelación.
+6. Imposibilidad de confirmar simultáneamente ambas transiciones.
+7. Inmutabilidad de `pointOfNoReturnAt`.
+8. Establecimiento conjunto de `pointOfNoReturnAt` y `pointOfNoReturnOperation`.
+9. Rechazo de valores no permitidos para `pointOfNoReturnOperation`.
+10. Ausencia de operaciones irreversibles cuando la cancelación gana la carrera.
+
+### Restauración del perfil
+
+Las pruebas deberán comprobar:
+
+1. Restauración de un perfil originalmente visible.
+2. Conservación de un perfil originalmente oculto.
+3. Compatibilidad con perfiles históricos sin `isProfileVisible`.
+4. Rechazo de `previousProfileVisibility` ausente o no booleano.
+5. Rechazo de `previousProfileVisibility` falsificado.
+6. Retirada de `deletionRequested`.
+7. Retirada de `deletionRequestedAt`.
+8. Conservación de todos los demás campos del perfil.
+9. Rechazo si `users/{uid}` no existe.
+10. Eliminación del dato temporal de restauración después de verificar el resultado.
+
+### Registro cancelado mínimo
+
+Las pruebas deberán comprobar:
+
+1. Creación de un único registro cancelado.
+2. Generación de un `cancellationRecordId` aleatorio y opaco.
+3. Imposibilidad de derivar el identificador desde el UID o correo.
+4. Uso de `status: cancelled`.
+5. Uso de hora del servidor para `cancelledAt`.
+6. Cálculo de `expiresAt` desde `cancelledAt`.
+7. Inmutabilidad de `cancelledAt`.
+8. Inmutabilidad de `expiresAt`.
+9. Presencia exclusiva de campos permitidos.
+10. Ausencia de UID, correo, `requestId` y `previousProfileVisibility`.
+11. Ausencia de contenido, credenciales, tokens y copias del perfil.
+12. Ausencia de identificadores DEL-S2.
+13. Rechazo de valores no permitidos en campos de lista cerrada.
+14. Eliminación de la solicitud activa solo después de confirmar la restauración y el registro cancelado.
+
+### Idempotencia y reintentos
+
+Las pruebas deberán comprobar:
+
+1. Reintento seguro después de una interrupción antes de restaurar el perfil.
+2. Reintento seguro después de restaurar el perfil.
+3. Reintento seguro después de crear el registro cancelado.
+4. Reintento seguro después de eliminar la solicitud activa.
+5. Respuesta idempotente después de completar la cancelación.
+6. Ausencia de registros cancelados duplicados.
+7. Ausencia de cambios incompatibles en la visibilidad del perfil.
+8. Imposibilidad de recrear una solicitud activa eliminada.
+9. Imposibilidad de extender `expiresAt`.
+10. Imposibilidad de crear DEL-S2 durante un reintento.
+11. Recuperación segura después de perder la respuesta al cliente.
+12. Comportamiento correcto ante dos llamadas concurrentes de cancelación.
+
+### Retención y expiración
+
+Las pruebas deberán comprobar:
+
+1. Inicio del plazo después de completar y verificar la cancelación.
+2. Vencimiento exactamente 30 días calendario después de `cancelledAt`.
+3. Eliminación completa del registro al vencer `expiresAt`.
+4. Reintento seguro si el registro ya fue eliminado.
+5. Imposibilidad de recrear un registro vencido.
+6. Ausencia de cambios en la cuenta activa durante la expiración.
+7. Ausencia de cambios en una nueva solicitud activa.
+8. Ausencia de cambios en la visibilidad del perfil.
+9. Ausencia de DEL-S2.
+10. Ausencia de una nueva comunicación de cancelación por la expiración.
+
+### Reglas de seguridad y acceso directo
+
+Las pruebas deberán comprobar:
+
+1. Rechazo de lectura directa de la solicitud activa desde la aplicación.
+2. Rechazo de actualización directa de la solicitud activa.
+3. Rechazo de cancelación directa desde la aplicación.
+4. Rechazo de eliminación directa de la solicitud activa.
+5. Rechazo de lectura directa del registro cancelado.
+6. Rechazo de creación directa del registro cancelado.
+7. Rechazo de actualización directa del registro cancelado.
+8. Rechazo de eliminación directa del registro cancelado.
+9. Rechazo de modificación directa de `pointOfNoReturnAt`.
+10. Rechazo de restauración directa del perfil como parte de la cancelación.
+11. Conservación de las validaciones estrictas para crear la solicitud inicial.
+12. Prevención de dos solicitudes activas simultáneas.
+
+### Respuestas para la aplicación
+
+Las pruebas deberán comprobar:
+
+1. Respuesta `cancelled` después de completar la cancelación.
+2. Respuesta idempotente `cancelled` después de un reintento completado.
+3. Respuesta `not-cancellable` para estados no cancelables.
+4. Respuesta `identity-verification-required` cuando corresponda.
+5. Respuesta `recent-session-required` cuando la reautenticación haya vencido.
+6. Respuesta `request-not-found` cuando no exista una solicitud procesable.
+7. Respuesta `point-of-no-return-reached` cuando corresponda.
+8. Respuesta `restoration-pending` durante una recuperación idempotente.
+9. Respuesta `temporary-error` ante un fallo transitorio seguro.
+10. Ausencia de UID, correo, fechas e identificadores internos en las respuestas.
+11. Ausencia de información que revele la existencia del registro cancelado.
+12. Uso de mensajes localizados en los 16 idiomas activos.
+13. Uso de un mensaje general seguro cuando falte una traducción.
+14. Imposibilidad de mostrar directamente un código técnico a la persona.
+
+### Ausencia de efectos destructivos
+
+Todas las rutas de cancelación y sus reintentos deberán probar que no:
+
+- eliminan conversaciones;
+- eliminan mensajes;
+- eliminan solicitudes o conexiones ordinarias;
+- eliminan reportes;
+- alteran listas de bloqueos;
+- eliminan `users/{uid}`;
+- eliminan Firebase Authentication;
+- modifican datos de otras cuentas;
+- crean DEL-S2;
+- ejecutan ninguna otra operación irreversible.
+
+### Entornos y condiciones de prueba
+
+Las pruebas deberán ejecutarse inicialmente con Emulator Suite y cuentas desechables.
+
+Antes de producción deberá existir cobertura para:
+
+- ejecución local controlada;
+- errores parciales simulados;
+- llamadas concurrentes;
+- respuestas perdidas;
+- reintentos;
+- expiración simulada;
+- tokens y sesiones inválidos;
+- perfiles visibles, ocultos e históricos;
+- ausencia temporal de documentos;
+- reglas desplegadas en un proyecto separado de pruebas.
+
+No deberán utilizarse cuentas reales ni datos personales reales para validar operaciones destructivas.
+
 
 ## 15. Evaluación de alternativas de backend
 
