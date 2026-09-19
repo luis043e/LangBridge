@@ -83,17 +83,239 @@ La cancelación no podrá permitirse:
 - Después de una operación irreversible.
 - Mediante una actualización directa desde la aplicación móvil.
 
-## 6. Requisitos de identidad
+## 6. Reautenticación reciente y requisitos de identidad
+
+### Requisitos generales
 
 Antes de cancelar, el backend deberá comprobar:
 
 1. Que exista una persona autenticada.
 2. Que el UID autenticado coincida con la solicitud activa.
 3. Que la identidad haya sido verificada nuevamente.
-4. Que la sesión sea suficientemente reciente.
+4. Que la autenticación se encuentre dentro de la ventana reciente aprobada.
 5. Que la solicitud permanezca en un estado cancelable.
+6. Que no se haya alcanzado el punto técnico de no retorno.
 
-La definición técnica exacta de sesión reciente permanece pendiente.
+La existencia de `auth.currentUser` no será suficiente para autorizar la cancelación.
+
+La renovación automática de un token de ID tampoco se considerará por sí sola una nueva verificación de identidad.
+
+### Proveedores actualmente admitidos
+
+LangBridge utiliza actualmente:
+
+```text
+email
+google
+```
+La aplicación deberá seleccionar el procedimiento de reautenticación según los proveedores realmente vinculados con la cuenta autenticada.
+
+No deberá confiar únicamente en el campo `authProvider` almacenado en el perfil de Firestore.
+
+### Correo y contraseña
+
+Para una cuenta con correo y contraseña, la aplicación deberá:
+
+1. Solicitar nuevamente la contraseña.
+2. Obtener el correo desde la persona actualmente autenticada.
+3. Crear una credencial nueva de correo y contraseña.
+4. Ejecutar la reautenticación sobre `auth.currentUser`.
+5. Eliminar inmediatamente la contraseña del estado local.
+6. Renovar el token de ID después de la reautenticación.
+7. Invocar el futuro backend de cancelación.
+
+La implementación prevista utilizará conceptualmente:
+
+```text
+EmailAuthProvider.credential
+reauthenticateWithCredential
+getIdToken
+```
+
+La contraseña:
+
+- no se almacenará de forma persistente;
+- no se guardará en Firestore;
+- no se enviará al backend;
+- no se incluirá en parámetros de navegación;
+- no se escribirá en registros;
+- no se conservará después del intento;
+- no se reutilizará desde el inicio de sesión original.
+
+Si la contraseña es incorrecta, la cancelación no continuará y la solicitud activa permanecerá sin cambios.
+
+### Google
+
+Para una cuenta vinculada con Google, la aplicación deberá:
+
+1. Iniciar una nueva interacción con Google.
+2. Obtener una credencial nueva del proveedor.
+3. Crear una credencial mediante `GoogleAuthProvider.credential`.
+4. Ejecutar la reautenticación sobre `auth.currentUser`.
+5. Renovar el token de ID de Firebase.
+6. Invocar el futuro backend de cancelación.
+
+La implementación prevista utilizará conceptualmente:
+
+```text
+GoogleSignin.signIn
+GoogleAuthProvider.credential
+reauthenticateWithCredential
+getIdToken
+```
+
+La reautenticación con Google no deberá utilizar el flujo general de registro ni tratar la cuenta como nueva.
+
+Tampoco deberá:
+
+- sobrescribir la aceptación legal;
+- cambiar los idiomas;
+- actualizar datos ordinarios del perfil;
+- crear otro documento de usuario;
+- almacenar el token de Google;
+- enviar la credencial de Google mediante Firestore;
+- incluir credenciales o tokens en registros técnicos.
+
+Si la persona cancela la interacción con Google, la cancelación de la solicitud de eliminación no continuará y ningún documento será modificado.
+
+### Cuentas con varios proveedores
+
+Si una cuenta tiene más de un proveedor vinculado:
+
+- deberá utilizarse un proveedor realmente vinculado;
+- la aplicación podrá presentar las opciones admitidas;
+- la reautenticación deberá aplicarse a `auth.currentUser`;
+- no deberá crearse una segunda cuenta;
+- no deberá cambiarse el UID;
+- no deberá confiar únicamente en `authProvider` almacenado en Firestore;
+- no deberá vincular ni desvincular proveedores durante la cancelación.
+
+La selección deberá basarse en los proveedores reales disponibles mediante Firebase Authentication.
+
+### Cancelación o fallo de la reautenticación
+
+Si la persona cancela la interfaz de reautenticación:
+
+- no se invocará el backend;
+- no se modificará la solicitud activa;
+- no se modificará el perfil;
+- no se creará un registro cancelado;
+- no se creará DEL-S2;
+- se mostrará un mensaje general.
+
+Si la reautenticación falla:
+
+- no se ejecutará la cancelación;
+- no se restaurará la visibilidad;
+- no se retirarán las marcas de eliminación;
+- no se eliminará la solicitud activa;
+- no se registrarán contraseñas, credenciales ni tokens;
+- podrá permitirse un nuevo intento controlado.
+
+Los errores deberán traducirse a mensajes generales y localizados, sin exponer detalles internos del proveedor.
+
+### Evidencia para el backend
+
+Después de una reautenticación correcta, la aplicación deberá obtener un token de ID actualizado mediante los mecanismos oficiales de Firebase Authentication.
+
+La aplicación no deberá enviar por separado:
+
+```text
+password
+Google ID token
+Google access token
+refresh token
+credential object
+auth_time supplied by the client
+```
+
+El backend deberá obtener la información autenticada desde el contexto verificado de la invocación o desde la verificación oficial del token.
+
+El backend deberá comprobar como mínimo:
+
+```text
+uid
+auth_time
+```
+
+El UID autenticado deberá coincidir con la ruta:
+
+```text
+accountDeletionRequests/{uid}
+```
+
+El backend no deberá aceptar un UID enviado libremente por la aplicación como autoridad para seleccionar la solicitud.
+
+### Ventana propuesta de autenticación reciente
+
+La ventana técnica inicial propuesta será:
+
+```text
+5 minutos
+```
+
+El backend deberá calcular la antigüedad utilizando su propia hora confiable y el valor autenticado de `auth_time`.
+
+Conceptualmente:
+
+```text
+serverTime - auth_time <= allowedRecentAuthenticationWindow
+```
+
+La aplicación no podrá proporcionar:
+
+- la hora actual;
+- la hora de reautenticación;
+- la antigüedad de la sesión;
+- la ventana permitida;
+- una declaración de que la identidad ya fue verificada.
+
+La ventana de 5 minutos permanece como propuesta técnica pendiente de pruebas y aprobación definitiva.
+
+### Expiración antes de invocar el backend
+
+Si la ventana reciente vence antes de ejecutar la cancelación:
+
+- el backend rechazará la operación;
+- la solicitud activa permanecerá sin cambios;
+- el perfil permanecerá oculto mientras la solicitud activa continúe existiendo;
+- no se creará un registro cancelado;
+- no se creará DEL-S2;
+- la persona deberá repetir la reautenticación;
+- el rechazo no alcanzará el punto técnico de no retorno.
+
+### Respuestas generales previstas
+
+Los resultados relacionados con identidad podrán incluir:
+
+```text
+identity-verification-required
+recent-session-required
+authentication-provider-unsupported
+reauthentication-cancelled
+temporary-error
+```
+
+Las respuestas no deberán revelar:
+
+- datos internos del token;
+- marcas de tiempo exactas del backend;
+- credenciales;
+- tokens;
+- información de otras cuentas;
+- detalles que permitan evadir la ventana reciente.
+
+### Estado de implementación
+
+Actualmente:
+
+- no existe reautenticación en la pantalla de eliminación;
+- no se importa `reauthenticateWithCredential`;
+- no se utiliza `EmailAuthProvider`;
+- el flujo de Google utiliza `signInWithCredential` para el inicio de sesión general;
+- no existe backend que compruebe `auth_time`;
+- la ventana de 5 minutos no está implementada;
+- no deberán realizarse cancelaciones reales hasta completar estas protecciones.
 
 ## 7. Punto técnico de no retorno
 
