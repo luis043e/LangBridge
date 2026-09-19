@@ -52,7 +52,7 @@ Cada decisión utilizará uno de estos estados:
 |---|---|---|---|
 | DEC-BE-001 | Plataforma de backend | Cloud Functions | recomendada |
 | DEC-BE-002 | Tipo de función | Función invocable protegida | recomendada |
-| DEC-BE-003 | Versión de Node.js | Pendiente de validación | pendiente |
+| DEC-BE-003 | Versión de Node.js | Node.js 24, condicionada a Functions de segunda generación | requiere-prueba |
 | DEC-BE-004 | Generación de Functions | Pendiente de validación | pendiente |
 | DEC-BE-005 | Región de ejecución | Pendiente de evaluación | pendiente |
 | DEC-BE-006 | Ventana de reautenticación | Cinco minutos | requiere-prueba |
@@ -348,3 +348,145 @@ Los costos y requisitos del plan deberán evaluarse antes de cambiar el estado d
 Adoptar provisionalmente una función invocable protegida como interfaz entre la aplicación móvil y el backend autorizado de cancelación.
 
 La decisión permanecerá en estado `recomendada` hasta aprobar la plataforma, la versión de ejecución, la región, los costos, las pruebas locales y el procedimiento de despliegue.
+
+### DEC-BE-003: Versión de Node.js
+
+**Pregunta:** ¿Qué versión de Node.js deberá utilizar el backend de cancelación?
+
+**Recomendación preliminar:** Node.js 24, condicionada a la aprobación de Cloud Functions de segunda generación.
+
+**Estado:** requiere-prueba.
+
+#### Entorno local verificado
+
+La inspección local confirmó:
+```text
+Node.js: v24.19.0
+npm: 11.17.0
+Firebase CLI: 15.30.2
+```
+
+El proyecto principal:
+
+- no define actualmente `engines.node`;
+- no contiene `.nvmrc`;
+- no contiene `.node-version`;
+- no contiene `.tool-versions`;
+- no contiene todavía un paquete independiente para Functions.
+
+La versión del backend deberá declararse más adelante en el paquete exclusivo de Functions y no deberá imponerse prematuramente al paquete principal de la aplicación móvil.
+
+#### Alternativas consideradas
+
+1. Node.js 24.
+2. Node.js 22.
+3. Node.js 20.
+4. Una versión posterior todavía no validada.
+
+#### Node.js 24
+
+Node.js 24 es la opción preliminar preferida porque:
+
+- coincide con el entorno local actualmente instalado;
+- ofrece un horizonte de soporte mayor que Node.js 22;
+- evita iniciar un backend nuevo sobre una versión próxima a quedar obsoleta;
+- permite preparar la implementación sobre una base reciente;
+- reduce la necesidad de una migración temprana de runtime.
+
+La aprobación dependerá de confirmar:
+
+- uso de Cloud Functions de segunda generación;
+- compatibilidad con la versión seleccionada de `firebase-functions`;
+- compatibilidad con la versión seleccionada de `firebase-admin`;
+- compatibilidad con Firebase CLI;
+- funcionamiento correcto en Emulator Suite;
+- ausencia de diferencias relevantes entre emulador y producción.
+
+#### Node.js 22
+
+Node.js 22 será la alternativa de compatibilidad.
+
+Sus ventajas incluyen:
+
+- disponibilidad para primera generación y funciones basadas en Cloud Run;
+- mayor flexibilidad si la generación de Functions todavía no está aprobada;
+- ecosistema más maduro para dependencias existentes;
+- ruta de contingencia si alguna dependencia no admite Node.js 24.
+
+Sus limitaciones incluyen un horizonte de soporte menor y la posibilidad de requerir una migración más temprana.
+
+#### Node.js 20
+
+Node.js 20 no se recomienda para un backend nuevo.
+
+No deberá seleccionarse salvo que aparezca una incompatibilidad excepcional, documentada y temporal que impida utilizar Node.js 22 o Node.js 24.
+
+No se aprobará una versión únicamente porque una dependencia antigua declare compatibilidad con ella.
+``
+#### Criterios de prueba
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse localmente:
+
+1. Instalación reproducible del paquete futuro de Functions.
+2. Compatibilidad de `firebase-functions`.
+3. Compatibilidad de `firebase-admin`.
+4. Inicio correcto del emulador de Functions.
+5. Ejecución de una función invocable mínima.
+6. Integración con el emulador de Authentication.
+7. Integración con el emulador de Firestore.
+8. Lectura válida del contexto autenticado.
+9. Lectura y validación de `auth_time`.
+10. Ejecución de transacciones.
+11. Pruebas automatizadas sin errores.
+12. Ausencia de advertencias críticas sobre el runtime.
+
+Estas pruebas deberán realizarse sin desplegar servicios y sin utilizar cuentas reales.
+
+#### Separación respecto de la aplicación móvil
+
+El runtime del backend deberá definirse en el futuro paquete independiente de Functions.
+
+No se modificará el `package.json` principal de LangBridge únicamente para fijar la versión del backend.
+
+Cuando se apruebe la infraestructura, podrán utilizarse controles específicos dentro de la carpeta de Functions, como:
+
+- `engines.node` en el paquete del backend;
+- un archivo local de versión cuando resulte necesario;
+- validaciones en integración continua;
+- documentación del runtime aprobado.
+
+#### Seguridad y mantenimiento
+
+La versión seleccionada deberá:
+
+- recibir actualizaciones de seguridad;
+- permanecer dentro de su período de soporte;
+- admitir actualizaciones planificadas;
+- evitar dependencias abandonadas;
+- mantener bloqueos reproducibles de dependencias;
+- revisarse antes de alcanzar deprecación;
+- contar con un procedimiento documentado de actualización.
+
+La aplicación no deberá depender de detalles internos del runtime para interpretar respuestas del backend.
+
+#### Costos y Blaze
+
+La selección de Node.js 24 o Node.js 22 no autoriza:
+
+- crear la carpeta `functions`;
+- instalar dependencias administrativas;
+- activar Blaze;
+- desplegar Cloud Functions;
+- cambiar recursos de producción.
+
+La selección definitiva deberá coordinarse con la generación de Functions, la región, las pruebas locales y el análisis económico.
+
+#### Decisión propuesta
+
+Adoptar Node.js 24 como runtime candidato, condicionado a seleccionar Cloud Functions de segunda generación y superar las pruebas locales de compatibilidad.
+
+Mantener Node.js 22 como alternativa de contingencia.
+
+Descartar Node.js 20 como opción normal para un backend nuevo.
+
+La decisión permanecerá en estado `requiere-prueba` hasta validar el SDK de Functions, Admin SDK, Firebase CLI y Emulator Suite.
