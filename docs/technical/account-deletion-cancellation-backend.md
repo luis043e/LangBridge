@@ -1822,30 +1822,90 @@ Durante esta fase:
 
 ## 17. Próximo paso técnico
 
-El próximo paso será cerrar las decisiones mínimas necesarias antes de crear infraestructura de backend.
+El diseño documental del backend seguro de cancelación se encuentra prácticamente completo.
 
-El siguiente bloque deberá:
+### Decisiones y diseños ya documentados
 
-1. Validar la arquitectura preliminar recomendada.
-2. Definir la estrategia de reautenticación reciente.
-3. Establecer el criterio técnico del punto de no retorno.
-4. Decidir si `expiresAt` utilizará una política TTL.
-5. Determinar si será necesaria una función programada complementaria.
-6. Seleccionar una versión compatible de Node.js.
-7. Seleccionar la región de ejecución.
-8. Preparar una estimación inicial de costos.
-9. Definir alertas y límites de presupuesto antes de considerar Blaze.
-10. Diseñar las pruebas locales del backend mediante Emulator Suite.
-11. Preparar un procedimiento de despliegue y reversión.
-12. Solicitar aprobación explícita antes de crear infraestructura o activar facturación.
+Actualmente están definidos:
 
-Hasta completar estas decisiones:
+1. La arquitectura preliminar basada en una función invocable protegida.
+2. La alternativa local exclusiva para Emulator Suite antes de cualquier despliegue.
+3. La reautenticación para correo y contraseña.
+4. La reautenticación para proveedor federado.
+5. La validación del `uid` desde el contexto autenticado.
+6. La comprobación de `auth_time` desde el backend.
+7. La ventana técnica inicial propuesta de cinco minutos.
+8. El punto técnico de no retorno.
+9. La carrera transaccional entre cancelación y eliminación.
+10. La restauración de `previousProfileVisibility`.
+11. El contrato del registro cancelado mínimo.
+12. La idempotencia y prevención de duplicados.
+13. La retención durante 30 días.
+14. Las respuestas seguras para la aplicación.
+15. Los controles de seguridad y acceso.
+16. El plan detallado de pruebas futuras.
+17. La prohibición de crear DEL-S2 durante una cancelación.
+
+### Decisiones todavía pendientes
+
+Antes de crear infraestructura deberán cerrarse:
+
+1. La aprobación definitiva de Cloud Functions como backend de producción.
+2. La aprobación definitiva de una función invocable.
+3. La aprobación o ajuste de la ventana de reautenticación de cinco minutos.
+4. La selección de una versión compatible de Node.js.
+5. La selección de la generación de Cloud Functions.
+6. La selección de la región de ejecución.
+7. La decisión definitiva sobre la política TTL.
+8. La aceptación de la posible ventana técnica de eliminación de TTL.
+9. La decisión sobre una función programada complementaria.
+10. La configuración futura de App Check.
+11. La estrategia exacta para la clave interna de idempotencia.
+12. El diseño de métricas y observabilidad.
+13. La estimación inicial de costos.
+14. Las alertas y límites de presupuesto.
+15. El procedimiento de despliegue y reversión.
+16. La aprobación explícita antes de activar Blaze o desplegar servicios.
+
+### Próximo bloque recomendado
+
+El próximo bloque deberá preparar una matriz de decisiones técnicas que compare y permita aprobar:
+
+- función invocable y alternativas;
+- versión y generación de Node.js;
+- región de ejecución;
+- ventana de reautenticación;
+- política TTL;
+- función programada complementaria;
+- App Check;
+- idempotencia;
+- costos y controles presupuestarios;
+- despliegue y reversión.
+
+La matriz deberá distinguir claramente:
+
+- decisión recomendada;
+- alternativas consideradas;
+- ventajas;
+- riesgos;
+- costos potenciales;
+- impacto sobre seguridad;
+- compatibilidad con Emulator Suite;
+- necesidad o no de Blaze;
+- estado de aprobación.
+
+### Restricciones hasta la aprobación
+
+Hasta cerrar la matriz de decisiones y recibir aprobación explícita:
 
 - no se creará la carpeta `functions`;
-- no se instalarán dependencias administrativas;
+- no se instalarán `firebase-functions` ni `firebase-admin`;
+- no se modificará `firebase.json` para agregar Functions;
 - no se activará Blaze;
+- no se configurará TTL en producción;
 - no se desplegará Firebase;
 - no se abrirán permisos administrativos al cliente;
-- no se ejecutarán cancelaciones con cuentas reales.
+- no se ejecutarán cancelaciones con cuentas reales;
+- no se ejecutará ninguna operación irreversible.
 
-La implementación del backend comenzará únicamente después de aprobar la arquitectura, los controles de seguridad, las pruebas locales y el impacto económico.
+La implementación local o de producción del backend comenzará únicamente después de aprobar la arquitectura, las decisiones técnicas pendientes, los controles de seguridad, las pruebas y el impacto económico.
