@@ -1865,6 +1865,140 @@ test(
   }
 );
 test(
+  'an originally hidden profile preserves false visibility',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-hidden-profile'
+          ),
+          {
+            uid: 'user-hidden-profile',
+            fullName: 'Hidden Profile User',
+            email: 'hidden-profile@example.com',
+            isProfileVisible: false,
+            deletionRequested: false,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-hidden-profile'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    const batch = writeBatch(firestore);
+
+    batch.set(
+      doc(
+        firestore,
+        'accountDeletionRequests',
+        'user-hidden-profile'
+      ),
+      {
+        userId: 'user-hidden-profile',
+        userEmail: 'hidden-profile@example.com',
+        status: 'pending',
+        previousProfileVisibility: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+    );
+
+    batch.update(
+      doc(
+        firestore,
+        'users',
+        'user-hidden-profile'
+      ),
+      {
+        isProfileVisible: false,
+        deletionRequested: true,
+        deletionRequestedAt: serverTimestamp(),
+      }
+    );
+
+    await assertSucceeds(batch.commit());
+  }
+);
+test(
+  'a historical profile without visibility defaults to true',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-historical-visibility'
+          ),
+          {
+            uid: 'user-historical-visibility',
+            fullName: 'Historical Visibility User',
+            email: 'historical-visibility@example.com',
+            deletionRequested: false,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-historical-visibility'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    const batch = writeBatch(firestore);
+
+    batch.set(
+      doc(
+        firestore,
+        'accountDeletionRequests',
+        'user-historical-visibility'
+      ),
+      {
+        userId: 'user-historical-visibility',
+        userEmail:
+          'historical-visibility@example.com',
+        status: 'pending',
+        previousProfileVisibility: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+    );
+
+    batch.update(
+      doc(
+        firestore,
+        'users',
+        'user-historical-visibility'
+      ),
+      {
+        isProfileVisible: false,
+        deletionRequested: true,
+        deletionRequestedAt: serverTimestamp(),
+      }
+    );
+
+    await assertSucceeds(batch.commit());
+  }
+);
+test(
   'a historical user profile with city can be updated',
   async () => {
     await testEnvironment.withSecurityRulesDisabled(
