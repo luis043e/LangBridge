@@ -1042,9 +1042,9 @@ La respuesta no deberá revelar:
 
 ## 12. Respuestas previstas para la aplicación
 
-El futuro backend deberá devolver respuestas generales y seguras.
+El futuro backend deberá devolver respuestas generales, seguras e idempotentes. La aplicación utilizará códigos estables para seleccionar mensajes localizados, pero no mostrará directamente textos técnicos enviados por el backend.
 
-Posibles resultados:
+### Resultados permitidos
 
 ```text
 cancelled
@@ -1057,14 +1057,64 @@ restoration-pending
 temporary-error
 ```
 
+Los códigos tendrán el siguiente significado general:
+
+- `cancelled`: la cancelación fue completada o un reintento confirmó que ya estaba completada.
+- `not-cancellable`: la solicitud existe, pero su estado actual no permite cancelarla.
+- `identity-verification-required`: la identidad deberá verificarse nuevamente antes de continuar.
+- `recent-session-required`: la sesión autenticada no cumple la ventana reciente permitida.
+- `request-not-found`: no se encontró una solicitud activa que pueda procesarse.
+- `point-of-no-return-reached`: la eliminación alcanzó el punto técnico de no retorno y ya no puede cancelarse.
+- `restoration-pending`: la cancelación fue aceptada, pero todavía existen operaciones idempotentes de restauración o limpieza pendientes.
+- `temporary-error`: ocurrió un fallo transitorio y la operación podrá reintentarse de forma segura.
+
+### Comportamiento de la aplicación
+
+La aplicación deberá:
+
+1. Tratar `cancelled` como un resultado exitoso e idempotente.
+2. Actualizar la interfaz solo después de recibir una respuesta segura del backend.
+3. Solicitar una nueva verificación cuando reciba `identity-verification-required`.
+4. Solicitar reautenticación cuando reciba `recent-session-required`.
+5. Impedir nuevos intentos de cancelación cuando reciba `point-of-no-return-reached`.
+6. Mantener una presentación no destructiva mientras reciba `restoration-pending`.
+7. Permitir un reintento controlado cuando reciba `temporary-error`.
+8. No inferir que la eliminación terminó únicamente porque la solicitud activa ya no pueda leerse desde el cliente.
+9. No crear, modificar ni eliminar registros protegidos como respuesta a uno de estos códigos.
+10. No mostrar rutas internas, identificadores administrativos ni detalles técnicos sensibles.
+
+### Localización
+
+Los códigos serán independientes del idioma y no se mostrarán literalmente a la persona.
+
+La aplicación deberá asociar cada código con una clave de traducción controlada y disponible en los 16 idiomas activos. Los mensajes localizados deberán:
+
+- explicar el resultado de manera clara;
+- evitar detalles administrativos internos;
+- no revelar la existencia de registros protegidos;
+- no incluir UID, correo, fechas internas ni identificadores;
+- diferenciar un resultado exitoso, una verificación requerida, un rechazo definitivo y un error temporal;
+- mantener el mismo significado jurídico y técnico en todos los idiomas.
+
+La ausencia de una traducción no deberá provocar que se muestre el código técnico directamente. Deberá utilizarse un mensaje general seguro previamente definido.
+
+### Información prohibida en las respuestas
+
 Las respuestas no deberán exponer:
 
+- UID o correo;
+- fechas internas;
+- `cancellationRecordId`;
+- claves de idempotencia;
 - detalles administrativos internos;
 - credenciales;
 - tokens;
 - rutas protegidas;
 - datos de otras cuentas;
+- estados o fases internas no destinados al cliente;
 - información que facilite eludir controles de seguridad.
+
+Las respuestas tampoco deberán permitir determinar si el registro cancelado todavía existe o si ya fue eliminado por expiración.
 
 ## 13. Reglas de seguridad
 
