@@ -584,24 +584,375 @@ Antes de implementar producción deberán existir pruebas para comprobar:
 17. Protección contra acceso directo desde el cliente.
 18. Ausencia de efectos sobre conversaciones, mensajes y reportes de una cuenta activa.
 
-## 15. Infraestructura pendiente
+## 15. Evaluación de alternativas de backend
 
-Antes de implementar deberán decidirse:
+### Requisitos mínimos
 
-- Tecnología del backend autorizado.
-- Necesidad de Cloud Functions.
-- Versión de Node.js.
-- Región de ejecución.
-- Uso de funciones invocables o endpoints HTTP.
-- Validación mediante App Check.
-- Estrategia de reautenticación.
-- Programación de expiraciones.
-- Gestión de secretos.
-- Registro técnico mínimo.
-- Costos y posible necesidad de Blaze.
-- Procedimiento de despliegue.
-- Estrategia de reversión.
-- Pruebas con emuladores.
+La infraestructura seleccionada deberá permitir:
+
+- validar la autenticación de la persona solicitante;
+- comprobar que el UID autenticado corresponda a la solicitud activa;
+- exigir una verificación reciente de identidad;
+- utilizar privilegios administrativos sin abrir permisos directos al cliente;
+- ejecutar operaciones atómicas o transacciones;
+- restaurar `previousProfileVisibility`;
+- eliminar la solicitud activa;
+- crear un único registro cancelado mínimo;
+- admitir reintentos idempotentes;
+- aplicar o coordinar la expiración de 30 días;
+- probarse localmente antes de cualquier despliegue;
+- conservar registros técnicos mínimos;
+- evitar exponer secretos en la aplicación móvil.
+
+### Alternativa A: función invocable
+
+Una función invocable permitiría que la aplicación solicitara la cancelación mediante una operación autenticada y controlada por el backend.
+
+Ventajas previstas:
+
+- integración directa con una aplicación que ya utiliza Firebase;
+- lógica aislada del cliente;
+- validación centralizada de autenticación;
+- uso de privilegios administrativos;
+- respuestas estructuradas para la aplicación;
+- posibilidad de integrar App Check;
+- compatibilidad con pruebas locales mediante emuladores;
+- menor necesidad de administrar rutas HTTP manualmente.
+
+Riesgos y requisitos:
+
+- requiere crear infraestructura de Cloud Functions;
+- requiere dependencias administrativas;
+- puede requerir el plan Blaze para despliegue;
+- deberá protegerse contra invocaciones repetidas;
+- no sustituye la reautenticación reciente;
+- deberá validar explícitamente el UID y los estados cancelables;
+- necesitará observabilidad y manejo de errores.
+
+Uso preliminar recomendado:
+
+```text
+cancelAccountDeletionRequest
+```
+
+El nombre definitivo deberá elegirse únicamente cuando comience la implementación.
+
+### Alternativa B: endpoint HTTP autorizado
+
+Un endpoint HTTP podría ejecutar el mismo procedimiento desde un servicio administrado o servidor propio.
+
+Ventajas previstas:
+
+- control explícito de rutas, encabezados y respuestas;
+- portabilidad hacia otros proveedores;
+- posibilidad de separar el backend del proyecto Firebase;
+- flexibilidad para integraciones externas futuras.
+
+Riesgos y requisitos:
+
+- autenticación manual más compleja;
+- validación explícita de tokens;
+- configuración de CORS cuando corresponda;
+- mayor superficie de seguridad;
+- necesidad de administrar despliegue, escalado y observabilidad;
+- riesgo de duplicar funciones que Firebase ya proporciona;
+- posible incremento del mantenimiento operativo.
+
+Esta alternativa no se recomienda como primera opción mientras LangBridge continúe utilizando principalmente servicios de Firebase.
+
+### Alternativa C: proceso administrativo provisional
+
+Un proceso administrativo provisional podría ejecutar cancelaciones de forma manual o semiautomatizada durante las primeras pruebas internas.
+
+Ventajas previstas:
+
+- permite validar el procedimiento antes de desplegar un backend público;
+- reduce el riesgo de automatizar prematuramente;
+- permite utilizar exclusivamente cuentas desechables;
+- facilita revisar cada transición durante las pruebas iniciales.
+
+Limitaciones:
+
+- no es adecuado para producción;
+- depende de intervención humana;
+- puede provocar demoras;
+- aumenta el riesgo de errores operativos;
+- no satisface el objetivo de procesamiento automático;
+- no deberá usar credenciales personales incrustadas en scripts;
+- no podrá convertirse en el procedimiento permanente.
+
+Esta alternativa solo podría utilizarse durante pruebas locales y controladas.
+
+### Alternativa D: función programada para expiración
+
+Una función programada podría buscar registros cancelados vencidos y eliminarlos periódicamente.
+
+Ventajas previstas:
+
+- permite comprobaciones adicionales antes de eliminar;
+- permite métricas, reintentos y registros técnicos;
+- puede detectar datos inconsistentes;
+- ofrece control sobre lotes y concurrencia;
+- puede servir como comprobación complementaria.
+
+Riesgos y requisitos:
+
+- utiliza infraestructura programada;
+- puede ejecutarse más de una vez;
+- puede solaparse con otra ejecución;
+- requiere idempotencia estricta;
+- puede implicar costos de Cloud Scheduler y Cloud Functions;
+- puede requerir el plan Blaze;
+- exige supervisión del proceso.
+
+No deberá suponerse que una sola ejecución programada ocurrirá exactamente una vez.
+
+### Alternativa E: política TTL de Firestore
+
+Una política TTL podría usar `expiresAt` para eliminar automáticamente los documentos vencidos de:
+
+```text
+cancelledDeletionRequests
+```
+
+Ventajas previstas:
+
+- menor cantidad de código personalizado;
+- eliminación automática basada en un campo definido;
+- reducción del almacenamiento de datos vencidos;
+- separación entre creación del registro y limpieza posterior;
+- menor superficie de errores en un proceso programado propio.
+
+Limitaciones y consideraciones:
+
+- la eliminación no será instantánea al alcanzar `expiresAt`;
+- un documento vencido podrá existir durante una ventana técnica posterior;
+- la eliminación podrá ocurrir horas después del vencimiento;
+- las eliminaciones contarán como operaciones de Firestore;
+- TTL no deberá modificar una cuenta activa;
+- TTL no deberá utilizarse para ejecutar la restauración;
+- TTL solo eliminará el registro cancelado mínimo;
+- deberá verificarse su disponibilidad, configuración y costo;
+- no deberá aplicarse accidentalmente a la solicitud activa ni a DEL-S2.
+
+Antes de aprobar TTL deberá determinarse si la política legal admite una ventana técnica razonable después del vencimiento.
+
+### Alternativa F: proceso local exclusivo para emuladores
+
+Antes de seleccionar una infraestructura de producción podrá implementarse una versión local destinada exclusivamente a Emulator Suite.
+
+Esta versión permitirá:
+
+- probar restauración del perfil;
+- probar eliminación de la solicitud activa;
+- crear registros cancelados sintéticos;
+- comprobar idempotencia;
+- simular concurrencia;
+- probar expiraciones;
+- verificar que no se cree DEL-S2;
+- trabajar únicamente con cuentas desechables;
+- evitar despliegues prematuros.
+
+La implementación local no deberá confundirse con una solución de producción.
+
+## 15.1 Arquitectura preliminar recomendada
+
+La arquitectura preliminar recomendada para LangBridge es:
+
+```text
+Aplicación móvil
+    |
+    | solicitud autenticada de cancelación
+    v
+Función invocable protegida
+    |
+    | validación de identidad, estado y punto de no retorno
+    v
+Operación administrativa idempotente
+    |
+    +-- restaurar el perfil
+    +-- retirar marcas de eliminación
+    +-- crear el registro cancelado mínimo
+    +-- eliminar la solicitud activa
+    +-- eliminar datos temporales
+    |
+    v
+Política TTL basada en expiresAt
+```
+
+La función invocable manejaría la cancelación inmediata.
+
+La política TTL manejaría exclusivamente la eliminación posterior del registro cancelado mínimo.
+
+Una tarea programada podría considerarse como mecanismo complementario de verificación, pero no será obligatoria en el diseño inicial.
+
+## 15.2 Recomendación preliminar por responsabilidad
+
+### Solicitud de cancelación
+
+Alternativa recomendada:
+
+```text
+función invocable protegida
+```
+
+### Restauración de visibilidad
+
+Alternativa recomendada:
+
+```text
+operación administrativa atómica o transaccional
+```
+
+### Creación del registro cancelado
+
+Alternativa recomendada:
+
+```text
+backend autorizado con cancellationRecordId opaco
+```
+
+### Eliminación de la solicitud activa
+
+Alternativa recomendada:
+
+```text
+misma operación administrativa de cancelación
+```
+
+### Expiración a los 30 días
+
+Alternativa preliminar recomendada:
+
+```text
+política TTL basada en expiresAt
+```
+
+### Verificación complementaria
+
+Alternativa opcional:
+
+```text
+función programada idempotente
+```
+
+## 15.3 App Check
+
+App Check podrá añadirse como una capa complementaria para reducir solicitudes provenientes de clientes no autorizados.
+
+App Check:
+
+- no sustituirá Firebase Authentication;
+- no sustituirá la reautenticación;
+- no decidirá si una solicitud es cancelable;
+- no sustituirá las comprobaciones del punto de no retorno;
+- no autorizará directamente escrituras administrativas;
+- deberá probarse antes de exigirse en producción.
+
+La aplicación deberá manejar de forma segura los errores producidos cuando App Check no esté disponible o no sea válido.
+
+## 15.4 Reautenticación reciente
+
+La función de cancelación no deberá confiar únicamente en que exista una sesión iniciada.
+
+Antes de invocar el backend, la aplicación deberá realizar una comprobación de identidad apropiada según el proveedor de autenticación.
+
+Posibles métodos:
+
+```text
+correo y contraseña:
+  reautenticación con credenciales
+
+proveedor federado:
+  reautenticación con el proveedor correspondiente
+```
+
+El backend deberá recibir únicamente evidencia válida y verificable a través de los mecanismos admitidos por Firebase Authentication.
+
+No deberá recibir contraseñas, tokens escritos manualmente ni credenciales almacenadas por la aplicación.
+
+La ventana exacta considerada como sesión reciente deberá decidirse antes de la implementación.
+
+## 15.5 Región y versión de ejecución
+
+Antes de crear infraestructura deberán seleccionarse:
+
+- una región compatible con la ubicación principal de los datos;
+- una versión de Node.js admitida;
+- una generación de Cloud Functions;
+- límites de memoria y tiempo;
+- configuración de concurrencia;
+- políticas de reintento;
+- retención de registros técnicos.
+
+La decisión deberá minimizar:
+
+- latencia;
+- transferencias innecesarias;
+- costos;
+- diferencias entre emulador y producción.
+
+## 15.6 Costos y Blaze
+
+No se activará Blaze durante la fase actual.
+
+Antes de activarlo deberá existir:
+
+1. Estimación de invocaciones mensuales.
+2. Estimación de lecturas y escrituras administrativas.
+3. Estimación de eliminaciones TTL.
+4. Estimación de tareas programadas.
+5. Alertas de presupuesto.
+6. Límites de uso cuando sean aplicables.
+7. Procedimiento para detener despliegues.
+8. Procedimiento de reversión.
+9. Aprobación explícita del responsable del proyecto.
+
+La activación de Blaze no se considerará implícita por escribir o probar código localmente.
+
+## 15.7 Pruebas con Emulator Suite
+
+Antes de cualquier despliegue deberán probarse localmente:
+
+- función de cancelación autenticada;
+- rechazo sin autenticación;
+- rechazo con UID diferente;
+- rechazo sin reautenticación;
+- cancelación en `pending`;
+- cancelación en `verified`;
+- cancelación condicionada en `processing`;
+- rechazo después del punto de no retorno;
+- restauración de visibilidad;
+- creación única del registro cancelado;
+- eliminación de la solicitud activa;
+- ausencia de DEL-S2;
+- reintentos idempotentes;
+- concurrencia;
+- expiración simulada;
+- errores parciales;
+- posibilidad de crear una solicitud nueva.
+
+Las pruebas locales no deberán utilizar cuentas ni datos reales.
+
+## 15.8 Decisiones todavía pendientes
+
+Permanecen pendientes:
+
+- aprobación definitiva de Cloud Functions;
+- aprobación de una función invocable;
+- selección de versión de Node.js;
+- selección de región;
+- definición de la sesión reciente;
+- estrategia exacta de reautenticación;
+- decisión final sobre TTL;
+- decisión sobre una función programada complementaria;
+- configuración de App Check;
+- estimación de costos;
+- aprobación de Blaze;
+- diseño de métricas y observabilidad;
+- procedimiento de despliegue y reversión.
+
+No se creará infraestructura hasta cerrar estas decisiones.
 
 ## 16. Restricciones actuales
 
@@ -618,10 +969,30 @@ Durante esta fase:
 
 ## 17. Próximo paso técnico
 
-El próximo paso será definir el contrato de datos del registro cancelado y evaluar las alternativas de backend, manteniendo separadas:
+El próximo paso será cerrar las decisiones mínimas necesarias antes de crear infraestructura de backend.
 
-1. La solicitud activa identificable.
-2. El registro cancelado temporal.
-3. El recibo DEL-S2 posterior a una eliminación completada.
+El siguiente bloque deberá:
 
-La implementación continuará únicamente después de validar el diseño, las pruebas necesarias y el impacto de infraestructura.
+1. Validar la arquitectura preliminar recomendada.
+2. Definir la estrategia de reautenticación reciente.
+3. Establecer el criterio técnico del punto de no retorno.
+4. Decidir si `expiresAt` utilizará una política TTL.
+5. Determinar si será necesaria una función programada complementaria.
+6. Seleccionar una versión compatible de Node.js.
+7. Seleccionar la región de ejecución.
+8. Preparar una estimación inicial de costos.
+9. Definir alertas y límites de presupuesto antes de considerar Blaze.
+10. Diseñar las pruebas locales del backend mediante Emulator Suite.
+11. Preparar un procedimiento de despliegue y reversión.
+12. Solicitar aprobación explícita antes de crear infraestructura o activar facturación.
+
+Hasta completar estas decisiones:
+
+- no se creará la carpeta `functions`;
+- no se instalarán dependencias administrativas;
+- no se activará Blaze;
+- no se desplegará Firebase;
+- no se abrirán permisos administrativos al cliente;
+- no se ejecutarán cancelaciones con cuentas reales.
+
+La implementación del backend comenzará únicamente después de aprobar la arquitectura, los controles de seguridad, las pruebas locales y el impacto económico.
