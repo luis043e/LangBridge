@@ -1,25 +1,25 @@
 ﻿import { readFile } from 'node:fs/promises';
 import {
-    after,
-    afterEach,
-    before,
-    test,
+  after,
+  afterEach,
+  before,
+  test,
 } from 'node:test';
 
 import {
-    assertFails,
-    assertSucceeds,
-    initializeTestEnvironment,
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
 
 import {
-    deleteDoc,
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc,
-    updateDoc,
-    writeBatch,
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 
 const projectId = 'langbridge-d048f';
@@ -1795,6 +1795,73 @@ test(
     );
 
     await assertSucceeds(batch.commit());
+  }
+);
+test(
+  'an account deletion request cannot falsify previous profile visibility',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore = context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'users',
+            'user-false-visibility'
+          ),
+          {
+            uid: 'user-false-visibility',
+            fullName: 'Visibility Test User',
+            email: 'visibility-test@example.com',
+            isProfileVisible: true,
+            deletionRequested: false,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-false-visibility'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    const batch = writeBatch(firestore);
+
+    batch.set(
+      doc(
+        firestore,
+        'accountDeletionRequests',
+        'user-false-visibility'
+      ),
+      {
+        userId: 'user-false-visibility',
+        userEmail: 'visibility-test@example.com',
+        status: 'pending',
+        previousProfileVisibility: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+    );
+
+    batch.update(
+      doc(
+        firestore,
+        'users',
+        'user-false-visibility'
+      ),
+      {
+        isProfileVisible: false,
+        deletionRequested: true,
+        deletionRequestedAt: serverTimestamp(),
+      }
+    );
+
+    await assertFails(batch.commit());
   }
 );
 test(
