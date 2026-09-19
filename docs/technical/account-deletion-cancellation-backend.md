@@ -1118,19 +1118,138 @@ Las respuestas tampoco deberán permitir determinar si el registro cancelado tod
 
 ## 13. Reglas de seguridad
 
+La cancelación deberá permanecer fuera de los permisos directos de la aplicación móvil. Todas las operaciones privilegiadas deberán ejecutarse exclusivamente desde un backend autorizado.
+
+### Autenticación y autorización
+
+El backend deberá:
+
+1. Exigir una llamada autenticada.
+2. Obtener el `uid` exclusivamente del contexto de autenticación verificado.
+3. Ignorar y rechazar cualquier `uid` libre enviado por la aplicación.
+4. Comprobar que el token pertenezca a la cuenta cuya solicitud se procesa.
+5. Verificar que exista un `auth_time` válido.
+6. Comprobar que la reautenticación se encuentre dentro de la ventana reciente permitida.
+7. Rechazar tokens ausentes, inválidos, vencidos o revocados.
+8. Aplicar el principio de privilegios mínimos a la identidad de ejecución del backend.
+9. No recibir ni registrar contraseñas, credenciales federadas, tokens de acceso ni secretos utilizados durante la reautenticación.
+
+La comprobación de `auth_time` deberá realizarse exclusivamente en el backend y no depender de fechas proporcionadas por el dispositivo.
+
+### Operaciones prohibidas para la aplicación
+
 La aplicación móvil no podrá:
 
 - leer directamente la solicitud protegida;
-- actualizar su estado;
-- marcarla como `cancelled`;
-- eliminar la solicitud;
+- actualizar el estado de la solicitud;
+- marcar la solicitud como `cancelled`;
+- eliminar la solicitud activa;
+- establecer o retirar `pointOfNoReturnAt`;
+- establecer o modificar `pointOfNoReturnOperation`;
+- declarar que no se alcanzó el punto de no retorno;
+- proporcionar `previousProfileVisibility` durante la cancelación;
 - restaurar directamente el perfil como parte de la cancelación;
+- retirar directamente `deletionRequested`;
+- retirar directamente `deletionRequestedAt`;
 - crear el registro cancelado;
+- seleccionar `cancellationRecordId`;
 - modificar `cancelledAt`;
 - modificar `expiresAt`;
-- declarar que no se alcanzó el punto de no retorno.
+- modificar el resultado técnico de restauración;
+- crear DEL-S2;
+- ejecutar operaciones administrativas de expiración.
 
 Estas operaciones deberán reservarse para el backend autorizado.
+
+### Protección de documentos
+
+Las reglas de seguridad deberán impedir que la aplicación móvil lea, cree, actualice o elimine directamente registros de:
+
+```text
+cancelledDeletionRequests/{cancellationRecordId}
+```
+
+La solicitud activa:
+
+```text
+accountDeletionRequests/{uid}
+```
+
+continuará protegida contra lectura, actualización y eliminación directa desde el cliente.
+
+La creación inicial de una solicitud desde la aplicación solo podrá permanecer permitida bajo las validaciones estrictas ya definidas, incluyendo:
+
+- ID del documento igual al UID autenticado;
+- estado inicial permitido;
+- campos limitados;
+- `previousProfileVisibility` protegido;
+- ocultamiento atómico del perfil;
+- `deletionRequested` establecido correctamente;
+- `deletionRequestedAt` igual a la hora del servidor.
+
+La existencia de permisos para crear una solicitud inicial no deberá conceder permisos para cancelarla o procesarla.
+
+### Concurrencia y punto de no retorno
+
+La autorización del backend no será suficiente por sí sola para aprobar una cancelación.
+
+Cada operación deberá comprobar dentro de una transacción o mecanismo protegido equivalente:
+
+- que la solicitud activa todavía existe;
+- que el estado continúa siendo cancelable;
+- que `pointOfNoReturnAt` está ausente;
+- que la cancelación no fue completada previamente;
+- que el procesador de eliminación no ganó previamente la carrera.
+
+La cancelación deberá rechazarse si el punto de no retorno fue confirmado antes de la transacción de cancelación.
+### App Check y controles complementarios
+
+App Check podrá utilizarse como una capa complementaria para reducir llamadas abusivas o procedentes de clientes no autorizados.
+
+App Check:
+
+- no sustituirá Firebase Authentication;
+- no sustituirá la reautenticación reciente;
+- no sustituirá la comprobación de `auth_time`;
+- no sustituirá la validación del estado;
+- no sustituirá la transacción contra el punto de no retorno;
+- no concederá permisos administrativos al cliente;
+- no se considerará por sí solo una prueba de identidad.
+
+La decisión definitiva sobre App Check dependerá de la arquitectura de backend seleccionada y deberá probarse antes de producción.
+
+### Registros y observabilidad
+
+Los registros técnicos del backend deberán aplicar minimización de datos.
+
+No deberán registrar:
+
+- contraseñas;
+- credenciales federadas;
+- tokens de acceso o sesión;
+- contenido de mensajes o conversaciones;
+- contenido de reportes;
+- copias del perfil;
+- `previousProfileVisibility` después de completar la restauración;
+- identificadores internos innecesarios;
+- datos personales que no sean indispensables para diagnosticar un fallo autorizado.
+
+Los errores deberán utilizar categorías técnicas generales y no deberán exponer información protegida en las respuestas destinadas a la aplicación.
+
+### Defensa ante abuso
+
+El backend futuro deberá contemplar:
+
+- limitación controlada de reintentos;
+- rechazo de solicitudes malformadas;
+- validación estricta de campos;
+- protección contra llamadas concurrentes;
+- prevención de duplicados;
+- control de tamaño de las solicitudes;
+- observabilidad de fallos sin conservar datos personales innecesarios;
+- revisión de App Check y mecanismos de limitación antes de producción.
+
+Las medidas contra abuso no deberán impedir que una persona legítimamente autenticada reintente una cancelación después de un error transitorio seguro.
 
 ## 14. Pruebas futuras
 
