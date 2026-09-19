@@ -53,7 +53,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-001 | Plataforma de backend | Cloud Functions | recomendada |
 | DEC-BE-002 | Tipo de función | Función invocable protegida | recomendada |
 | DEC-BE-003 | Versión de Node.js | Node.js 24, condicionada a Functions de segunda generación | requiere-prueba |
-| DEC-BE-004 | Generación de Functions | Pendiente de validación | pendiente |
+| DEC-BE-004 | Generación de Functions | Segunda generación, condicionada a pruebas locales | requiere-prueba |
 | DEC-BE-005 | Región de ejecución | Pendiente de evaluación | pendiente |
 | DEC-BE-006 | Ventana de reautenticación | Cinco minutos | requiere-prueba |
 | DEC-BE-007 | Expiración del registro cancelado | Política TTL | requiere-prueba |
@@ -490,3 +490,209 @@ Mantener Node.js 22 como alternativa de contingencia.
 Descartar Node.js 20 como opción normal para un backend nuevo.
 
 La decisión permanecerá en estado `requiere-prueba` hasta validar el SDK de Functions, Admin SDK, Firebase CLI y Emulator Suite.
+
+### DEC-BE-004: Generación de Cloud Functions
+
+**Pregunta:** ¿Qué generación de Cloud Functions deberá utilizar el backend de cancelación?
+
+**Recomendación preliminar:** Cloud Functions de segunda generación.
+
+**Estado:** requiere-prueba.
+
+#### Alternativas consideradas
+
+1. Cloud Functions de segunda generación.
+2. Cloud Functions de primera generación.
+3. Cloud Run administrado directamente.
+4. Mantener únicamente una implementación local hasta cerrar la decisión.
+
+#### Segunda generación
+
+Cloud Functions de segunda generación es la opción preliminar preferida porque:
+
+- es la generación recomendada para funciones nuevas;
+- permite utilizar Node.js 24;
+- se ejecuta sobre infraestructura de Cloud Run;
+- ofrece configuración más flexible de recursos;
+- permite controlar la concurrencia;
+- admite administración de revisiones y tráfico;
+- ofrece una ruta de evolución más amplia;
+- es compatible conceptualmente con una función invocable;
+- evita iniciar un componente nuevo sobre una generación anterior.
+
+La selección de segunda generación no implica utilizar automáticamente sus límites máximos.
+
+El backend de cancelación deberá comenzar con una configuración conservadora y ajustarse solamente después de observar pruebas y métricas.
+
+#### Primera generación
+
+La primera generación se conservará únicamente como alternativa de compatibilidad.
+
+Podría considerarse si:
+
+- una dependencia indispensable no funciona con segunda generación;
+- Emulator Suite presenta una incompatibilidad bloqueante;
+- la función invocable seleccionada no se comporta correctamente en segunda generación;
+- aparece una limitación concreta y documentada que impide continuar.
+
+No deberá elegirse primera generación únicamente por familiaridad o por evitar evaluar la concurrencia.
+
+#### Cloud Run administrado directamente
+
+Un servicio administrado directamente mediante Cloud Run ofrecería mayor control sobre el entorno, despliegue y rutas HTTP.
+
+Sin embargo, también exigiría gestionar más aspectos de:
+
+- autenticación;
+- autorización;
+- rutas;
+- validación de tokens;
+- escalado;
+- observabilidad;
+- despliegue;
+- mantenimiento operativo.
+
+Por estas razones no se recomienda como primera opción para el flujo inicial de cancelación.
+
+#### Concurrencia y configuración inicial
+
+La segunda generación permite que una instancia procese varias solicitudes simultáneamente.
+
+Para el flujo de cancelación, una mayor concurrencia no deberá considerarse automáticamente beneficiosa. Dos solicitudes simultáneas podrían competir con:
+
+- otra llamada de cancelación;
+- el procesador de eliminación;
+- una restauración pendiente;
+- un reintento después de una respuesta perdida;
+- el establecimiento del punto de no retorno.
+
+La seguridad no deberá depender de limitar la concurrencia a una sola solicitud. La operación deberá seguir utilizando transacciones, precondiciones e idempotencia.
+
+Sin embargo, durante las pruebas iniciales se recomienda:
+
+- comenzar con una configuración conservadora;
+- probar dos o más llamadas concurrentes;
+- probar la carrera entre cancelación y eliminación;
+- comprobar que solo una transición pueda confirmarse;
+- medir el comportamiento antes de aumentar concurrencia;
+- no utilizar la concurrencia para sustituir controles transaccionales.
+
+La configuración definitiva permanecerá pendiente hasta realizar pruebas locales.
+
+#### Seguridad y privilegios
+
+La segunda generación deberá configurarse aplicando privilegios mínimos.
+
+El backend deberá:
+
+- utilizar una identidad de ejecución controlada;
+- acceder únicamente a los recursos necesarios;
+- validar Authentication antes de ejecutar operaciones administrativas;
+- comprobar `auth_time`;
+- rechazar datos administrativos proporcionados por el cliente;
+- proteger la carrera contra `pointOfNoReturnAt`;
+- minimizar los registros técnicos;
+- evitar secretos incrustados;
+- impedir acceso público no controlado;
+- mantener bloqueadas las escrituras administrativas directas desde la aplicación.
+
+La elección de segunda generación no sustituirá ninguna validación de identidad, estado o idempotencia.
+
+#### Compatibilidad con función invocable
+
+Antes de aprobar esta decisión deberá comprobarse que la función invocable seleccionada:
+
+- recibe correctamente el contexto autenticado;
+- funciona con Node.js 24;
+- admite la validación de `auth_time`;
+- puede integrarse con App Check;
+- devuelve códigos generales y seguros;
+- maneja errores sin exponer detalles internos;
+- funciona correctamente con los emuladores de Authentication y Firestore;
+- mantiene el mismo contrato esperado por la aplicación móvil.
+
+Si una incompatibilidad bloqueante impide utilizar Node.js 24, deberá evaluarse Node.js 22 antes de considerar primera generación.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán realizarse pruebas locales para comprobar:
+
+1. Inicio correcto del emulador de Functions.
+2. Ejecución de una función invocable mínima.
+3. Autenticación válida.
+4. Rechazo sin autenticación.
+5. Validación de `auth_time`.
+6. Integración con Firestore Emulator.
+7. Transacciones administrativas.
+8. Dos llamadas concurrentes de cancelación.
+9. Carrera entre cancelación y punto de no retorno.
+10. Reintento después de una respuesta perdida.
+11. Recuperación después de un error parcial.
+12. Creación única del registro cancelado.
+13. Ausencia de DEL-S2.
+14. Ausencia de operaciones irreversibles.
+15. Ausencia de datos sensibles en respuestas y registros.
+16. Funcionamiento bajo una configuración conservadora de concurrencia.
+
+Estas pruebas no requerirán desplegar servicios ni utilizar cuentas reales.
+
+#### Recursos y límites
+
+Antes de producción deberán definirse explícitamente:
+
+- memoria;
+- tiempo máximo de ejecución;
+- concurrencia;
+- número mínimo de instancias;
+- número máximo de instancias;
+- política de reintentos;
+- identidad de servicio;
+- retención de registros;
+- límites de uso;
+- alertas presupuestarias.
+
+La configuración inicial deberá evitar recursos mínimos permanentes que generen costos sin una necesidad demostrada.
+
+Los límites máximos deberán reducir el riesgo de consumo inesperado y abuso.
+
+#### Costos y Blaze
+
+La segunda generación puede implicar recursos y cargos asociados con Cloud Run, Cloud Build, Artifact Registry y otros servicios relacionados con el despliegue.
+
+La recomendación documental no autoriza:
+
+- activar Blaze;
+- crear recursos en producción;
+- desplegar Functions;
+- configurar instancias mínimas;
+- crear repositorios o artefactos;
+- modificar cuotas;
+- utilizar datos reales.
+
+Antes del despliegue deberán evaluarse los costos potenciales y configurarse alertas presupuestarias.
+
+#### Reversión y migración
+
+Antes de producción deberá existir un procedimiento para:
+
+- detener nuevos despliegues;
+- deshabilitar temporalmente la función;
+- restaurar una revisión anterior;
+- revertir cambios incompatibles;
+- migrar el runtime cuando sea necesario;
+- conservar una respuesta segura para la aplicación durante una interrupción;
+- evitar que una reversión reactive solicitudes canceladas;
+- evitar que una reversión extienda `expiresAt`;
+- evitar que una reversión cree DEL-S2.
+
+La reversión no deberá depender de modificar directamente datos mediante la aplicación móvil.
+
+#### Decisión propuesta
+
+Adoptar Cloud Functions de segunda generación como candidata para el backend de cancelación.
+
+Mantener primera generación únicamente como alternativa de compatibilidad documentada.
+
+Iniciar, cuando exista aprobación para crear infraestructura local, con una configuración conservadora de recursos y concurrencia.
+
+La decisión permanecerá en estado `requiere-prueba` hasta validar Node.js 24, la función invocable, Emulator Suite, concurrencia, costos y procedimiento de reversión.
