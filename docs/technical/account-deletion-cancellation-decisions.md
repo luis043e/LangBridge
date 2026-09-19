@@ -54,7 +54,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-002 | Tipo de función | Función invocable protegida | recomendada |
 | DEC-BE-003 | Versión de Node.js | Node.js 24, condicionada a Functions de segunda generación | requiere-prueba |
 | DEC-BE-004 | Generación de Functions | Segunda generación, condicionada a pruebas locales | requiere-prueba |
-| DEC-BE-005 | Región de ejecución | Pendiente de evaluación | pendiente |
+| DEC-BE-005 | Región de ejecución | us-central1, próxima a Firestore nam5 | requiere-prueba |
 | DEC-BE-006 | Ventana de reautenticación | Cinco minutos | requiere-prueba |
 | DEC-BE-007 | Expiración del registro cancelado | Política TTL | requiere-prueba |
 | DEC-BE-008 | Función programada complementaria | No necesaria inicialmente | diferida |
@@ -696,3 +696,161 @@ Mantener primera generación únicamente como alternativa de compatibilidad docu
 Iniciar, cuando exista aprobación para crear infraestructura local, con una configuración conservadora de recursos y concurrencia.
 
 La decisión permanecerá en estado `requiere-prueba` hasta validar Node.js 24, la función invocable, Emulator Suite, concurrencia, costos y procedimiento de reversión.
+
+### DEC-BE-005: Región de ejecución
+
+**Pregunta:** ¿En qué región deberá ejecutarse el backend de cancelación?
+
+**Recomendación preliminar:** `us-central1`.
+
+**Estado:** requiere-prueba.
+
+#### Ubicación de Firestore verificada
+
+La inspección realizada en Firebase Console confirmó:
+
+```text
+Base de datos: (default)
+Ubicación: nam5
+Edición: Estándar
+Configuración: Firestore nativo
+```
+La ubicación `nam5` es multirregional y no deberá confundirse con una región individual de Functions.
+
+#### Alternativas consideradas
+
+1. `us-central1`.
+2. `us-east1`.
+3. Otra región compatible de Estados Unidos.
+4. Una región más próxima a la mayoría futura de usuarios.
+5. Mantener la región pendiente hasta realizar pruebas locales y estimaciones de producción.
+
+#### Razones para recomendar us-central1
+
+`us-central1` es la recomendación preliminar porque:
+
+- está relacionada geográficamente con la ubicación multirregional `nam5`;
+- permite mantener el backend próximo a una de las áreas principales de Firestore;
+- puede reducir latencia frente a una región distante;
+- es una región ampliamente utilizada para servicios de Firebase y Google Cloud;
+- ofrece una opción coherente para comenzar las pruebas técnicas;
+- permite documentar una región explícita en vez de depender de valores predeterminados.
+
+La selección de `us-central1` deberá confirmarse antes del despliegue y no se basará únicamente en la ubicación física del responsable del proyecto.
+
+#### Latencia y proximidad a Firestore
+
+La región de Functions deberá seleccionarse priorizando la comunicación con Firestore y no únicamente la proximidad con el dispositivo de la persona usuaria.
+
+El flujo de cancelación realizará operaciones administrativas que incluyen:
+
+- lectura de la solicitud activa;
+- lectura del perfil;
+- transacciones;
+- restauración de la visibilidad;
+- retirada de marcas de eliminación;
+- creación del registro cancelado;
+- eliminación de la solicitud activa;
+- reintentos idempotentes.
+
+Mantener Functions próxima a `nam5` puede reducir la latencia y las transferencias innecesarias durante esas operaciones.
+
+La aplicación móvil realizará una llamada relativamente pequeña al backend. La mayor parte del trabajo ocurrirá entre Functions y Firestore.
+
+#### Residencia y transferencia de datos
+
+Antes de aprobar la región deberán revisarse:
+
+- requisitos legales de residencia de datos;
+- ubicación principal de las personas usuarias;
+- transferencias entre regiones;
+- costos potenciales de red;
+- disponibilidad de los servicios necesarios;
+- compatibilidad con la ubicación `nam5`;
+- futuras necesidades de expansión internacional.
+
+La selección de `us-central1` no cambiará la ubicación de Firestore.
+
+No se creará una base nueva ni se migrarán datos como parte de esta decisión.
+
+#### Seguridad
+
+La región seleccionada no sustituirá los controles de seguridad del backend.
+
+La función deberá mantener:
+
+- autenticación obligatoria;
+- comprobación de `auth_time`;
+- validación del `uid`;
+- transacciones contra el punto de no retorno;
+- privilegios mínimos;
+- idempotencia;
+- minimización de registros;
+- ausencia de secretos incrustados;
+- respuestas generales y seguras.
+
+La aplicación no podrá seleccionar la región ni dirigir una cancelación hacia un endpoint administrativo alternativo.
+
+#### Compatibilidad y pruebas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Disponibilidad de Functions de segunda generación en `us-central1`.
+2. Disponibilidad del runtime Node.js 24.
+3. Compatibilidad de la función invocable.
+4. Integración con Firestore ubicado en `nam5`.
+5. Funcionamiento con Authentication.
+6. Transacciones correctas.
+7. Latencia razonable.
+8. Ausencia de errores por ubicación.
+9. Ausencia de transferencias innecesarias.
+10. Comportamiento correcto de los reintentos.
+11. Compatibilidad con despliegue y reversión.
+12. Diferencias relevantes entre Emulator Suite y producción.
+
+Las pruebas locales no reproducirán completamente la latencia regional. La validación final deberá realizarse con un proyecto separado de pruebas y sin datos personales reales.
+
+#### Costos y Blaze
+
+La recomendación de `us-central1` no autoriza:
+
+- activar Blaze;
+- desplegar Functions;
+- crear recursos regionales;
+- modificar Firestore;
+- configurar TTL;
+- utilizar cuentas reales;
+- ejecutar cancelaciones reales.
+
+Antes del despliegue deberán evaluarse:
+
+- costos de invocación;
+- lecturas y escrituras;
+- posibles transferencias entre ubicaciones;
+- almacenamiento de artefactos;
+- registros técnicos;
+- límites máximos de instancias;
+- alertas presupuestarias.
+
+#### Reversión y continuidad
+
+El procedimiento de despliegue deberá permitir:
+
+- detener nuevas invocaciones;
+- restaurar una revisión anterior;
+- cambiar la región solo mediante un procedimiento controlado;
+- evitar endpoints duplicados activos;
+- impedir que dos regiones procesen simultáneamente la misma cancelación;
+- mantener respuestas seguras durante una interrupción;
+- preservar la idempotencia;
+- evitar la creación duplicada de registros cancelados.
+
+Un cambio futuro de región deberá tratarse como una migración técnica y no como una modificación automática.
+
+#### Decisión propuesta
+
+Adoptar `us-central1` como región candidata para la función invocable de cancelación debido a la ubicación multirregional `nam5` de Firestore.
+
+Mantener la decisión en estado `requiere-prueba` hasta confirmar disponibilidad, compatibilidad, latencia, costos, residencia de datos y procedimiento de reversión.
+
+No configurar ni desplegar recursos regionales hasta recibir aprobación explícita.
