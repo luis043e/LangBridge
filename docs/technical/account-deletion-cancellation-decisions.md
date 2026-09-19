@@ -165,3 +165,186 @@ Antes de desplegar deberán existir:
 Adoptar provisionalmente Cloud Functions como plataforma candidata de producción y utilizar Emulator Suite como entorno inicial de desarrollo y pruebas.
 
 Esta decisión permanecerá en estado `recomendada` hasta aprobar costos, región, versión de Node.js, generación de Functions y condiciones de despliegue.
+
+### DEC-BE-002: Tipo de función
+
+**Pregunta:** ¿Qué mecanismo deberá utilizar la aplicación móvil para solicitar al backend la cancelación de una solicitud de eliminación?
+
+**Recomendación preliminar:** función invocable protegida.
+
+**Estado:** recomendada.
+
+#### Alternativas consideradas
+
+1. Función invocable de Cloud Functions.
+2. Función HTTP con endpoint propio.
+3. Endpoint en Cloud Run.
+4. Operación administrativa sin acceso directo desde la aplicación.
+
+#### Razones de la recomendación
+
+La función invocable es la opción preliminar preferida porque:
+
+- se integra directamente con Firebase Authentication;
+- permite recibir un contexto autenticado verificado;
+- facilita obtener el `uid` sin aceptarlo como identificador libre del cliente;
+- permite devolver códigos de resultado estructurados;
+- reduce la configuración manual de rutas y encabezados;
+- puede integrarse con App Check;
+- es compatible con Emulator Suite;
+- mantiene la operación administrativa fuera de las reglas directas del cliente;
+- reduce la superficie inicial de implementación frente a un endpoint HTTP propio.
+
+#### Contrato preliminar de entrada
+
+La función invocable no deberá aceptar un `uid` proporcionado libremente por la aplicación.
+
+La entrada deberá limitarse a datos estrictamente necesarios y no deberá incluir:
+
+- UID;
+- correo;
+- contraseña;
+- credenciales federadas;
+- tokens de acceso;
+- tokens de sesión;
+- `previousProfileVisibility`;
+- `cancelledAt`;
+- `expiresAt`;
+- `pointOfNoReturnAt`;
+- `cancellationRecordId`;
+- estados administrativos elegidos por el cliente.
+
+Cuando no sea necesario ningún dato de negocio adicional, la función deberá admitir una entrada vacía o un objeto limitado y validado.
+
+#### Contexto autenticado
+
+La función deberá obtener del contexto autenticado:
+
+- el `uid`;
+- las marcas de autenticación disponibles;
+- `auth_time`;
+- la evidencia complementaria admitida por Firebase Authentication.
+
+La función deberá rechazar:
+
+- llamadas sin autenticación;
+- contextos inválidos;
+- `auth_time` ausente o inválido;
+- sesiones fuera de la ventana reciente permitida;
+- solicitudes que intenten seleccionar otra cuenta;
+- datos desconocidos o innecesarios.
+
+#### Contrato preliminar de respuesta
+
+La función deberá devolver únicamente códigos generales permitidos:
+
+```text
+cancelled
+not-cancellable
+identity-verification-required
+recent-session-required
+request-not-found
+point-of-no-return-reached
+restoration-pending
+temporary-error
+```
+
+La respuesta no deberá incluir:
+
+- UID;
+- correo;
+- fechas internas;
+- rutas de documentos;
+- `cancellationRecordId`;
+- claves de idempotencia;
+- fases administrativas;
+- contenido;
+- credenciales;
+- tokens;
+- detalles que permitan correlacionar el registro cancelado con una cuenta.
+
+#### Errores y reintentos
+
+La función deberá distinguir entre:
+
+- resultado exitoso e idempotente;
+- verificación de identidad requerida;
+- sesión reciente requerida;
+- estado no cancelable;
+- punto de no retorno alcanzado;
+- restauración pendiente;
+- error temporal seguro.
+
+Los errores técnicos internos deberán transformarse en respuestas generales. La aplicación no deberá recibir trazas, mensajes administrativos libres ni detalles de Firebase Admin SDK.
+
+Los reintentos deberán ser seguros y no podrán:
+
+- duplicar el registro cancelado;
+- extender `expiresAt`;
+- recrear una solicitud activa;
+- alterar nuevamente un perfil ya restaurado;
+- crear DEL-S2;
+- ejecutar operaciones irreversibles.
+
+#### Alternativa HTTP
+
+Una función HTTP o un endpoint de Cloud Run podría ofrecer mayor control sobre rutas, encabezados y portabilidad.
+
+Sin embargo, exigiría:
+
+- verificar manualmente tokens;
+- diseñar autorización explícita;
+- gestionar CORS cuando corresponda;
+- definir límites y validación de solicitudes;
+- ampliar la observabilidad;
+- mantener una superficie adicional de seguridad;
+- administrar más detalles de despliegue y escalado.
+
+Por estas razones, el endpoint HTTP queda como alternativa futura y no como primera opción.
+
+#### Seguridad
+
+La función invocable deberá:
+
+- utilizar privilegios administrativos únicamente en el backend;
+- aplicar el principio de privilegios mínimos;
+- validar el estado real de Firestore;
+- competir transaccionalmente contra el punto de no retorno;
+- impedir decisiones basadas solo en datos del cliente;
+- minimizar registros técnicos;
+- no registrar secretos;
+- admitir protección complementaria mediante App Check;
+- mantener bloqueadas las operaciones administrativas directas desde la aplicación.
+
+#### Compatibilidad con Emulator Suite
+
+Antes de cualquier despliegue deberán probarse localmente:
+
+- llamada autenticada válida;
+- rechazo sin autenticación;
+- rechazo con sesión no reciente;
+- rechazo de campos desconocidos;
+- obtención del UID desde el contexto;
+- códigos de respuesta seguros;
+- concurrencia;
+- reintentos;
+- errores parciales;
+- ausencia de datos sensibles en las respuestas.
+
+#### Costos y Blaze
+
+La selección documental de una función invocable no autoriza:
+
+- crear infraestructura;
+- desplegar Cloud Functions;
+- activar Blaze;
+- configurar recursos de producción;
+- utilizar cuentas reales.
+
+Los costos y requisitos del plan deberán evaluarse antes de cambiar el estado de esta decisión a `aprobada`.
+
+#### Decisión propuesta
+
+Adoptar provisionalmente una función invocable protegida como interfaz entre la aplicación móvil y el backend autorizado de cancelación.
+
+La decisión permanecerá en estado `recomendada` hasta aprobar la plataforma, la versión de ejecución, la región, los costos, las pruebas locales y el procedimiento de despliegue.
