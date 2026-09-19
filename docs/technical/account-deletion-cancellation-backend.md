@@ -319,20 +319,222 @@ Actualmente:
 
 ## 7. Punto técnico de no retorno
 
-El backend deberá mantener un indicador explícito que permita determinar si comenzó una operación irreversible.
+### Definición
 
-El indicador técnico todavía deberá diseñarse.
+El punto técnico de no retorno representa el instante a partir del cual LangBridge ya no puede garantizar una cancelación segura ni la recuperación completa de la información.
 
-Posibles elementos futuros:
+Se considerará alcanzado inmediatamente antes de comenzar la primera operación irreversible del procedimiento de eliminación.
+
+Las operaciones irreversibles aprobadas incluyen:
+
+- eliminación de mensajes;
+- eliminación de conversaciones;
+- eliminación de solicitudes de conexión;
+- eliminación de referencias en listas `blockedUserIds` de otras cuentas;
+- eliminación de reportes;
+- eliminación del documento `users/{uid}`;
+- eliminación de la cuenta de Firebase Authentication.
+
+La ocultación temporal del perfil y la creación de la solicitud activa no constituirán por sí solas el punto de no retorno.
+
+### Indicador definitivo
+
+La solicitud activa utilizará el campo:
 
 ```text
-irreversibleProcessingStartedAt
-irreversibleOperation
-canCancel
-processingCheckpoint
+pointOfNoReturnAt
 ```
 
-No se seleccionará ningún campo definitivo hasta diseñar el procesador integral de eliminación.
+Antes de alcanzar el punto de no retorno, el campo deberá:
+
+- estar ausente;
+- no contener `null`;
+- no poder ser creado por la aplicación móvil;
+- no poder modificarse mediante reglas del cliente.
+
+Cuando se alcance el punto de no retorno, `pointOfNoReturnAt` deberá:
+
+- establecerse exclusivamente desde el backend autorizado;
+- utilizar una marca de tiempo del servidor;
+- fijarse una sola vez;
+- permanecer inmutable;
+- no poder eliminarse;
+- no depender de la hora del dispositivo;
+- establecerse inmediatamente antes de la primera operación irreversible.
+
+### Categoría general de la primera operación irreversible
+
+La solicitud activa también podrá contener:
+
+```text
+pointOfNoReturnOperation
+```
+
+Este campo deberá:
+
+- establecerse exclusivamente desde el backend;
+- utilizar una lista cerrada de valores generales;
+- establecerse junto con `pointOfNoReturnAt`;
+- permanecer inmutable;
+- no contener identificadores de documentos;
+- no contener UID, correo ni contenido;
+- no revelar detalles administrativos sensibles.
+
+Valores preliminares permitidos:
+
+```text
+messages
+conversations
+connection-requests
+external-block-references
+reports
+user-profile
+authentication
+```
+
+La lista definitiva deberá validarse antes de la implementación.
+
+### Transición atómica
+
+El backend deberá utilizar una transacción o mecanismo equivalente para:
+
+1. Leer la solicitud activa.
+2. Confirmar que la solicitud exista.
+3. Confirmar que el estado sea `processing`.
+4. Confirmar que `pointOfNoReturnAt` todavía esté ausente.
+5. Confirmar que no exista una cancelación en curso o completada.
+6. Establecer `pointOfNoReturnAt` con hora del servidor.
+7. Establecer `pointOfNoReturnOperation`.
+8. Confirmar la transición.
+9. Comenzar la primera operación irreversible.
+
+La primera operación irreversible no deberá comenzar antes de confirmar correctamente la transición.
+
+Si la transición falla, no deberá comenzar ninguna operación irreversible.
+
+### Carrera entre cancelación y eliminación
+
+La cancelación y el avance al punto de no retorno deberán competir mediante una operación transaccional protegida.
+
+Solo una de las dos operaciones podrá confirmar primero su transición:
+
+```text
+cancelación confirmada
+```
+
+o:
+
+```text
+punto de no retorno confirmado
+```
+
+Si la cancelación confirma primero:
+
+- el punto de no retorno no podrá establecerse;
+- no comenzará ninguna eliminación irreversible;
+- se restaurará el perfil;
+- se completará la cancelación.
+
+Si el punto de no retorno confirma primero:
+
+- la cancelación será rechazada;
+- la solicitud permanecerá en `processing`;
+- el proceso de eliminación continuará de manera idempotente;
+- no se intentará restaurar información ya eliminada.
+
+La aplicación móvil no podrá decidir cuál operación gana la carrera.
+
+### Cancelación por estado
+
+En `pending`:
+
+- la cancelación podrá continuar después de verificar nuevamente la identidad;
+- `pointOfNoReturnAt` deberá estar ausente.
+
+En `verified`:
+
+- la cancelación podrá continuar después de verificar nuevamente la identidad;
+- `pointOfNoReturnAt` deberá estar ausente.
+
+En `processing`:
+
+- la cancelación solo podrá continuar si `pointOfNoReturnAt` está ausente;
+- el backend deberá comprobar el estado dentro de la misma operación protegida.
+
+En `completed`:
+
+- la cancelación será rechazada;
+- la existencia o ausencia anómala del indicador no permitirá reabrir el proceso.
+
+### Comportamiento después del punto de no retorno
+
+Después de establecer `pointOfNoReturnAt`:
+
+- no se permitirá cancelar;
+- no se restaurará el perfil;
+- no se eliminará el indicador;
+- no se cambiará la categoría general registrada;
+- la solicitud permanecerá en `processing` hasta finalizar;
+- los fallos parciales admitirán reintentos seguros;
+- el procedimiento continuará hasta `completed`;
+- no se prometerá recuperar datos ya eliminados.
+
+### Reintentos
+
+Un reintento del procesador deberá:
+
+- conservar el mismo `pointOfNoReturnAt`;
+- conservar la misma `pointOfNoReturnOperation`;
+- no crear una segunda marca de tiempo;
+- no reiniciar el proceso desde el comienzo;
+- comprobar qué operaciones ya terminaron;
+- continuar desde el último punto seguro;
+- evitar duplicar eliminaciones o recibos;
+- no permitir una cancelación tardía.
+
+### Acceso y protección
+
+La aplicación móvil no podrá:
+
+- crear `pointOfNoReturnAt`;
+- crear `pointOfNoReturnOperation`;
+- modificar estos campos;
+- eliminarlos;
+- establecerlos como `null`;
+- declarar que todavía no se alcanzó el punto de no retorno;
+- declarar que una operación irreversible comenzó;
+- enviar una categoría elegida libremente.
+
+Estas operaciones deberán reservarse para el backend autorizado.
+
+### Respuestas generales para la aplicación
+
+Si la cancelación ya no es posible, el backend podrá devolver:
+
+```text
+point-of-no-return-reached
+```
+
+La respuesta no deberá revelar:
+
+- qué documento fue eliminado;
+- cuántos elementos fueron eliminados;
+- nombres de colecciones internas;
+- identificadores;
+- horas administrativas exactas;
+- detalles que faciliten eludir controles de seguridad.
+
+### Estado de implementación
+
+Actualmente:
+
+- `pointOfNoReturnAt` no existe en la solicitud activa;
+- `pointOfNoReturnOperation` no existe;
+- no existe backend autorizado para establecer esos campos;
+- no existe una transacción entre la cancelación y el inicio irreversible;
+- las reglas actuales no permiten esos campos desde el cliente;
+- no se ejecuta ninguna operación irreversible;
+- no deberán realizarse eliminaciones reales hasta completar el backend y sus pruebas.
 
 ## 8. Operación de cancelación
 
