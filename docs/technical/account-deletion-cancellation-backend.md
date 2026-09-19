@@ -538,22 +538,119 @@ Actualmente:
 
 ## 8. Operación de cancelación
 
-Si la cancelación es válida, el backend deberá ejecutar de forma atómica o mediante un procedimiento idempotente coordinado:
+La cancelación deberá ejecutarse exclusivamente mediante un backend autorizado. El cliente no podrá restaurar el perfil, modificar el estado de la solicitud, eliminar la solicitud activa ni crear directamente el registro cancelado.
 
-1. Leer `accountDeletionRequests/{uid}`.
-2. Confirmar que la solicitud existe.
-3. Confirmar que el estado permite cancelación.
-4. Confirmar que no se alcanzó el punto de no retorno.
-5. Leer `previousProfileVisibility`.
-6. Restaurar `users/{uid}.isProfileVisible`.
-7. Retirar `users/{uid}.deletionRequested`.
-8. Retirar `users/{uid}.deletionRequestedAt`.
-9. Crear un registro cancelado mínimo.
-10. Eliminar la solicitud activa identificable.
-11. Verificar que la restauración del perfil haya terminado.
-12. Eliminar los datos temporales de restauración.
-13. Permitir una nueva solicitud futura.
-14. No crear DEL-S2.
+### 8.1. Autenticación y solicitud
+
+Antes de iniciar la operación, el backend deberá:
+
+1. Exigir una llamada autenticada.
+2. Obtener el `uid` exclusivamente del contexto autenticado.
+3. Rechazar cualquier `uid` libre enviado por el cliente.
+4. Comprobar que el token contiene un `auth_time` válido.
+5. Confirmar que la reautenticación ocurrió dentro de la ventana reciente permitida.
+6. Rechazar la cancelación si falta `auth_time`, si es inválido o si la ventana permitida ha vencido.
+7. No recibir, guardar ni registrar contraseñas, credenciales de Google, tokens de acceso ni otros secretos de reautenticación.
+
+La ventana técnica inicial propuesta es de cinco minutos. Este valor continúa pendiente de pruebas y aprobación definitiva antes de implementarlo.
+
+### 8.2. Validación de la solicitud activa
+
+El backend deberá leer `accountDeletionRequests/{uid}` y comprobar que:
+
+1. La solicitud existe.
+2. El campo `userId` coincide con el `uid` autenticado.
+3. El estado actual permite cancelación.
+4. Los estados `pending` y `verified` son cancelables después de verificar nuevamente la identidad.
+5. El estado `processing` solo es cancelable si todavía no se alcanzó el punto técnico de no retorno.
+6. El estado `completed` nunca es cancelable.
+7. `pointOfNoReturnAt` está ausente.
+8. No existe una cancelación previamente confirmada para la misma operación.
+
+La presencia de `pointOfNoReturnAt` deberá provocar el rechazo de la cancelación, aunque una parte del cliente todavía muestre la opción de cancelar.
+
+### 8.3. Carrera con el procesador de eliminación
+
+La cancelación y el avance de la eliminación deberán competir mediante una transacción o mecanismo equivalente protegido por el backend.
+
+Dentro de esa operación protegida, el backend deberá volver a leer la solicitud activa y confirmar simultáneamente:
+
+- que el estado continúa siendo cancelable;
+- que `pointOfNoReturnAt` continúa ausente;
+- que ninguna cancelación fue confirmada previamente;
+- que el procesador de eliminación no obtuvo antes el derecho de comenzar una operación irreversible.
+
+Solo una transición podrá confirmarse primero:
+
+- cancelación confirmada; o
+- punto de no retorno confirmado.
+
+Si la cancelación gana la carrera:
+
+- no se establecerá `pointOfNoReturnAt`;
+- no comenzará ninguna operación irreversible;
+- se restaurará el perfil;
+- la solicitud activa se cerrará como cancelada.
+
+Si el procesador de eliminación gana la carrera:
+
+- la cancelación será rechazada;
+- la solicitud permanecerá en `processing`;
+- no se restaurará el perfil;
+- la eliminación continuará mediante operaciones idempotentes.
+
+### 8.4. Restauración y cierre de la solicitud
+
+Cuando la cancelación sea válida y gane la carrera, el backend deberá ejecutar de forma atómica o mediante un procedimiento idempotente coordinado:
+
+1. Leer `previousProfileVisibility` desde la solicitud activa.
+2. Confirmar que `previousProfileVisibility` sea booleano.
+3. Confirmar que exista `users/{uid}`.
+4. Restaurar `users/{uid}.isProfileVisible` con el valor conservado.
+5. Retirar `users/{uid}.deletionRequested`.
+6. Retirar `users/{uid}.deletionRequestedAt`.
+7. Verificar que la restauración del perfil haya finalizado correctamente.
+8. Crear una sola vez el registro cancelado mínimo.
+9. Establecer `cancelledAt` con la hora del servidor.
+10. Establecer `expiresAt` exactamente a 30 días calendario desde `cancelledAt`.
+11. Eliminar la solicitud activa identificable.
+12. Eliminar `previousProfileVisibility` y cualquier otro dato temporal de restauración al completar y verificar la restauración.
+13. Permitir una nueva solicitud de eliminación posterior.
+14. No crear un recibo DEL-S2.
+
+La solicitud activa no deberá eliminarse antes de que la restauración del perfil y la creación del registro cancelado mínimo estén confirmadas.
+
+### 8.5. Idempotencia y reintentos
+
+La operación deberá ser segura ante reintentos, respuestas perdidas y ejecuciones concurrentes.
+
+Si el backend recibe nuevamente la misma operación después de completar la cancelación, deberá:
+
+- reconocer que la cancelación ya fue completada;
+- no crear un segundo registro cancelado;
+- no extender `expiresAt`;
+- no volver a aplicar cambios incompatibles al perfil;
+- no recrear la solicitud activa;
+- no crear DEL-S2;
+- devolver una respuesta idempotente que no exponga identificadores internos ni datos personales.
+
+Si ocurre un fallo antes de confirmar la operación protegida, podrá reintentarse desde el inicio.
+
+Si ocurre un fallo después de confirmar la cancelación, el backend deberá continuar únicamente las operaciones pendientes de restauración y limpieza, sin permitir que el procesador de eliminación alcance posteriormente el punto de no retorno.
+
+### 8.6. Resultado esperado
+
+Una cancelación completada deberá dejar el sistema en el siguiente estado:
+
+- la cuenta continúa activa;
+- la visibilidad anterior del perfil queda restaurada;
+- `deletionRequested` y `deletionRequestedAt` quedan retirados;
+- la solicitud activa identificable deja de existir;
+- existe un único registro cancelado mínimo con expiración a 30 días;
+- no permanece `previousProfileVisibility`;
+- no se ejecuta ninguna operación irreversible;
+- no se crea DEL-S2;
+- la persona puede crear una nueva solicitud de eliminación en el futuro.
 
 ## 9. Contrato del registro cancelado mínimo
 
