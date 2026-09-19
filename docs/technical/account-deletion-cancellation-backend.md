@@ -290,40 +290,234 @@ Una cancelación:
 
 DEL-S2 solo podrá existir después de completar efectivamente una eliminación.
 
-## 10. Retención
+## 10. Retención y expiración
 
-El registro cancelado se conservará durante 30 días calendario desde `cancelledAt`.
+### Inicio del período
 
-Después del plazo deberá eliminarse completamente.
+El período de conservación comenzará en la fecha efectiva en que el backend complete y verifique la cancelación.
 
-La expiración deberá:
+El backend establecerá una sola vez:
 
-- ejecutarse desde un entorno autorizado;
-- admitir reintentos seguros;
-- ser idempotente;
-- no afectar la cuenta activa;
-- no crear DEL-S2;
-- no impedir una nueva solicitud.
+```text
+cancelledAt
+expiresAt
+```
 
-## 11. Idempotencia
+`cancelledAt` deberá:
 
-Una repetición de la operación de cancelación no deberá:
+- utilizar la hora del servidor;
+- representar la finalización efectiva de la cancelación;
+- establecerse después de restaurar correctamente el perfil;
+- no depender de la hora del dispositivo;
+- no reutilizar la fecha de creación de la solicitud activa;
+- no modificarse durante reintentos posteriores.
 
-- duplicar registros cancelados;
-- modificar incorrectamente la visibilidad;
-- reactivar solicitudes terminales;
+`expiresAt` deberá:
+
+- calcularse a partir de `cancelledAt`;
+- representar exactamente 30 días calendario después de `cancelledAt`;
+- establecerse en la misma operación lógica que crea el registro cancelado;
+- permanecer inmutable;
+- no extenderse por reintentos, lecturas o nuevas solicitudes;
+- no reutilizar el plazo de DEL-S2.
+
+### Cálculo del vencimiento
+
+El cálculo de `expiresAt` deberá realizarse exclusivamente en el backend autorizado.
+
+La aplicación móvil no podrá:
+
+- proporcionar `cancelledAt`;
+- proporcionar `expiresAt`;
+- modificar esas fechas;
+- solicitar una extensión;
+- reiniciar el período;
+- seleccionar la zona horaria usada por el backend.
+
+Antes de implementar deberá definirse una única función compartida para calcular el vencimiento y evitar diferencias entre procesos.
+
+### Eliminación del registro vencido
+
+Cuando se alcance `expiresAt`, el registro cancelado deberá eliminarse completamente.
+
+La operación de expiración deberá:
+
+1. Leer el registro cancelado.
+2. Confirmar que `status` sea `cancelled`.
+3. Confirmar que `expiresAt` exista.
+4. Confirmar que el plazo haya vencido.
+5. Eliminar únicamente el registro cancelado.
+6. No modificar la cuenta activa.
+7. No modificar una solicitud activa nueva.
+8. No restaurar ni ocultar el perfil.
+9. No crear DEL-S2.
+10. No enviar una nueva confirmación de cancelación.
+
+### Reintentos de expiración
+
+La expiración deberá admitir reintentos seguros.
+
+Si el registro ya no existe, el proceso deberá tratar el resultado como una eliminación previamente completada y no como una razón para recrearlo.
+
+Un reintento no deberá:
+
+- recrear un registro eliminado;
+- cambiar `cancelledAt`;
+- cambiar `expiresAt`;
+- extender la retención;
+- afectar datos ordinarios de la cuenta;
+- afectar una nueva solicitud activa;
+- producir DEL-S2;
+- generar registros duplicados.
+
+### Alternativas técnicas pendientes
+
+Las alternativas futuras para ejecutar la expiración podrán incluir:
+
+- una tarea programada desde un backend autorizado;
+- una función programada;
+- un proceso administrativo automatizado;
+- una política administrada de tiempo de vida, si satisface los requisitos técnicos y legales;
+- un proceso local exclusivo para pruebas con emuladores.
+
+La alternativa definitiva no se seleccionará hasta revisar:
+
+- disponibilidad en el plan de Firebase;
+- necesidad de Blaze;
+- precisión del vencimiento;
+- posibilidades de reintento;
+- observabilidad;
+- costos;
+- pruebas con emuladores;
+- procedimiento de reversión.
+
+## 11. Idempotencia y prevención de duplicados
+
+### Clave interna de operación
+
+El backend deberá generar una clave interna de idempotencia para cada cancelación.
+
+La clave:
+
+- se utilizará únicamente durante el procesamiento autorizado;
+- no se expondrá a la aplicación;
+- no se derivará directamente del UID o correo;
+- no sustituirá `cancellationRecordId`;
+- no se conservará indefinidamente;
+- no permitirá reconstruir la identidad.
+
+La estrategia exacta permanece pendiente de la selección del backend.
+
+### Creación única del registro cancelado
+
+Una misma cancelación válida deberá producir como máximo un registro cancelado.
+
+El backend deberá impedir que dos ejecuciones concurrentes:
+
+- creen dos registros para la misma cancelación;
+- restauren el perfil con valores diferentes;
+- eliminen dos veces solicitudes distintas;
+- calculen fechas de expiración diferentes;
+- creen DEL-S2;
+- prolonguen el período de retención.
+
+La creación del registro cancelado deberá coordinarse con:
+
+1. La restauración del perfil.
+2. La retirada de las marcas de eliminación.
+3. La eliminación de la solicitud activa.
+4. La limpieza de los datos temporales de restauración.
+
+### Orden lógico de la cancelación
+
+La operación deberá reconocer como mínimo estas fases internas:
+
+```text
+not-started
+restoration-in-progress
+profile-restored
+cancelled-record-created
+active-request-removed
+temporary-restoration-data-removed
+completed
+```
+
+Estas fases describen el procedimiento técnico interno y no deberán exponerse como estados modificables por la aplicación móvil.
+
+### Reintento después de una interrupción
+
+Si el proceso se interrumpe, un reintento deberá continuar desde el último punto seguro comprobable.
+
+El backend deberá verificar el estado real de los documentos antes de repetir una operación.
+
+Ejemplos:
+
+- Si el perfil ya fue restaurado, no deberá invertir nuevamente su visibilidad.
+- Si el registro cancelado ya existe, no deberá crear otro.
+- Si la solicitud activa ya fue eliminada, no deberá recrearla.
+- Si los datos temporales ya fueron eliminados, no deberá exigirlos nuevamente.
+- Si la operación terminó, deberá devolver un resultado general de cancelación completada.
+
+### Restauración idempotente del perfil
+
+La restauración de `isProfileVisible` deberá utilizar exclusivamente el valor protegido de `previousProfileVisibility`.
+
+La restauración deberá:
+
+- ejecutarse desde el backend autorizado;
+- comprobar que el valor sea booleano;
+- evitar valores proporcionados por el cliente durante la cancelación;
+- mantener `false` cuando el perfil estaba oculto;
+- restaurar `true` cuando el perfil estaba visible;
+- retirar `deletionRequested`;
+- retirar `deletionRequestedAt`;
+- no alterar otros campos del perfil.
+
+Después de verificar la restauración, `previousProfileVisibility` no deberá copiarse al registro cancelado.
+
+### Solicitud activa y solicitudes posteriores
+
+Después de completar la cancelación:
+
+- la solicitud activa anterior deberá dejar de existir;
+- el registro cancelado no podrá reactivarse;
+- podrá crearse una solicitud nueva;
+- la nueva solicitud deberá superar una nueva verificación;
+- la nueva solicitud deberá tener sus propias fechas;
+- la nueva solicitud deberá conservar nuevamente la visibilidad anterior;
+- no podrán existir dos solicitudes activas simultáneamente.
+
+### Operaciones prohibidas durante reintentos
+
+Un reintento no podrá:
+
+- duplicar el registro cancelado;
+- reutilizar una verificación anterior para una solicitud nueva;
+- cambiar la visibilidad a un valor distinto del anterior;
 - crear DEL-S2;
-- borrar datos ordinarios de una cuenta activa;
-- crear dos solicitudes activas;
-- prolongar indefinidamente la retención.
+- eliminar conversaciones, mensajes o reportes;
+- eliminar Firebase Authentication;
+- modificar datos de otras cuentas;
+- extender `expiresAt`;
+- reactivar una solicitud cancelada;
+- borrar datos ordinarios de una cuenta activa.
 
-Cada operación deberá poder distinguir entre:
+### Resultado idempotente
 
-- cancelación no iniciada;
-- restauración en curso;
-- restauración completada;
-- registro cancelado creado;
-- limpieza temporal completada.
+Una operación repetida después de una cancelación completada deberá devolver una respuesta general equivalente a:
+
+```text
+cancelled
+```
+
+La respuesta no deberá revelar:
+
+- si el registro cancelado todavía existe;
+- su identificador;
+- fechas internas;
+- fases administrativas;
+- claves de idempotencia;
+- detalles que permitan correlacionar el registro con una cuenta.
 
 ## 12. Respuestas previstas para la aplicación
 
