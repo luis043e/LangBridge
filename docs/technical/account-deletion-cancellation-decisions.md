@@ -60,7 +60,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-008 | Función programada complementaria | No necesaria inicialmente | diferida |
 | DEC-BE-009 | App Check | Capa complementaria futura | diferida |
 | DEC-BE-010 | Estrategia de idempotencia | Clave interna opaca y operación transaccional protegida | requiere-prueba |
-| DEC-BE-011 | Métricas y observabilidad | Registros técnicos mínimos | pendiente |
+| DEC-BE-011 | Métricas y observabilidad | Métricas agregadas y registros técnicos mínimos | requiere-prueba |
 | DEC-BE-012 | Costos y Blaze | No activar todavía | pendiente |
 | DEC-BE-013 | Despliegue y reversión | Procedimiento previo obligatorio | pendiente |
 ## 5. Decisiones detalladas
@@ -2208,3 +2208,275 @@ La clave interna no sustituirá `cancellationRecordId`, no se expondrá a la apl
 Mantener DEC-BE-010 en estado `requiere-prueba` hasta validar transacciones, concurrencia, respuestas perdidas, errores parciales, recuperación, limpieza de la clave y ausencia de duplicados mediante Emulator Suite.
 
 Esta decisión no autoriza crear Functions, instalar dependencias administrativas, activar Blaze, desplegar servicios ni ejecutar cancelaciones con cuentas reales.
+
+### DEC-BE-011: Métricas y observabilidad
+
+**Pregunta:** ¿Qué métricas y registros técnicos deberán conservarse para operar el backend sin almacenar datos personales innecesarios?
+
+**Recomendación preliminar:** métricas agregadas y registros técnicos mínimos basados en categorías cerradas.
+
+**Estado:** requiere-prueba.
+
+#### Objetivos
+
+La observabilidad deberá permitir:
+
+- detectar errores repetidos;
+- identificar conflictos transaccionales;
+- comprobar reintentos idempotentes;
+- detectar restauraciones pendientes;
+- verificar el comportamiento del punto de no retorno;
+- comprobar el funcionamiento de TTL;
+- medir duración técnica general;
+- detectar abuso o tráfico anómalo;
+- generar alertas operativas;
+- apoyar una reversión segura;
+- verificar que no se produzcan duplicados;
+- distinguir errores temporales de rechazos definitivos.
+
+La observabilidad no deberá utilizarse para reconstruir contenido, perfiles o relaciones entre cuentas.
+
+#### Métricas generales permitidas
+
+Podrán calcularse métricas agregadas como:
+
+- cantidad de solicitudes de cancelación recibidas;
+- cantidad de cancelaciones completadas;
+- cantidad de resultados `not-cancellable`;
+- cantidad de resultados `recent-session-required`;
+- cantidad de resultados `point-of-no-return-reached`;
+- cantidad de resultados `restoration-pending`;
+- cantidad de errores temporales;
+- cantidad de conflictos transaccionales;
+- cantidad de reintentos detectados;
+- cantidad de operaciones idempotentes ya completadas;
+- cantidad de registros cancelados creados;
+- cantidad de inconsistencias de `expiresAt`;
+- cantidad de registros vencidos detectados;
+- duración técnica agregada de las operaciones;
+- cantidad de llamadas rechazadas por autenticación;
+- cantidad de llamadas rechazadas por validación;
+- cantidad de llamadas bloqueadas por controles complementarios.
+
+Las métricas deberán agregarse de forma que no permitan identificar directamente a una persona.
+
+#### Categorías técnicas cerradas
+
+Los registros técnicos deberán utilizar categorías predefinidas y generales.
+
+Ejemplos preliminares:
+
+```text
+cancellation-started
+cancellation-completed
+cancellation-already-completed
+reauthentication-required
+point-of-no-return-reached
+transaction-conflict
+restoration-pending
+temporary-error
+invalid-request
+authentication-required
+expired-record-detected
+ttl-observation
+```
+
+Las categorías deberán mantenerse en una lista cerrada.
+
+No se permitirán mensajes libres que incorporen accidentalmente datos personales, credenciales, rutas completas o contenido de documentos.
+
+#### Datos prohibidos
+
+Los registros técnicos y las métricas no deberán conservar:
+
+- contraseñas;
+- credenciales federadas;
+- tokens de acceso;
+- tokens de sesión;
+- tokens completos de App Check;
+- contenido de mensajes;
+- contenido de conversaciones;
+- contenido de reportes;
+- copias del perfil;
+- fotografías;
+- nombres;
+- correo;
+- país o ciudad;
+- idiomas del perfil;
+- listas de bloqueos;
+- datos de conexiones;
+- `previousProfileVisibility` después de completar la restauración;
+- `cancellationRecordId` cuando no sea estrictamente necesario;
+- claves internas de idempotencia;
+- identificadores DEL-S2;
+- rutas completas que permitan correlacionar documentos;
+- datos de otras cuentas;
+- trazas que contengan secretos o información personal.
+
+Los errores inesperados deberán depurarse mediante categorías controladas y entornos de prueba, no ampliando indiscriminadamente la información registrada en producción.
+
+#### Acceso y retención
+
+El acceso a métricas y registros técnicos deberá limitarse a identidades administrativas autorizadas.
+
+La aplicación móvil no podrá:
+
+- leer registros técnicos;
+- consultar métricas administrativas;
+- modificar categorías de eventos;
+- seleccionar el nivel de registro;
+- extender la retención;
+- eliminar evidencias técnicas;
+- acceder a alertas internas.
+
+Antes de producción deberá definirse:
+
+- el período mínimo necesario de conservación;
+- el período máximo permitido;
+- el proceso de eliminación automática;
+- las identidades autorizadas;
+- el procedimiento de revisión;
+- los límites de exportación;
+- la protección frente a accesos no autorizados;
+- la separación entre desarrollo, pruebas y producción.
+
+Los registros no deberán conservarse indefinidamente.
+
+Los errores temporales, reintentos o nuevas solicitudes no deberán reiniciar automáticamente el período de retención de registros anteriores.
+
+#### Alertas operativas
+
+Deberán considerarse alertas para detectar:
+
+- aumento anómalo de errores temporales;
+- aumento de conflictos transaccionales;
+- restauraciones pendientes durante demasiado tiempo;
+- múltiples reintentos de la misma operación;
+- intentos repetidos sin autenticación;
+- rechazos repetidos por sesión no reciente;
+- intentos de modificar el punto de no retorno;
+- registros cancelados duplicados;
+- inconsistencias de `expiresAt`;
+- errores de TTL;
+- fallos al retirar marcas de eliminación;
+- fallos al eliminar la solicitud activa;
+- respuestas internas inesperadas;
+- crecimiento inusual de costos o invocaciones.
+
+Las alertas deberán utilizar umbrales documentados y evitar incluir datos personales en títulos, mensajes o canales de notificación.
+
+Una alerta no deberá ejecutar automáticamente operaciones destructivas ni modificar una cuenta activa.
+
+#### Separación respecto de analítica y publicidad
+
+Las métricas operativas del backend de cancelación deberán permanecer separadas de la analítica de producto y de cualquier sistema publicitario futuro.
+
+Los datos generados por el procedimiento de cancelación no deberán utilizarse para:
+
+- personalizar anuncios;
+- crear segmentos publicitarios;
+- medir intereses personales;
+- inferir motivos de cancelación;
+- reconstruir perfiles;
+- identificar relaciones entre cuentas;
+- dirigir campañas comerciales;
+- determinar el valor publicitario de una persona;
+- combinarse con contenido de mensajes o conversaciones;
+- enriquecer perfiles de terceros.
+
+La integración futura de publicidad en LangBridge no deberá recibir acceso a:
+
+- solicitudes de eliminación;
+- registros cancelados;
+- resultados de reautenticación;
+- claves internas de idempotencia;
+- estados administrativos;
+- errores del backend;
+- métricas individuales de cancelación;
+- registros técnicos de seguridad.
+
+Las métricas de observabilidad deberán utilizarse exclusivamente para seguridad, confiabilidad, diagnóstico, cumplimiento y control de costos.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Registro de una cancelación completada mediante una categoría permitida.
+2. Registro de un conflicto transaccional.
+3. Registro de una restauración pendiente.
+4. Registro de un error temporal.
+5. Registro de una sesión reciente requerida.
+6. Registro de un punto de no retorno alcanzado.
+7. Agregación de métricas sin identificar directamente a una persona.
+8. Ausencia de contraseñas.
+9. Ausencia de credenciales federadas.
+10. Ausencia de tokens de acceso o sesión.
+11. Ausencia de tokens completos de App Check.
+12. Ausencia de contenido de mensajes.
+13. Ausencia de contenido de conversaciones.
+14. Ausencia de contenido de reportes.
+15. Ausencia de copias del perfil.
+16. Ausencia de correo.
+17. Ausencia de claves internas de idempotencia.
+18. Ausencia de identificadores DEL-S2.
+19. Ausencia de rutas completas innecesarias.
+20. Rechazo de categorías técnicas no permitidas.
+21. Acceso restringido a identidades autorizadas.
+22. Separación entre desarrollo, pruebas y producción.
+23. Eliminación de registros al vencer su retención.
+24. Imposibilidad de extender la retención desde la aplicación.
+25. Generación de alertas sin datos personales.
+26. Ausencia de operaciones destructivas provocadas por una alerta.
+27. Separación respecto de analítica de producto.
+28. Separación respecto de publicidad.
+29. Ausencia de información sensible en respuestas al cliente.
+30. Verificación de costos asociados con registros y métricas.
+
+Las pruebas deberán utilizar datos sintéticos y cuentas desechables.
+
+Las salidas de prueba deberán revisarse expresamente para detectar datos sensibles accidentalmente registrados.
+
+#### Costos e infraestructura
+
+Antes de producción deberán evaluarse:
+
+- volumen estimado de registros;
+- volumen estimado de métricas;
+- retención configurada;
+- costos de almacenamiento;
+- costos de consulta;
+- costos de alertas;
+- costos de exportación;
+- costos de herramientas de monitoreo;
+- límites presupuestarios;
+- procedimiento para reducir el nivel de registro;
+- procedimiento para detener exportaciones;
+- procedimiento de reversión.
+
+No se habilitarán exportaciones externas ni períodos extensos de retención sin una necesidad documentada.
+
+La decisión documental no autoriza:
+
+- activar Blaze;
+- habilitar herramientas de monitoreo pagadas;
+- exportar registros;
+- crear paneles de producción;
+- desplegar Functions;
+- utilizar cuentas reales;
+- conservar datos indefinidamente.
+
+#### Decisión propuesta
+
+Adoptar métricas agregadas y registros técnicos mínimos basados en categorías cerradas.
+
+Utilizar la observabilidad exclusivamente para seguridad, confiabilidad, diagnóstico, cumplimiento y control de costos.
+
+Prohibir el registro de credenciales, tokens, contenido, copias del perfil, claves internas e identificadores personales innecesarios.
+
+Separar las métricas del backend de la analítica de producto y de cualquier sistema publicitario futuro.
+
+Definir antes de producción la retención, el acceso, las alertas, los costos y la eliminación automática de los registros.
+
+Mantener DEC-BE-011 en estado `requiere-prueba` hasta validar la minimización de datos, las categorías permitidas, las alertas, la retención y la separación respecto de analítica y publicidad.
+
+Esta decisión no autoriza desplegar observabilidad de producción, activar Blaze ni utilizar datos personales reales.
