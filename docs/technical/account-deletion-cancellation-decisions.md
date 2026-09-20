@@ -1091,3 +1091,277 @@ Utilizar la hora confiable del backend y el `auth_time` verificado, con comparac
 Requerir una nueva reautenticación cuando la ventana haya vencido o cuando la evidencia autenticada sea insuficiente.
 
 Mantener la decisión en estado `requiere-prueba` hasta validar correo y contraseña, Google Sign-In, límites temporales, reintentos y respuestas localizadas mediante Emulator Suite.
+
+### DEC-BE-007: Expiración del registro cancelado
+
+**Pregunta:** ¿Qué mecanismo deberá eliminar el registro cancelado mínimo después de su período de conservación?
+
+**Recomendación preliminar:** política TTL de Firestore basada en `expiresAt`.
+
+**Estado:** requiere-prueba.
+
+#### Objetivo de retención
+
+El registro cancelado mínimo deberá conservarse durante 30 días calendario desde la finalización efectiva de la cancelación.
+
+El backend deberá establecer una sola vez:
+
+```text
+cancelledAt
+expiresAt
+```
+
+`cancelledAt` utilizará la hora confiable del servidor y representará la finalización efectiva de la cancelación.
+
+`expiresAt` deberá:
+
+- calcularse exclusivamente desde `cancelledAt`;
+- representar exactamente 30 días calendario después de `cancelledAt`;
+- establecerse al crear el registro cancelado;
+- permanecer inmutable;
+- no extenderse mediante reintentos;
+- no reiniciarse por lecturas;
+- no modificarse debido a una solicitud nueva;
+- no reutilizar plazos de DEL-S2.
+
+#### Alternativas consideradas
+
+1. Política TTL de Firestore.
+2. Función programada de limpieza.
+3. Política TTL con verificación programada complementaria.
+4. Proceso administrativo temporal para pruebas.
+5. Eliminación manual, únicamente durante desarrollo controlado.
+
+La eliminación manual no será aceptable como mecanismo de producción.
+
+#### Política TTL recomendada
+
+La política TTL deberá aplicarse exclusivamente al campo:
+
+```text
+expiresAt
+```
+
+de la colección:
+
+```text
+cancelledDeletionRequests
+```
+
+TTL deberá utilizarse únicamente para eliminar el registro cancelado mínimo cuando haya vencido.
+
+TTL no deberá:
+
+- aplicarse a `accountDeletionRequests`;
+- aplicarse a `users`;
+- aplicarse a conversaciones o mensajes;
+- aplicarse a reportes;
+- aplicarse a DEL-S2 mediante esta misma política;
+- restaurar perfiles;
+- retirar marcas de eliminación;
+- ejecutar operaciones administrativas adicionales;
+- modificar una cuenta activa;
+- modificar una solicitud nueva.
+
+Los documentos de `cancelledDeletionRequests` no deberán contener subcolecciones, porque la eliminación TTL del documento principal no garantiza la eliminación automática de subcolecciones.
+
+#### Ventana técnica de eliminación
+
+La política TTL no garantiza que el documento sea eliminado exactamente al alcanzar `expiresAt`.
+
+Después del vencimiento podrá existir una ventana técnica antes de la eliminación física. Durante esa ventana:
+
+- el registro se considerará vencido;
+- el registro no podrá tratarse como vigente;
+- el registro no podrá reactivarse;
+- `expiresAt` no podrá modificarse;
+- la retención no podrá extenderse;
+- el registro no podrá utilizarse para bloquear una solicitud nueva;
+- el registro no podrá convertirse en DEL-S2;
+- el registro no podrá provocar cambios sobre la cuenta activa.
+
+La aceptación de TTL para producción dependerá de aprobar expresamente esta diferencia entre:
+
+```text
+vencimiento lógico
+```
+
+y:
+
+```text
+eliminación física
+```
+
+El vencimiento lógico ocurrirá al alcanzar `expiresAt`.
+
+La eliminación física ocurrirá posteriormente mediante TTL, dentro de la ventana operativa del servicio.
+
+#### Tratamiento de registros vencidos
+
+Cualquier proceso autorizado que encuentre un registro con:
+
+```text
+serverTime >= expiresAt
+```
+
+deberá tratarlo como vencido, aunque el documento todavía exista físicamente.
+
+Un registro vencido no deberá:
+
+- aparecer como una cancelación vigente;
+- impedir una solicitud de eliminación nueva;
+- modificar el perfil;
+- retirar o establecer marcas de eliminación;
+- provocar comunicaciones nuevas;
+- generar una nueva fecha de expiración;
+- reiniciar el plazo de 30 días;
+- crear DEL-S2;
+- exponer información a la aplicación móvil.
+
+La aplicación no tendrá lectura directa sobre estos registros y no deberá depender de comprobar su eliminación física.
+
+#### Inmutabilidad de expiresAt
+
+`expiresAt` deberá permanecer inmutable desde la creación del registro cancelado.
+
+Ningún reintento, función programada, proceso administrativo o solicitud nueva podrá:
+
+- retrasar `expiresAt`;
+- adelantar `expiresAt` sin una corrección técnica autorizada y documentada;
+- sustituirlo por una hora proporcionada por el dispositivo;
+- eliminarlo antes de que el registro sea procesable por TTL;
+- usar una fecha distinta para renovar la retención;
+- recalcularlo desde la fecha de un reintento;
+- reutilizarlo para una cancelación posterior.
+
+Si un registro carece de `expiresAt`, contiene un valor inválido o presenta una inconsistencia temporal, deberá enviarse a un procedimiento técnico controlado.
+
+La inconsistencia no deberá corregirse:
+
+- desde la aplicación móvil;
+- mediante una fecha proporcionada por el cliente;
+- extendiendo automáticamente la retención;
+- recreando la solicitud activa;
+- creando DEL-S2;
+- modificando datos ordinarios de la cuenta.
+
+Una corrección técnica autorizada deberá quedar limitada al mínimo necesario y no deberá convertir un registro vencido en vigente.
+
+#### Función programada complementaria
+
+Una función programada podrá evaluarse como mecanismo complementario de verificación, pero no será obligatoria en el diseño inicial.
+
+Una función complementaria podría:
+
+- detectar registros vencidos que todavía existan;
+- identificar registros sin `expiresAt`;
+- identificar valores temporales inválidos;
+- comprobar que no existan subcolecciones;
+- generar métricas técnicas generales;
+- eliminar registros vencidos mediante una operación idempotente autorizada;
+- ayudar a verificar el comportamiento de TTL.
+
+La función programada no deberá:
+
+- extender `expiresAt`;
+- recrear registros eliminados;
+- modificar una cuenta activa;
+- modificar una solicitud nueva;
+- restaurar perfiles;
+- crear DEL-S2;
+- enviar nuevas confirmaciones de cancelación;
+- procesar conversaciones, mensajes o reportes;
+- sustituir la política TTL sin una decisión nueva.
+
+La necesidad de esta función dependerá de las pruebas, los costos, la observabilidad y la aceptación de la ventana técnica de TTL.
+
+#### Costos y limitaciones
+
+Las eliminaciones realizadas mediante TTL cuentan como operaciones de eliminación de Firestore.
+
+Antes de producción deberán evaluarse:
+
+- cantidad estimada de cancelaciones;
+- cantidad mensual de eliminaciones TTL;
+- costos por operaciones de eliminación;
+- almacenamiento temporal durante la ventana posterior al vencimiento;
+- costo de una posible función programada;
+- costo de registros técnicos;
+- límites aplicables de Firestore;
+- configuración de alertas presupuestarias.
+
+La política TTL:
+
+- no garantiza eliminación instantánea;
+- no elimina subcolecciones automáticamente;
+- no ejecuta eliminaciones de forma transaccional;
+- puede procesar documentos con la misma fecha en momentos diferentes;
+- deberá utilizar siempre el último valor válido de `expiresAt`;
+- deberá configurarse únicamente después de revisar el impacto sobre documentos existentes.
+
+La activación de TTL sobre una colección existente deberá comprobar previamente que no contiene documentos con fechas vencidas incorrectas o inesperadas.
+
+#### Restricciones actuales
+
+La recomendación documental de TTL no autoriza:
+
+- configurar una política TTL en producción;
+- modificar índices o configuraciones remotas;
+- activar Blaze;
+- crear Functions;
+- desplegar servicios;
+- utilizar cuentas reales;
+- crear registros cancelados reales;
+- ejecutar eliminaciones reales.
+
+Las pruebas iniciales deberán utilizar documentos sintéticos, fechas controladas y un entorno separado cuando corresponda.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Creación de un registro cancelado con `cancelledAt` válido.
+2. Cálculo de `expiresAt` exactamente desde `cancelledAt`.
+3. Conservación lógica durante 30 días calendario.
+4. Inmutabilidad de `cancelledAt`.
+5. Inmutabilidad de `expiresAt`.
+6. Rechazo de una extensión mediante reintentos.
+7. Rechazo de fechas proporcionadas por el cliente.
+8. Tratamiento como vencido al alcanzar `expiresAt`.
+9. Imposibilidad de tratar como vigente un documento vencido todavía existente.
+10. Eliminación física posterior mediante TTL.
+11. Ausencia de subcolecciones.
+12. Eliminación exclusiva del registro cancelado mínimo.
+13. Ausencia de modificaciones sobre la cuenta activa.
+14. Ausencia de modificaciones sobre una solicitud nueva.
+15. Ausencia de cambios en la visibilidad del perfil.
+16. Ausencia de DEL-S2.
+17. Ausencia de nuevas comunicaciones por la expiración.
+18. Comportamiento seguro cuando falta `expiresAt`.
+19. Comportamiento seguro ante un valor temporal inválido.
+20. Reintento idempotente si el registro ya fue eliminado.
+21. Imposibilidad de recrear un registro vencido.
+22. Prueba de una posible función programada complementaria.
+23. Verificación de costos y operaciones de eliminación.
+24. Verificación de que TTL no se aplique a otras colecciones.
+
+Las pruebas iniciales deberán utilizar Emulator Suite y datos sintéticos.
+
+La eliminación física administrada mediante TTL deberá validarse posteriormente en un proyecto separado de pruebas, sin cuentas ni datos personales reales.
+
+#### Decisión propuesta
+
+Adoptar una política TTL de Firestore basada exclusivamente en `expiresAt` como mecanismo candidato para eliminar los registros de `cancelledDeletionRequests`.
+
+Considerar el registro lógicamente vencido desde el instante en que:
+
+```text
+serverTime >= expiresAt
+```
+Aceptar provisionalmente que la eliminación física no será instantánea y podrá ocurrir durante la ventana operativa posterior del servicio.
+
+Mantener una función programada únicamente como alternativa complementaria, condicionada a pruebas, observabilidad, necesidad técnica y costos.
+
+No permitir subcolecciones bajo los registros cancelados.
+
+Mantener la decisión en estado `requiere-prueba` hasta aprobar expresamente la ventana técnica de eliminación, verificar costos, probar documentos vencidos y confirmar que TTL no afecta ninguna cuenta activa, solicitud nueva o registro DEL-S2.
