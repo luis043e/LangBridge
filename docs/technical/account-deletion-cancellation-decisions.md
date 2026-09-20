@@ -23,17 +23,37 @@ Su finalidad es distinguir claramente:
 
 ## 2. Restricciones vigentes
 
-Mientras esta matriz no esté cerrada y aprobada:
+La matriz técnica está cerrada y se autoriza iniciar la implementación local controlada del backend.
 
-- no se creará la carpeta `functions`;
-- no se instalarán `firebase-functions` ni `firebase-admin`;
-- no se modificará `firebase.json` para agregar Functions;
-- no se activará Blaze;
-- no se configurará TTL en producción;
-- no se desplegará Firebase;
-- no se abrirán permisos administrativos al cliente;
-- no se utilizarán cuentas reales;
-- no se ejecutará ninguna operación irreversible.
+Durante esta fase local se autoriza:
+
+- crear la carpeta `functions`;
+- crear un paquete independiente para el backend;
+- instalar `firebase-functions`, `firebase-admin` y TypeScript dentro de `functions`;
+- modificar `firebase.json` para agregar Functions y los emuladores necesarios;
+- utilizar Functions Emulator, Authentication Emulator y Firestore Emulator;
+- implementar una función invocable mínima;
+- utilizar proyectos con identificador `demo-*`;
+- utilizar cuentas desechables y datos sintéticos;
+- ejecutar pruebas automatizadas locales;
+- probar transacciones, concurrencia, idempotencia y respuestas seguras en emuladores.
+
+La autorización local no permite:
+
+- activar Blaze;
+- asociar facturación;
+- desplegar Functions;
+- desplegar Firebase;
+- modificar recursos de producción;
+- configurar TTL en producción;
+- crear Cloud Scheduler;
+- utilizar cuentas personales o datos reales;
+- abrir permisos administrativos al cliente;
+- ejecutar cancelaciones con cuentas reales;
+- ejecutar eliminaciones reales;
+- ejecutar ninguna operación irreversible.
+
+Cualquier despliegue en la nube continuará sujeto a las decisiones, pruebas y aprobaciones definidas en esta matriz.
 
 ## 3. Estados de decisión
 

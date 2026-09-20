@@ -1809,16 +1809,37 @@ No se creará infraestructura hasta cerrar estas decisiones.
 
 ## 16. Restricciones actuales
 
-Durante esta fase:
+La etapa de decisiones técnicas está cerrada y se autoriza iniciar la implementación local controlada del backend.
 
-- No se creará la carpeta `functions`.
-- No se instalará `firebase-functions`.
-- No se instalará `firebase-admin`.
-- No se activará Blaze.
-- No se desplegará Firebase.
-- No se probará con cuentas reales.
-- No se abrirán permisos de cancelación al cliente.
-- No se ejecutará una eliminación real.
+Durante esta fase local se autoriza:
+
+- crear la carpeta `functions`;
+- crear un paquete independiente para el backend;
+- instalar `firebase-functions`, `firebase-admin` y TypeScript dentro de `functions`;
+- modificar `firebase.json` para agregar Functions y los emuladores necesarios;
+- utilizar Functions Emulator, Authentication Emulator y Firestore Emulator;
+- implementar una función invocable mínima;
+- utilizar proyectos con identificador `demo-*`;
+- utilizar cuentas desechables y datos sintéticos;
+- ejecutar pruebas automatizadas locales;
+- validar transacciones, concurrencia, idempotencia y respuestas seguras mediante emuladores.
+
+Durante esta fase continúa prohibido:
+
+- activar Blaze;
+- asociar facturación;
+- desplegar Functions;
+- desplegar Firebase;
+- modificar recursos de producción;
+- configurar TTL en producción;
+- crear Cloud Scheduler;
+- utilizar cuentas personales o datos reales;
+- abrir permisos de cancelación o administración al cliente;
+- ejecutar cancelaciones con cuentas reales;
+- ejecutar eliminaciones reales;
+- ejecutar cualquier operación irreversible.
+
+Cualquier despliegue en la nube continuará sujeto a las pruebas, límites, controles económicos y aprobaciones documentadas.
 
 ## 17. Próximo paso técnico
 
@@ -1894,18 +1915,37 @@ La matriz deberá distinguir claramente:
 - necesidad o no de Blaze;
 - estado de aprobación.
 
-### Restricciones hasta la aprobación
+### Autorización para implementación local
 
-Hasta cerrar la matriz de decisiones y recibir aprobación explícita:
+La matriz de decisiones está cerrada y se autoriza comenzar la implementación local controlada del backend.
 
-- no se creará la carpeta `functions`;
-- no se instalarán `firebase-functions` ni `firebase-admin`;
-- no se modificará `firebase.json` para agregar Functions;
-- no se activará Blaze;
-- no se configurará TTL en producción;
-- no se desplegará Firebase;
-- no se abrirán permisos administrativos al cliente;
-- no se ejecutarán cancelaciones con cuentas reales;
-- no se ejecutará ninguna operación irreversible.
+La autorización local permite:
 
-La implementación local o de producción del backend comenzará únicamente después de aprobar la arquitectura, las decisiones técnicas pendientes, los controles de seguridad, las pruebas y el impacto económico.
+- crear la carpeta `functions`;
+- instalar `firebase-functions`, `firebase-admin` y TypeScript dentro del paquete independiente del backend;
+- modificar `firebase.json` para agregar Functions y los emuladores necesarios;
+- utilizar Functions Emulator, Authentication Emulator y Firestore Emulator;
+- implementar una función invocable mínima;
+- utilizar proyectos con identificador `demo-*`;
+- utilizar cuentas desechables y datos sintéticos;
+- ejecutar pruebas automatizadas locales;
+- validar autenticación, transacciones, concurrencia, idempotencia, recuperación y respuestas seguras mediante emuladores.
+
+La autorización local no permite:
+
+- activar Blaze;
+- asociar facturación;
+- configurar TTL en producción;
+- crear Cloud Scheduler;
+- desplegar Functions;
+- desplegar Firebase;
+- modificar recursos de producción;
+- abrir permisos administrativos al cliente;
+- utilizar cuentas personales o datos reales;
+- ejecutar cancelaciones con cuentas reales;
+- ejecutar eliminaciones reales;
+- ejecutar ninguna operación irreversible.
+
+La implementación local comenzará con una función invocable mínima y avanzará de forma incremental, manteniendo TypeScript en cero errores, pruebas aprobadas y Git limpio.
+
+Cualquier despliegue en la nube requerirá una aprobación posterior independiente y continuará sujeto a los controles económicos, técnicos y operativos documentados.
