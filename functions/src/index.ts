@@ -1,4 +1,15 @@
 import {
+  getApps,
+  initializeApp,
+} from "firebase-admin/app";
+import {
+  getFirestore,
+} from "firebase-admin/firestore";
+
+import {
+  evaluateDeletionRequest,
+} from "./deletion-request-state.js";
+import {
   evaluateRecentAuthentication,
 } from "./recent-authentication.js";
 
@@ -7,6 +18,13 @@ import {
   HttpsError,
   onCall,
 } from "firebase-functions/v2/https";
+
+if (getApps().length === 0) {
+  initializeApp();
+}
+
+const firestore =
+  getFirestore();
 
 setGlobalOptions({
   region: "us-central1",
@@ -59,31 +77,87 @@ function requireRecentAuthentication(
   );
 }
 
+function validateCallableRequest(
+  request: {
+    auth?: {
+      uid: string;
+      token: {
+        auth_time?: unknown;
+      };
+    };
+    data: unknown;
+  }
+): {
+  uid: string;
+} {
+  if (request.auth === undefined) {
+    throw new HttpsError(
+      "unauthenticated",
+      "Authentication is required."
+    );
+  }
+
+  if (hasUnknownInput(request.data)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "The request contains unsupported data."
+    );
+  }
+
+  requireRecentAuthentication(
+    request.auth.token.auth_time
+  );
+
+  return {
+    uid: request.auth.uid,
+  };
+}
+
 export const cancellationBackendProbe = onCall(
   {
     timeoutSeconds: 30,
   },
   (request) => {
-    if (request.auth === undefined) {
-      throw new HttpsError(
-        "unauthenticated",
-        "Authentication is required."
-      );
-    }
-
-    if (hasUnknownInput(request.data)) {
-      throw new HttpsError(
-        "invalid-argument",
-        "The request contains unsupported data."
-      );
-    }
-
-    requireRecentAuthentication(
-      request.auth.token.auth_time
+    validateCallableRequest(
+      request
     );
 
     return {
       status: "ready",
+    };
+  }
+);
+
+export const cancellationRequestStateProbe = onCall(
+  {
+    timeoutSeconds: 30,
+  },
+  async (request) => {
+    const {
+      uid,
+    } = validateCallableRequest(
+      request
+    );
+
+    const snapshot =
+      await firestore
+        .collection(
+          "accountDeletionRequests"
+        )
+        .doc(uid)
+        .get();
+
+    const result =
+      evaluateDeletionRequest(
+        snapshot.exists,
+        snapshot.exists
+          ? snapshot.data()
+          : undefined,
+        uid
+      );
+
+    return {
+      status: result.status,
     };
   }
 );
