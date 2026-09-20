@@ -1548,3 +1548,230 @@ Exigir una nueva evaluación de costos, seguridad, consultas, frecuencia, límit
 Mantener DEC-BE-008 en estado `diferida`.
 
 Esta decisión no autoriza crear Cloud Scheduler, desplegar Functions, activar Blaze ni modificar recursos de producción.
+
+### DEC-BE-009: App Check
+
+**Pregunta:** ¿Debe exigirse App Check para invocar el futuro backend de cancelación?
+
+**Recomendación preliminar:** incorporarlo como capa complementaria en una etapa posterior.
+
+**Estado:** diferida.
+
+#### Objetivo
+
+App Check podrá ayudar a reducir solicitudes procedentes de aplicaciones modificadas, clientes no reconocidos o entornos no autorizados.
+
+Su función será complementar los controles principales del backend, no sustituirlos.
+
+App Check podrá contribuir a:
+
+- verificar que una solicitud proceda de una instancia reconocida de la aplicación;
+- reducir llamadas automatizadas desde clientes no autorizados;
+- mejorar la defensa ante abuso;
+- aportar señales adicionales para observabilidad;
+- limitar parte del tráfico no legítimo;
+- proteger la función invocable junto con otros controles.
+
+App Check no demostrará por sí solo la identidad de la persona que solicita la cancelación.
+
+#### Controles que App Check no sustituye
+
+App Check no sustituirá:
+
+- Firebase Authentication;
+- la comprobación del `uid`;
+- la reautenticación reciente;
+- la validación de `auth_time`;
+- la ventana de cinco minutos;
+- la comprobación del estado de la solicitud;
+- la carrera transaccional contra `pointOfNoReturnAt`;
+- la idempotencia;
+- las reglas de seguridad de Firestore;
+- la validación estricta de entradas;
+- los límites de uso;
+- los controles presupuestarios;
+- las pruebas de seguridad.
+
+Una llamada con App Check válido deberá rechazarse si falla cualquiera de los controles obligatorios de identidad, estado o autorización.
+
+#### Estado inicial
+
+App Check no se habilitará como requisito obligatorio durante la primera implementación local del backend.
+
+La primera fase deberá concentrarse en validar:
+
+- Authentication;
+- `auth_time`;
+- la función invocable;
+- transacciones;
+- restauración del perfil;
+- idempotencia;
+- respuestas seguras;
+- pruebas mediante Emulator Suite.
+
+Después de estabilizar esos controles, App Check podrá incorporarse y probarse como una capa adicional.
+
+#### Plataformas y proveedores
+
+La estrategia futura de App Check deberá definirse por plataforma.
+
+Para Android deberán evaluarse los proveedores admitidos y apropiados para:
+
+- compilaciones locales;
+- Emulator Suite;
+- APK privado;
+- prueba cerrada;
+- distribución mediante Google Play;
+- dispositivos físicos compatibles;
+- versiones anteriores todavía admitidas.
+
+Las compilaciones de desarrollo deberán utilizar mecanismos específicos de depuración y nunca deberán incorporar secretos de depuración en una versión pública.
+
+Si LangBridge se publica posteriormente en otras plataformas, cada plataforma deberá contar con una configuración independiente y probada.
+
+La aprobación de App Check para Android no implicará automáticamente su aprobación para web, iOS u otras plataformas.
+
+#### Activación gradual
+
+App Check no deberá pasar directamente de desactivado a obligatorio para todas las solicitudes de producción.
+
+La activación futura deberá realizarse por etapas:
+
+1. Integrar el SDK sin exigir todavía el token.
+2. Verificar la obtención de tokens en desarrollo.
+3. Probar dispositivos físicos.
+4. Probar compilaciones privadas.
+5. Observar solicitudes válidas e inválidas.
+6. Comprobar el impacto sobre versiones anteriores.
+7. Validar los mensajes de error.
+8. Aplicar la protección inicialmente en un entorno de pruebas.
+9. Habilitar la exigencia en producción solo después de completar la validación.
+10. Mantener un procedimiento documentado de reversión.
+
+La activación gradual deberá evitar bloquear de forma inesperada a usuarios legítimos.
+
+#### Errores y recuperación
+
+La aplicación deberá distinguir entre:
+
+- falta de autenticación;
+- reautenticación vencida;
+- token de App Check ausente;
+- token de App Check inválido;
+- servicio temporalmente no disponible;
+- error transitorio de red;
+- rechazo definitivo del backend.
+
+Los errores de App Check destinados a la aplicación deberán transformarse en respuestas generales y seguras.
+
+La aplicación no deberá mostrar:
+
+- tokens;
+- identificadores internos;
+- nombres de proveedores técnicos;
+- claves de depuración;
+- detalles de validación;
+- instrucciones que permitan eludir App Check;
+- trazas administrativas.
+
+Un fallo de App Check no deberá provocar:
+
+- cancelación directa desde el cliente;
+- apertura de permisos administrativos;
+- restauración directa del perfil;
+- creación de registros cancelados;
+- eliminación de solicitudes;
+- creación de DEL-S2;
+- ejecución de operaciones irreversibles.
+
+#### Privacidad y registros
+
+Los registros relacionados con App Check deberán aplicar minimización de datos.
+
+Podrán conservar categorías técnicas generales, por ejemplo:
+
+- token ausente;
+- token inválido;
+- proveedor no disponible;
+- error temporal;
+- solicitud bloqueada;
+- validación completada.
+
+No deberán conservar innecesariamente:
+
+- tokens completos;
+- credenciales;
+- contenido;
+- UID
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión de `diferida` a `requiere-prueba` o `aprobada`, deberán comprobarse:
+
+1. Obtención válida de un token de App Check en desarrollo.
+2. Funcionamiento del mecanismo de depuración sin exponer secretos.
+3. Rechazo de una llamada sin token cuando la exigencia se encuentre habilitada.
+4. Rechazo de un token inválido.
+5. Rechazo de un token vencido.
+6. Aceptación de una llamada con token válido.
+7. Autenticación obligatoria aunque App Check sea válido.
+8. Reautenticación reciente obligatoria aunque App Check sea válido.
+9. Validación de `auth_time` aunque App Check sea válido.
+10. Validación del estado cancelable.
+11. Protección de la carrera contra `pointOfNoReturnAt`.
+12. Funcionamiento de la función invocable mediante Emulator Suite.
+13. Funcionamiento en una compilación privada para Android.
+14. Funcionamiento en dispositivos físicos compatibles.
+15. Tratamiento seguro de un servicio temporalmente no disponible.
+16. Tratamiento seguro de errores de red.
+17. Ausencia de tokens y secretos en registros.
+18. Ausencia de detalles técnicos sensibles en respuestas.
+19. Mensajes localizados y seguros en los 16 idiomas activos.
+20. Compatibilidad con una activación gradual.
+21. Procedimiento de reversión de la exigencia.
+22. Verificación de que versiones antiguas no sean bloqueadas sin aviso previo.
+23. Ausencia de permisos administrativos directos para el cliente.
+24. Ausencia de DEL-S2 y operaciones irreversibles ante fallos de App Check.
+
+Las pruebas deberán utilizar cuentas desechables, compilaciones controladas y un entorno separado cuando corresponda.
+
+#### Costos e infraestructura
+
+La evaluación de App Check deberá considerar:
+
+- disponibilidad de proveedores por plataforma;
+- requisitos para distribución mediante Google Play;
+- compatibilidad con compilaciones privadas;
+- mantenimiento de claves y configuraciones;
+- observabilidad;
+- soporte para dispositivos legítimos;
+- procedimientos de depuración;
+- impacto operativo de falsos rechazos;
+- costos indirectos de soporte;
+- procedimiento de activación y reversión.
+
+La decisión documental no autoriza:
+
+- habilitar la exigencia en producción;
+- registrar proveedores definitivos;
+- modificar configuraciones remotas;
+- activar Blaze;
+- desplegar Functions;
+- publicar una nueva compilación;
+- utilizar cuentas reales;
+- bloquear versiones existentes.
+
+Cualquier secreto o token de depuración deberá mantenerse fuera del repositorio y nunca deberá incluirse en una compilación pública.
+
+#### Decisión propuesta
+
+No exigir App Check durante la primera implementación local del backend de cancelación.
+
+Mantener App Check como capa complementaria futura y diferida.
+
+Reconsiderar su implementación después de estabilizar Authentication, `auth_time`, la función invocable, las transacciones, la idempotencia y las respuestas seguras.
+
+Exigir una integración gradual, pruebas en dispositivos físicos, tratamiento seguro de errores y un procedimiento de reversión antes de habilitarlo en producción.
+
+Mantener DEC-BE-009 en estado `diferida`.
+
+Esta decisión no autoriza habilitar App Check, registrar proveedores definitivos, desplegar servicios, activar Blaze ni modificar recursos de producción.
