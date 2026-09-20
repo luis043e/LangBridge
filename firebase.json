@@ -1,16 +1,51 @@
 ﻿{
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "dist",
-    "cleanUrls": true,
-    "trailingSlash": false,
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+    "firestore":  {
+                      "rules":  "firestore.rules",
+                      "indexes":  "firestore.indexes.json"
+                  },
+    "hosting":  {
+                    "public":  "dist",
+                    "cleanUrls":  true,
+                    "trailingSlash":  false,
+                    "ignore":  [
+                                   "firebase.json",
+                                   "**/.*",
+                                   "**/node_modules/**"
+                               ]
+                },
+    "functions":  [
+                      {
+                          "ignore":  [
+                                         "node_modules",
+                                         ".git",
+                                         "firebase-debug.log",
+                                         "firebase-debug.*.log",
+                                         "*.local"
+                                     ],
+                          "source":  "functions",
+                          "codebase":  "default"
+                      }
+                  ],
+    "emulators":  {
+                      "logging":  {
+                                      "port":  4500
+                                  },
+                      "functions":  {
+                                        "port":  5001
+                                    },
+                      "singleProjectMode":  true,
+                      "firestore":  {
+                                        "port":  8080
+                                    },
+                      "hub":  {
+                                  "port":  4400
+                              },
+                      "auth":  {
+                                   "port":  9099
+                               },
+                      "ui":  {
+                                 "port":  4000,
+                                 "enabled":  true
+                             }
+                  }
 }
