@@ -422,7 +422,7 @@ Node.js 20 no se recomienda para un backend nuevo.
 No deberá seleccionarse salvo que aparezca una incompatibilidad excepcional, documentada y temporal que impida utilizar Node.js 22 o Node.js 24.
 
 No se aprobará una versión únicamente porque una dependencia antigua declare compatibilidad con ella.
-``
+
 #### Criterios de prueba
 
 Antes de cambiar esta decisión a `aprobada` deberán comprobarse localmente:
@@ -1068,7 +1068,7 @@ Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
 20. Imposibilidad de omitir la verificación mediante datos proporcionados por el cliente.
 
 Las pruebas deberán utilizar Emulator Suite y cuentas desechables. No se utilizarán contraseñas reales ni cuentas personales.
-``
+
 #### Costos e infraestructura
 
 La aprobación documental de una ventana de cinco minutos no autoriza:
