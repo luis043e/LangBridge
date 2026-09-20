@@ -17,8 +17,69 @@ const stateFunctionUrl =
 
 async function createDeletionRequest(
   uid,
-  email
+  email,
+  options = {}
 ) {
+  const {
+    userId = uid,
+    status = 'pending',
+    previousProfileVisibility = true,
+    includePreviousProfileVisibility = true,
+    pointOfNoReturnAt,
+    pointOfNoReturnOperation,
+  } = options;
+
+  const fields = {
+    userId: {
+      stringValue:
+        userId,
+    },
+    userEmail: {
+      stringValue:
+        email,
+    },
+    status: {
+      stringValue:
+        status,
+    },
+    createdAt: {
+      timestampValue:
+        new Date().toISOString(),
+    },
+    updatedAt: {
+      timestampValue:
+        new Date().toISOString(),
+    },
+  };
+
+  if (
+    includePreviousProfileVisibility
+  ) {
+    fields.previousProfileVisibility = {
+      booleanValue:
+        previousProfileVisibility,
+    };
+  }
+
+  if (
+    pointOfNoReturnAt !== undefined
+  ) {
+    fields.pointOfNoReturnAt = {
+      timestampValue:
+        pointOfNoReturnAt,
+    };
+  }
+
+  if (
+    pointOfNoReturnOperation !==
+    undefined
+  ) {
+    fields.pointOfNoReturnOperation = {
+      stringValue:
+        pointOfNoReturnOperation,
+    };
+  }
+
   const documentUrl =
     `http://127.0.0.1:8080/v1/projects/${projectId}/databases/(default)/documents/accountDeletionRequests/${uid}`;
 
@@ -34,32 +95,7 @@ async function createDeletionRequest(
             'Bearer owner',
         },
         body: JSON.stringify({
-          fields: {
-            userId: {
-              stringValue:
-                uid,
-            },
-            userEmail: {
-              stringValue:
-                email,
-            },
-            status: {
-              stringValue:
-                'pending',
-            },
-            previousProfileVisibility: {
-              booleanValue:
-                true,
-            },
-            createdAt: {
-              timestampValue:
-                new Date().toISOString(),
-            },
-            updatedAt: {
-              timestampValue:
-                new Date().toISOString(),
-            },
-          },
+          fields,
         }),
       }
     );
@@ -323,6 +359,275 @@ test(
     assert.equal(
       body.error.status,
       'INVALID_ARGUMENT'
+    );
+  }
+);
+test(
+  'the request state probe accepts a pending request with previous false visibility',
+  async () => {
+    const email =
+      'state-hidden@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        previousProfileVisibility:
+          false,
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'cancellable',
+        },
+      }
+    );
+  }
+);
+
+test(
+  'the request state probe accepts processing before the point of no return',
+  async () => {
+    const email =
+      'state-processing@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        status:
+          'processing',
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'cancellable',
+        },
+      }
+    );
+  }
+);
+test(
+  'the request state probe rejects processing after the point of no return',
+  async () => {
+    const email =
+      'state-point-of-no-return@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        status:
+          'processing',
+        pointOfNoReturnAt:
+          new Date().toISOString(),
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'point-of-no-return-reached',
+        },
+      }
+    );
+  }
+);
+
+test(
+  'the request state probe rejects a request with a different internal user id',
+  async () => {
+    const email =
+      'state-wrong-user@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        userId:
+          'forged-user-id',
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'not-cancellable',
+        },
+      }
+    );
+  }
+);
+test(
+  'the request state probe rejects a non-cancellable stored status',
+  async () => {
+    const email =
+      'state-cancelled@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        status:
+          'cancelled',
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'not-cancellable',
+        },
+      }
+    );
+  }
+);
+
+test(
+  'the request state probe rejects a request without previous profile visibility',
+  async () => {
+    const email =
+      'state-missing-visibility@example.com';
+
+    const authBody =
+      await createEmulatorUser(
+        email
+      );
+
+    await createDeletionRequest(
+      authBody.localId,
+      email,
+      {
+        includePreviousProfileVisibility:
+          false,
+      }
+    );
+
+    const response =
+      await invokeStateProbe(
+        authBody.idToken
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      body,
+      {
+        result: {
+          status:
+            'not-cancellable',
+        },
+      }
     );
   }
 );
