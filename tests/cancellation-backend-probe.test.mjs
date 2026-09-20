@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {
-    test,
+  test,
 } from 'node:test';
 
 const projectId =
@@ -13,7 +13,8 @@ const functionUrl =
   `http://127.0.0.1:5001/${projectId}/us-central1/cancellationBackendProbe`;
 
 async function invokeProbe(
-  idToken
+  idToken,
+  data = {}
 ) {
   const headers = {
     'Content-Type': 'application/json',
@@ -30,7 +31,7 @@ async function invokeProbe(
       method: 'POST',
       headers,
       body: JSON.stringify({
-        data: {},
+        data,
       }),
     }
   );
@@ -113,6 +114,60 @@ test(
           status: 'ready',
         },
       }
+    );
+  }
+);
+test(
+  'the cancellation backend probe rejects unsupported authenticated input',
+  async () => {
+    const authResponse =
+      await fetch(
+        authUrl,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json',
+          },
+          body: JSON.stringify({
+            email:
+              'backend-probe-input@example.com',
+            password:
+              'LocalTestPassword123!',
+            returnSecureToken:
+              true,
+          }),
+        }
+      );
+
+    assert.equal(
+      authResponse.ok,
+      true
+    );
+
+    const authBody =
+      await authResponse.json();
+
+    const response =
+      await invokeProbe(
+        authBody.idToken,
+        {
+          userId:
+            'forged-user',
+        }
+      );
+
+    const body =
+      await response.json();
+
+    assert.equal(
+      response.ok,
+      false
+    );
+
+    assert.equal(
+      body.error.status,
+      'INVALID_ARGUMENT'
     );
   }
 );
