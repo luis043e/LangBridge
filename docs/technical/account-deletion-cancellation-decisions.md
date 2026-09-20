@@ -854,3 +854,240 @@ Adoptar `us-central1` como región candidata para la función invocable de cance
 Mantener la decisión en estado `requiere-prueba` hasta confirmar disponibilidad, compatibilidad, latencia, costos, residencia de datos y procedimiento de reversión.
 
 No configurar ni desplegar recursos regionales hasta recibir aprobación explícita.
+
+### DEC-BE-006: Ventana de reautenticación reciente
+
+**Pregunta:** ¿Durante cuánto tiempo después de una reautenticación deberá permitirse solicitar la cancelación de una eliminación?
+
+**Recomendación preliminar:** cinco minutos.
+
+**Estado:** requiere-prueba.
+
+#### Objetivo de seguridad
+
+La cancelación de una solicitud de eliminación es una operación sensible porque conserva la cuenta, restaura la configuración anterior del perfil y detiene un procedimiento solicitado previamente.
+
+Una sesión iniciada no será suficiente por sí sola. Antes de solicitar la cancelación, la persona deberá verificar nuevamente su identidad mediante el método compatible con su proveedor de autenticación.
+
+La ventana reciente deberá:
+
+- reducir el riesgo de uso de una sesión abandonada o comprometida;
+- permitir completar razonablemente la interacción con la aplicación;
+- evitar períodos innecesariamente largos;
+- utilizar evidencia verificada por Firebase Authentication;
+- calcularse exclusivamente desde el backend;
+- aplicarse de forma consistente a todos los proveedores compatibles.
+
+#### Valor preliminar
+
+La ventana técnica inicial propuesta será:
+
+```text
+5 minutos
+```
+
+El cálculo conceptual será:
+
+```text
+serverTime - auth_time <= allowedRecentAuthenticationWindow
+```
+
+El backend utilizará:
+
+- su propia hora confiable;
+- el `auth_time` contenido en el contexto autenticado verificado;
+- una duración configurada en el backend;
+- una comparación inclusiva en el límite permitido.
+
+La aplicación no podrá proporcionar ni modificar:
+
+- `auth_time`;
+- la hora actual;
+- la duración de la ventana;
+- una indicación de que la sesión es reciente;
+- una excepción manual al vencimiento.
+
+#### Razones para proponer cinco minutos
+
+Cinco minutos ofrecen preliminarmente un equilibrio entre seguridad y facilidad de uso.
+
+La duración propuesta permite tiempo para:
+
+- completar la reautenticación;
+- regresar a la pantalla de cancelación;
+- leer el aviso correspondiente;
+- confirmar la decisión;
+- realizar una llamada inicial;
+- admitir un reintento inmediato después de un error transitorio.
+
+La ventana no deberá utilizarse para autorizar indefinidamente operaciones nuevas. Una solicitud nueva o una operación sensible distinta podrá exigir otra reautenticación.
+
+#### Correo y contraseña
+
+Para una cuenta autenticada con correo y contraseña, la aplicación deberá:
+
+1. Solicitar nuevamente la contraseña.
+2. Crear una credencial únicamente en memoria.
+3. Ejecutar `reauthenticateWithCredential`.
+4. Obtener un token actualizado después de completar la reautenticación.
+5. Invocar el backend con el contexto autenticado actualizado.
+6. Eliminar inmediatamente la contraseña del estado local.
+
+La contraseña no deberá:
+
+- guardarse en Firestore;
+- enviarse como dato de la función invocable;
+- escribirse en registros;
+- conservarse para reintentos posteriores;
+- incluirse en mensajes de error;
+- almacenarse en analítica.
+
+Un error de contraseña incorrecta deberá mantenerse separado de un fallo temporal del backend. La cancelación no comenzará hasta que la reautenticación haya finalizado correctamente.
+
+#### Proveedor federado
+
+Para una cuenta autenticada mediante Google, la aplicación deberá utilizar el flujo de reautenticación correspondiente al proveedor.
+
+El procedimiento deberá:
+
+- confirmar nuevamente la identidad;
+- obtener una credencial válida del proveedor;
+- ejecutar la reautenticación de Firebase Authentication;
+- actualizar el token autenticado;
+- evitar crear un perfil nuevo;
+- evitar reutilizar el flujo general de registro;
+- no enviar credenciales federadas al backend como datos libres;
+- no conservar tokens más tiempo del necesario.
+
+Si en el futuro LangBridge admite otros proveedores, cada proveedor deberá contar con una estrategia explícita de reautenticación antes de permitir la cancelación.
+
+Una ventana válida para un proveedor no deberá reutilizarse como prueba de identidad para otra cuenta o proveedor.
+
+#### Vencimiento y límites temporales
+
+El backend deberá rechazar la cancelación cuando:
+
+- falte `auth_time`;
+- `auth_time` no sea válido;
+- `auth_time` represente una fecha futura fuera de una tolerancia técnica permitida;
+- la antigüedad de la autenticación supere la ventana configurada;
+- el token no corresponda a la cuenta autenticada;
+- la reautenticación no haya actualizado correctamente el contexto.
+
+La comparación inicial utilizará un límite inclusivo:
+
+```text
+antigüedad <= 5 minutos
+```
+
+Una antigüedad superior al límite deberá producir:
+
+```text
+recent-session-required
+```
+
+La tolerancia técnica frente a pequeñas diferencias de reloj deberá ser mínima, documentada y aplicada exclusivamente desde el backend. No deberá ampliar materialmente la ventana aprobada.
+
+#### Reintentos e idempotencia
+
+Un error transitorio inmediatamente después de una reautenticación válida podrá reintentarse mientras la ventana permanezca vigente.
+
+El reintento deberá:
+
+- utilizar un contexto autenticado todavía válido;
+- volver a comprobar `auth_time`;
+- volver a comprobar el estado de la solicitud;
+- volver a comprobar la ausencia de `pointOfNoReturnAt`;
+- conservar la idempotencia;
+- evitar duplicar el registro cancelado;
+- evitar extender `expiresAt`;
+- evitar recrear una solicitud activa;
+- evitar crear DEL-S2.
+
+Una respuesta perdida después de completar la cancelación deberá devolver un resultado idempotente general y no exigir reautenticación con el único propósito de descubrir un registro interno.
+
+Si la cancelación no fue confirmada y la ventana venció antes del reintento, deberá solicitarse una nueva reautenticación.
+
+#### Solicitudes nuevas y reutilización
+
+La reautenticación reciente no deberá reutilizarse indefinidamente.
+
+Una solicitud de eliminación nueva deberá:
+
+- tener su propia verificación;
+- conservar nuevamente la visibilidad anterior;
+- utilizar sus propias fechas;
+- superar los controles vigentes;
+- no depender de una cancelación anterior.
+
+La aplicación no deberá almacenar una marca local que permita omitir la reautenticación en operaciones futuras.
+
+#### Respuestas seguras
+
+Cuando la ventana haya vencido, el backend devolverá:
+```text
+recent-session-required
+```
+
+La respuesta no deberá revelar:
+
+- el valor exacto de `auth_time`;
+- la hora interna del servidor;
+- cuántos segundos excedieron el límite;
+- información sobre sesiones anteriores;
+- credenciales;
+- tokens;
+- detalles administrativos;
+- información que facilite eludir el control temporal.
+
+La aplicación deberá asociar el código con un mensaje localizado y seguro disponible en los 16 idiomas activos.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Reautenticación válida con correo y contraseña.
+2. Reautenticación válida con Google.
+3. Rechazo sin reautenticación.
+4. Rechazo cuando falta `auth_time`.
+5. Rechazo cuando `auth_time` no es válido.
+6. Aceptación inmediatamente después de reautenticar.
+7. Aceptación justo antes del límite.
+8. Comportamiento exacto en el límite de cinco minutos.
+9. Rechazo inmediatamente después del límite.
+10. Rechazo de una fecha futura inválida.
+11. Uso exclusivo de la hora del backend.
+12. Reintento dentro de la ventana.
+13. Reintento después del vencimiento.
+14. Respuesta perdida después de completar la cancelación.
+15. Dos llamadas concurrentes con el mismo contexto autenticado.
+16. Ausencia de contraseñas, credenciales y tokens en registros.
+17. Eliminación inmediata de la contraseña del estado local.
+18. Mensajes seguros en los 16 idiomas.
+19. Imposibilidad de reutilizar una verificación para otra cuenta.
+20. Imposibilidad de omitir la verificación mediante datos proporcionados por el cliente.
+
+Las pruebas deberán utilizar Emulator Suite y cuentas desechables. No se utilizarán contraseñas reales ni cuentas personales.
+``
+#### Costos e infraestructura
+
+La aprobación documental de una ventana de cinco minutos no autoriza:
+
+- crear la carpeta `functions`;
+- instalar dependencias administrativas;
+- activar Blaze;
+- desplegar Functions;
+- utilizar cuentas reales;
+- ejecutar cancelaciones reales.
+
+La lógica temporal deberá mantenerse configurable en el backend y no depender de una constante controlada por la aplicación móvil.
+
+#### Decisión propuesta
+
+Mantener cinco minutos como ventana técnica candidata para la reautenticación reciente.
+
+Utilizar la hora confiable del backend y el `auth_time` verificado, con comparación inclusiva en el límite.
+
+Requerir una nueva reautenticación cuando la ventana haya vencido o cuando la evidencia autenticada sea insuficiente.
+
+Mantener la decisión en estado `requiere-prueba` hasta validar correo y contraseña, Google Sign-In, límites temporales, reintentos y respuestas localizadas mediante Emulator Suite.
