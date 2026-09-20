@@ -1365,3 +1365,186 @@ Mantener una función programada únicamente como alternativa complementaria, co
 No permitir subcolecciones bajo los registros cancelados.
 
 Mantener la decisión en estado `requiere-prueba` hasta aprobar expresamente la ventana técnica de eliminación, verificar costos, probar documentos vencidos y confirmar que TTL no afecta ninguna cuenta activa, solicitud nueva o registro DEL-S2.
+
+### DEC-BE-008: Función programada complementaria
+
+**Pregunta:** ¿Debe existir inicialmente una función programada que complemente la política TTL?
+
+**Recomendación preliminar:** no crearla inicialmente.
+
+**Estado:** diferida.
+
+#### Relación con TTL
+
+La política TTL basada en `expiresAt` permanecerá como mecanismo candidato principal para eliminar los registros vencidos de `cancelledDeletionRequests`.
+
+Una función programada no deberá duplicar automáticamente las responsabilidades de TTL ni convertirse en un segundo mecanismo de eliminación sin una necesidad técnica demostrada.
+
+La ausencia inicial de una función programada permite:
+
+- reducir infraestructura;
+- evitar lógica duplicada;
+- reducir costos potenciales;
+- disminuir la superficie de errores;
+- evitar ejecuciones concurrentes innecesarias;
+- evaluar primero el comportamiento real de TTL.
+
+#### Condiciones para reconsiderarla
+
+La función programada podrá reconsiderarse si las pruebas muestran:
+
+- registros vencidos que permanecen durante períodos operativamente inaceptables;
+- registros sin `expiresAt`;
+- valores temporales inválidos;
+- necesidad de métricas técnicas periódicas;
+- necesidad de verificar que TTL funciona correctamente;
+- inconsistencias que no puedan resolverse mediante el procedimiento principal;
+- una exigencia legal o técnica de comprobación complementaria;
+- beneficios operativos superiores a sus costos y riesgos.
+
+La existencia de una ventana técnica normal de TTL no será, por sí sola, razón suficiente para crear una función programada.
+
+#### Responsabilidades permitidas
+
+Si se aprueba en el futuro, la función programada deberá limitarse a responsabilidades técnicas complementarias.
+
+Podrá:
+
+- consultar registros de `cancelledDeletionRequests`;
+- identificar registros lógicamente vencidos;
+- comprobar la existencia y validez de `expiresAt`;
+- detectar inconsistencias mínimas previamente definidas;
+- eliminar de forma idempotente un registro vencido;
+- generar métricas técnicas agregadas;
+- comprobar que TTL se encuentre funcionando;
+- registrar categorías generales de fallos;
+- finalizar correctamente cuando no existan documentos procesables.
+
+La función no deberá depender de datos proporcionados por la aplicación móvil.
+
+#### Operaciones prohibidas
+
+La función programada no podrá:
+
+- extender `expiresAt`;
+- modificar `cancelledAt`;
+- recrear registros ya eliminados;
+- reactivar una cancelación;
+- recrear una solicitud activa;
+- restaurar perfiles;
+- modificar `isProfileVisible`;
+- establecer o retirar `deletionRequested`;
+- establecer o retirar `deletionRequestedAt`;
+- crear DEL-S2;
+- modificar una cuenta activa;
+- modificar una solicitud nueva;
+- eliminar conversaciones;
+- eliminar mensajes;
+- eliminar conexiones;
+- eliminar reportes;
+- modificar listas de bloqueos;
+- eliminar `users/{uid}`;
+- eliminar Firebase Authentication;
+- enviar una nueva confirmación de cancelación;
+- procesar ninguna otra operación irreversible.
+
+La función tampoco deberá convertir una inconsistencia de expiración en una autorización para modificar datos ordinarios de la cuenta.
+
+#### Idempotencia y concurrencia
+
+Cada ejecución deberá ser idempotente.
+
+Si dos ejecuciones se solapan, ambas deberán comprobar el estado real del documento antes de eliminarlo.
+
+La función deberá tratar como resultado seguro:
+
+- un registro ya eliminado;
+- un registro que todavía no ha vencido;
+- un registro vencido eliminado por otra ejecución;
+- una ejecución sin documentos procesables;
+- una interrupción después de completar una eliminación.
+
+Una ejecución repetida no deberá:
+
+- generar documentos duplicados;
+- extender la retención;
+- cambiar fechas;
+- recrear datos;
+- crear DEL-S2;
+- afectar la cuenta activa.
+
+La seguridad no deberá depender de que el programador ejecute la función exactamente una vez.
+
+#### Costos e infraestructura
+
+Una función programada podría implicar costos asociados con:
+
+- invocaciones periódicas;
+- lecturas de Firestore;
+- eliminaciones de documentos;
+- Cloud Scheduler;
+- Cloud Functions;
+- registros técnicos;
+- almacenamiento de artefactos;
+- tiempo de ejecución.
+
+Antes de aprobarla deberán definirse:
+
+- frecuencia de ejecución;
+- consultas utilizadas;
+- límite de documentos por ejecución;
+- número máximo de instancias;
+- tiempo máximo;
+- política de reintentos;
+- alertas presupuestarias;
+- procedimiento para detenerla;
+- procedimiento de reversión.
+
+No se activará Blaze ni se crearán recursos programados únicamente para probar una necesidad todavía no demostrada.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión de `diferida` a `requiere-prueba` o `aprobada`, deberá demostrarse una necesidad técnica concreta.
+
+Si se implementa una función programada, las pruebas deberán comprobar:
+
+1. Ejecución sin documentos procesables.
+2. Identificación de un registro lógicamente vencido.
+3. Omisión segura de un registro todavía vigente.
+4. Tratamiento seguro de un registro sin `expiresAt`.
+5. Tratamiento seguro de un valor temporal inválido.
+6. Eliminación idempotente de un registro vencido.
+7. Resultado seguro cuando TTL eliminó previamente el documento.
+8. Resultado seguro cuando otra ejecución eliminó previamente el documento.
+9. Dos ejecuciones programadas concurrentes.
+10. Interrupción antes de eliminar un documento.
+11. Interrupción después de completar una eliminación.
+12. Imposibilidad de extender `expiresAt`.
+13. Imposibilidad de modificar `cancelledAt`.
+14. Imposibilidad de recrear un registro eliminado.
+15. Ausencia de cambios sobre una cuenta activa.
+16. Ausencia de cambios sobre una solicitud nueva.
+17. Ausencia de cambios sobre la visibilidad del perfil.
+18. Ausencia de DEL-S2.
+19. Ausencia de nuevas comunicaciones.
+20. Ausencia de operaciones irreversibles.
+21. Aplicación de límites por ejecución.
+22. Generación de métricas técnicas mínimas.
+23. Ausencia de datos personales innecesarios en registros.
+24. Procedimiento seguro para detener la programación.
+
+Las pruebas deberán utilizar datos sintéticos y un entorno separado. No se utilizarán cuentas personales ni datos reales.
+
+#### Decisión propuesta
+
+No crear inicialmente una función programada complementaria.
+
+Mantener TTL como mecanismo candidato principal para la eliminación física de los registros vencidos.
+
+Conservar la función programada como alternativa diferida y reconsiderarla únicamente si las pruebas o la operación real demuestran una necesidad técnica, legal u operativa.
+
+Exigir una nueva evaluación de costos, seguridad, consultas, frecuencia, límites, observabilidad y reversión antes de crearla.
+
+Mantener DEC-BE-008 en estado `diferida`.
+
+Esta decisión no autoriza crear Cloud Scheduler, desplegar Functions, activar Blaze ni modificar recursos de producción.
