@@ -61,7 +61,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-009 | App Check | Capa complementaria futura | diferida |
 | DEC-BE-010 | Estrategia de idempotencia | Clave interna opaca y operación transaccional protegida | requiere-prueba |
 | DEC-BE-011 | Métricas y observabilidad | Métricas agregadas y registros técnicos mínimos | requiere-prueba |
-| DEC-BE-012 | Costos y Blaze | No activar todavía | pendiente |
+| DEC-BE-012 | Costos y Blaze | Mantener Blaze desactivado hasta aprobar presupuesto y límites | requiere-prueba |
 | DEC-BE-013 | Despliegue y reversión | Procedimiento previo obligatorio | pendiente |
 ## 5. Decisiones detalladas
 
@@ -2480,3 +2480,277 @@ Definir antes de producción la retención, el acceso, las alertas, los costos y
 Mantener DEC-BE-011 en estado `requiere-prueba` hasta validar la minimización de datos, las categorías permitidas, las alertas, la retención y la separación respecto de analítica y publicidad.
 
 Esta decisión no autoriza desplegar observabilidad de producción, activar Blaze ni utilizar datos personales reales.
+
+### DEC-BE-012: Costos y Blaze
+
+**Pregunta:** ¿Cuándo podrá activarse el plan Blaze y qué controles económicos deberán existir antes del despliegue?
+
+**Recomendación preliminar:** mantener Blaze desactivado hasta aprobar una estimación de costos, alertas presupuestarias, límites operativos y procedimientos de detención y reversión.
+
+**Estado:** requiere-prueba.
+
+#### Principio general
+
+La escritura de documentación, el desarrollo local y las pruebas mediante Emulator Suite no autorizarán la activación de Blaze.
+
+Blaze solo podrá considerarse cuando:
+
+- la arquitectura esté aprobada;
+- la función invocable esté diseñada;
+- el runtime esté validado;
+- la región esté confirmada;
+- las pruebas locales estén preparadas;
+- exista una estimación económica;
+- existan límites operativos;
+- existan alertas presupuestarias;
+- exista un procedimiento de despliegue;
+- exista un procedimiento de reversión;
+- exista aprobación explícita del responsable del proyecto.
+
+La activación de facturación no deberá considerarse una consecuencia automática de crear código local.
+
+#### Componentes con costos potenciales
+
+La estimación deberá contemplar como mínimo:
+
+- invocaciones de Cloud Functions;
+- tiempo de ejecución;
+- memoria asignada;
+- concurrencia;
+- instancias máximas;
+- instancias mínimas;
+- lecturas de Firestore;
+- escrituras de Firestore;
+- eliminaciones de Firestore;
+- eliminaciones TTL;
+- almacenamiento temporal;
+- registros técnicos;
+- métricas y alertas;
+- Cloud Build;
+- Artifact Registry;
+- tráfico entre ubicaciones;
+- posibles tareas de Cloud Scheduler;
+- posibles funciones programadas;
+- entornos separados de pruebas;
+- herramientas externas que se aprueben posteriormente.
+
+No deberá suponerse que un nivel gratuito cubra permanentemente todos los componentes.
+
+#### Estimación inicial de uso
+
+Antes de desplegar deberán prepararse escenarios de consumo como:
+
+1. Prueba técnica con cuentas desechables.
+2. Prueba cerrada con 3 a 5 personas.
+3. Prueba ampliada con decenas de personas.
+4. Uso con cientos de usuarios activos.
+5. Uso con miles de usuarios activos.
+6. Escenario anómalo de llamadas repetidas.
+7. Escenario de abuso o error de programación.
+8. Escenario de reintentos después de fallos parciales.
+
+Cada escenario deberá estimar:
+
+- invocaciones mensuales;
+- lecturas por operación;
+- escrituras por operación;
+- eliminaciones por operación;
+- almacenamiento;
+- volumen de registros;
+- duración de ejecución;
+- concurrencia esperada;
+- costo mensual aproximado;
+- peor caso razonable.
+
+Las estimaciones deberán actualizarse cuando las pruebas reales proporcionen mediciones más precisas.
+
+#### Límites conservadores
+
+La configuración inicial de producción deberá utilizar límites conservadores.
+
+Antes de desplegar deberán definirse:
+
+- memoria asignada;
+- tiempo máximo de ejecución;
+- concurrencia;
+- número máximo de instancias;
+- número mínimo de instancias;
+- política de reintentos;
+- tamaño máximo de entrada;
+- frecuencia máxima esperada por cuenta;
+- límites generales de invocación;
+- volumen máximo de registros técnicos;
+- retención máxima de registros;
+- límites de mensajes y alertas.
+
+Inicialmente:
+
+- no se configurarán instancias mínimas permanentes sin una necesidad demostrada;
+- el número máximo de instancias deberá limitar el consumo inesperado;
+- la concurrencia deberá mantenerse conservadora;
+- los reintentos automáticos no deberán ser ilimitados;
+- los errores persistentes deberán detener nuevos intentos automáticos;
+- la función no deberá escalar sin límites documentados;
+- los límites no deberán sustituir la autenticación, idempotencia o validación.
+
+Los límites podrán ajustarse únicamente después de revisar métricas, costos y comportamiento real.
+
+#### Alertas presupuestarias
+
+Antes de activar Blaze deberán definirse alertas para detectar:
+
+- gasto acumulado superior al esperado;
+- crecimiento inusual de invocaciones;
+- aumento de lecturas o escrituras;
+- aumento de eliminaciones;
+- crecimiento de registros técnicos;
+- almacenamiento inesperado de artefactos;
+- tareas programadas ejecutándose con demasiada frecuencia;
+- instancias activas durante períodos innecesarios;
+- tráfico entre ubicaciones;
+- errores que provoquen reintentos repetidos.
+
+Las alertas deberán establecerse en varios niveles progresivos.
+
+Como mínimo deberán existir:
+
+1. Un nivel informativo temprano.
+2. Un nivel de advertencia.
+3. Un nivel crítico.
+4. Un procedimiento de respuesta para cada nivel.
+
+Una alerta de presupuesto no deberá interpretarse como un límite automático de gasto. Deberán existir además controles técnicos para reducir o detener el consumo.
+
+#### Respuesta ante consumo inesperado
+
+Si aparece consumo inesperado, el procedimiento deberá permitir:
+
+1. Identificar el servicio responsable.
+2. Detener nuevos despliegues.
+3. Reducir el número máximo de instancias.
+4. Deshabilitar temporalmente la función cuando sea seguro.
+5. Detener tareas programadas.
+6. Reducir registros no esenciales.
+7. Revisar reintentos automáticos.
+8. Bloquear tráfico abusivo.
+9. Restaurar una revisión anterior.
+10. Preservar la evidencia técnica mínima necesaria.
+11. Evitar modificaciones manuales desde la aplicación.
+12. Documentar la causa y la corrección.
+
+La respuesta al consumo inesperado no deberá:
+
+- abrir permisos administrativos al cliente;
+- omitir Authentication;
+- desactivar la idempotencia;
+- modificar cuentas activas;
+- extender `expiresAt`;
+- recrear solicitudes;
+- crear DEL-S2;
+- ejecutar operaciones irreversibles.
+
+La aplicación deberá recibir una respuesta temporal general si el backend se deshabilita de forma controlada.
+
+#### Separación entre pruebas y producción
+
+Los costos y recursos de pruebas deberán mantenerse separados de producción cuando sea técnicamente viable.
+
+La estrategia deberá distinguir:
+
+- Emulator Suite local;
+- proyecto separado de pruebas;
+- compilaciones privadas;
+- prueba cerrada;
+- producción.
+
+Emulator Suite será el entorno inicial preferido porque permite validar la lógica sin desplegar recursos de producción.
+
+Cuando resulte necesario validar comportamiento real en la nube, deberá utilizarse un proyecto separado de pruebas con:
+
+- cuentas desechables;
+- datos sintéticos;
+- límites conservadores;
+- alertas presupuestarias;
+- recursos mínimos;
+- ausencia de información personal real;
+- procedimiento de limpieza posterior.
+
+Las credenciales, proyectos, configuraciones y datos de pruebas no deberán mezclarse con producción.
+
+#### Condiciones para aprobar Blaze
+
+Blaze solo podrá aprobarse después de confirmar:
+
+1. Arquitectura definitiva del backend.
+2. Función invocable protegida.
+3. Node.js y generación de Functions.
+4. Región de ejecución.
+5. Ventana de reautenticación.
+6. Estrategia TTL.
+7. Estrategia de idempotencia.
+8. Métricas y observabilidad.
+9. Pruebas locales satisfactorias.
+10. Estimación de costos por escenario.
+11. Límites máximos de instancias.
+12. Ausencia inicial de instancias mínimas innecesarias.
+13. Alertas presupuestarias.
+14. Procedimiento ante consumo inesperado.
+15. Procedimiento de despliegue.
+16. Procedimiento de reversión.
+17. Proyecto separado de pruebas cuando corresponda.
+18. Aprobación explícita del responsable del proyecto.
+
+La aprobación deberá registrarse documentalmente. No será suficiente una activación accidental o implícita desde una herramienta.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Ejecución completa mediante Emulator Suite sin facturación.
+2. Estimación de lecturas por cancelación.
+3. Estimación de escrituras por cancelación.
+4. Estimación de eliminaciones por cancelación.
+5. Estimación de invocaciones mensuales.
+6. Estimación de eliminaciones TTL.
+7. Estimación de almacenamiento temporal.
+8. Estimación de registros técnicos.
+9. Escenario de 3 a 5 personas.
+10. Escenario con decenas de personas.
+11. Escenario con cientos de usuarios.
+12. Escenario con miles de usuarios.
+13. Escenario de llamadas repetidas.
+14. Escenario de error que provoca reintentos.
+15. Aplicación de límites máximos de instancias.
+16. Ausencia inicial de instancias mínimas innecesarias.
+17. Generación de una alerta informativa.
+18. Generación de una alerta de advertencia.
+19. Generación de una alerta crítica.
+20. Procedimiento para detener nuevos despliegues.
+21. Procedimiento para deshabilitar temporalmente la función.
+22. Procedimiento para detener tareas programadas.
+23. Procedimiento para reducir registros.
+24. Procedimiento para restaurar una revisión anterior.
+25. Separación entre pruebas y producción.
+26. Ausencia de cuentas y datos personales reales.
+27. Revisión de costos de red entre regiones.
+28. Revisión de costos de Cloud Build y Artifact Registry.
+29. Revisión de costos de observabilidad.
+30. Aprobación explícita antes de activar Blaze.
+
+Las estimaciones deberán revisarse después de obtener mediciones reales de las pruebas.
+
+#### Decisión propuesta
+
+Mantener Blaze desactivado durante la fase documental y la preparación local inicial.
+
+Utilizar Emulator Suite como entorno principal para desarrollar y validar el backend.
+
+Considerar Blaze únicamente después de completar las pruebas locales, estimar costos, configurar límites y alertas, y aprobar los procedimientos de despliegue y reversión.
+
+No utilizar inicialmente instancias mínimas permanentes sin una necesidad técnica demostrada.
+
+Registrar de forma explícita cualquier aprobación futura de facturación.
+
+Mantener DEC-BE-012 en estado `requiere-prueba`.
+
+Esta decisión no autoriza activar Blaze, asociar facturación, desplegar Functions, crear recursos programados ni utilizar cuentas reales.
