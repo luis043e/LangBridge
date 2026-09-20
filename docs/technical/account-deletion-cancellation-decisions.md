@@ -62,7 +62,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-010 | Estrategia de idempotencia | Clave interna opaca y operación transaccional protegida | requiere-prueba |
 | DEC-BE-011 | Métricas y observabilidad | Métricas agregadas y registros técnicos mínimos | requiere-prueba |
 | DEC-BE-012 | Costos y Blaze | Mantener Blaze desactivado hasta aprobar presupuesto y límites | requiere-prueba |
-| DEC-BE-013 | Despliegue y reversión | Procedimiento previo obligatorio | pendiente |
+| DEC-BE-013 | Despliegue y reversión | Despliegue gradual con validación y reversión documentada | requiere-prueba |
 ## 5. Decisiones detalladas
 
 ### DEC-BE-001: Plataforma de backend
@@ -2754,3 +2754,384 @@ Registrar de forma explícita cualquier aprobación futura de facturación.
 Mantener DEC-BE-012 en estado `requiere-prueba`.
 
 Esta decisión no autoriza activar Blaze, asociar facturación, desplegar Functions, crear recursos programados ni utilizar cuentas reales.
+
+### DEC-BE-013: Despliegue y reversión
+
+**Pregunta:** ¿Qué procedimiento deberá seguirse para desplegar el backend de cancelación y revertirlo de forma segura si aparece un problema?
+
+**Recomendación preliminar:** despliegue gradual, validado primero en Emulator Suite y en un proyecto separado de pruebas, con procedimiento documentado de reversión.
+
+**Estado:** requiere-prueba.
+
+#### Principio general
+
+No se realizará ningún despliegue de producción hasta completar:
+
+- la arquitectura del backend;
+- la función invocable protegida;
+- la selección del runtime;
+- la generación de Functions;
+- la región;
+- la reautenticación reciente;
+- la estrategia TTL;
+- la idempotencia;
+- la observabilidad;
+- la estimación de costos;
+- los límites operativos;
+- las pruebas locales;
+- la aprobación explícita de Blaze;
+- el procedimiento de reversión.
+
+La existencia de código funcional en local no autorizará automáticamente su despliegue.
+
+#### Entornos
+
+El procedimiento deberá distinguir claramente:
+
+```text
+desarrollo local
+proyecto de pruebas
+prueba cerrada
+producción
+```
+
+Cada entorno deberá utilizar:
+
+- configuración identificable;
+- credenciales separadas;
+- datos apropiados para su finalidad;
+- límites propios;
+- registros técnicos separados;
+- variables y secretos controlados;
+- procedimientos de limpieza;
+- permisos mínimos.
+
+Emulator Suite será el entorno inicial para desarrollar y validar la lógica.
+
+El primer despliegue en la nube deberá realizarse en un proyecto separado de pruebas, con cuentas desechables y datos sintéticos.
+
+#### Requisitos previos al primer despliegue
+
+Antes del primer despliegue deberán completarse:
+
+1. TypeScript sin errores.
+2. Pruebas automatizadas sin fallos.
+3. Pruebas de reglas de Firestore aprobadas.
+4. Pruebas de Authentication mediante emulador.
+5. Pruebas de Functions mediante emulador.
+6. Pruebas de transacciones.
+7. Pruebas de concurrencia.
+8. Pruebas de idempotencia.
+9. Pruebas de respuestas perdidas.
+10. Pruebas de errores parciales.
+11. Pruebas de restauración de perfiles.
+12. Pruebas del punto de no retorno.
+13. Pruebas de retención y expiración.
+14. Verificación de ausencia de DEL-S2.
+15. Verificación de ausencia de operaciones irreversibles.
+16. Revisión de dependencias.
+17. Revisión de permisos.
+18. Revisión de secretos.
+19. Revisión de costos.
+20. Configuración de alertas presupuestarias.
+21. Definición de límites máximos de instancias.
+22. Confirmación de la región.
+23. Procedimiento de reversión ensayado.
+24. Aprobación explícita para desplegar.
+
+Git deberá estar limpio y la versión que vaya a desplegarse deberá estar identificada por un commit específico.
+
+#### Despliegue gradual
+
+El despliegue deberá avanzar por etapas controladas:
+
+1. Validación completa mediante Emulator Suite.
+2. Despliegue en un proyecto separado de pruebas.
+3. Pruebas técnicas con cuentas desechables.
+4. Verificación de costos, registros y alertas.
+5. Pruebas concurrentes y de recuperación.
+6. Validación de la aplicación contra el backend de pruebas.
+7. Prueba cerrada con acceso limitado.
+8. Revisión de resultados.
+9. Corrección de problemas.
+10. Aprobación explícita antes de producción.
+11. Despliegue limitado en producción.
+12. Supervisión reforzada después del despliegue.
+
+Cada etapa deberá contar con criterios de entrada y salida.
+
+No se avanzará a la etapa siguiente si existen:
+
+- errores de TypeScript;
+- pruebas fallidas;
+- conflictos de reglas;
+- duplicados;
+- restauraciones incorrectas;
+- respuestas que expongan datos sensibles;
+- costos no comprendidos;
+- fallos de autenticación;
+- fallos de `auth_time`;
+- carreras no controladas;
+- operaciones irreversibles inesperadas;
+- creación de DEL-S2 durante una cancelación;
+- ausencia de un procedimiento de reversión disponible.
+
+El despliegue de producción deberá limitarse inicialmente a la función estrictamente necesaria.
+
+No se desplegarán simultáneamente componentes opcionales como una función programada o la exigencia de App Check sin decisiones y pruebas independientes.
+
+#### Identificación de la versión
+
+Cada despliegue deberá asociarse con:
+
+- un commit específico;
+- una rama conocida;
+- una versión identificable;
+- dependencias bloqueadas;
+- configuración documentada;
+- región confirmada;
+- runtime confirmado;
+- generación de Functions confirmada;
+- fecha de despliegue;
+- responsable de la aprobación.
+
+No se desplegará desde un árbol de trabajo con cambios sin guardar.
+
+La versión desplegada deberá poder reconstruirse desde el repositorio sin depender de archivos locales no documentados.
+
+Los secretos, credenciales y tokens de depuración no deberán conservarse en Git.
+
+#### Verificaciones posteriores al despliegue
+
+Después de cada despliegue deberán comprobarse:
+
+1. Disponibilidad de la función invocable.
+2. Rechazo de llamadas no autenticadas.
+3. Validación de `auth_time`.
+4. Rechazo de entradas desconocidas.
+5. Funcionamiento de una cancelación sintética válida.
+6. Rechazo después del punto de no retorno.
+7. Restauración correcta del perfil.
+8. Creación única del registro cancelado.
+9. Eliminación de la solicitud activa.
+10. Ausencia de DEL-S2.
+11. Ausencia de operaciones irreversibles.
+12. Respuestas generales y seguras.
+13. Funcionamiento de métricas mínimas.
+14. Funcionamiento de alertas.
+15. Costos iniciales dentro de lo esperado.
+16. Límites máximos de instancias configurados.
+17. Ausencia de secretos en registros.
+18. Compatibilidad con la versión privada de la aplicación.
+19. Ausencia de errores críticos.
+20. Disponibilidad del procedimiento de reversión.
+
+Las verificaciones posteriores deberán utilizar cuentas
+
+#### Procedimiento de reversión
+
+Antes de cada despliegue deberá existir una versión anterior conocida y recuperable.
+
+La reversión deberá permitir:
+
+1. Detener nuevos despliegues.
+2. Identificar la versión problemática.
+3. Limitar nuevas invocaciones cuando sea necesario.
+4. Restaurar una revisión anterior compatible.
+5. Verificar nuevamente Authentication.
+6. Verificar nuevamente `auth_time`.
+7. Comprobar las transacciones.
+8. Comprobar la idempotencia.
+9. Verificar las respuestas destinadas a la aplicación.
+10. Confirmar que no se creen duplicados.
+11. Confirmar que no se cree DEL-S2.
+12. Revisar métricas y registros técnicos.
+13. Documentar la causa y el resultado.
+14. Mantener Git y la configuración sincronizados con la versión restaurada.
+
+La reversión no deberá depender de modificar datos directamente desde la aplicación móvil.
+
+#### Restricciones de la reversión
+
+Una reversión no podrá:
+
+- reactivar una solicitud cancelada;
+- recrear una solicitud activa eliminada;
+- ocultar nuevamente un perfil restaurado;
+- modificar `previousProfileVisibility`;
+- extender `expiresAt`;
+- modificar `cancelledAt`;
+- recrear un registro cancelado eliminado;
+- crear un registro cancelado duplicado;
+- crear DEL-S2;
+- retirar un punto de no retorno confirmado;
+- permitir que cancelación y eliminación ganen simultáneamente;
+- eliminar conversaciones, mensajes o reportes de una cuenta activa;
+- modificar datos de otras cuentas;
+- abrir permisos administrativos al cliente;
+- desactivar Authentication;
+- omitir la reautenticación reciente;
+- exponer secretos o identificadores internos.
+
+Si una versión anterior no comprende un estado nuevo ya almacenado, no deberá desplegarse hasta definir una migración o una respuesta segura compatible.
+
+#### Operaciones en curso
+
+Antes de revertir deberá determinarse si existen operaciones en curso.
+
+Una operación en curso deberá clasificarse como:
+
+- todavía no confirmada;
+- cancelación confirmada con restauración pendiente;
+- cancelación completada;
+- punto de no retorno confirmado;
+- eliminación en procesamiento;
+- error temporal recuperable.
+
+La reversión deberá respetar el estado real almacenado.
+
+Si la cancelación ya fue confirmada:
+
+- el procesador de eliminación no podrá continuar;
+- deberán completarse únicamente las operaciones idempotentes pendientes;
+- no podrá alcanzarse posteriormente el punto de no retorno;
+- no podrá crearse otro registro cancelado.
+
+Si el punto de no retorno ya fue confirmado:
+
+- la cancelación no podrá reactivarse;
+- el perfil no será restaurado;
+- la eliminación continuará mediante el procedimiento autorizado;
+- una versión revertida no podrá interpretar el estado como cancelable.
+
+Las operaciones en curso no deberán resolverse mediante fechas, estados o identificadores proporcionados por la aplicación.
+
+#### Compatibilidad con la aplicación
+
+El contrato entre la aplicación y el backend deberá mantenerse estable durante un despliegue o una reversión.
+
+La aplicación deberá poder manejar estos resultados generales:
+
+```text
+cancelled
+not-cancellable
+identity-verification-required
+recent-session-required
+request-not-found
+point-of-no-return-reached
+restoration-pending
+temporary-error
+```
+
+Una versión nueva del backend no deberá exigir inmediatamente campos que las versiones privadas existentes de la aplicación no puedan proporcionar.
+
+Una reversión no deberá provocar que la aplicación:
+
+- muestre códigos técnicos directamente;
+- exponga mensajes administrativos;
+- interprete un error temporal como eliminación completada;
+- restaure directamente el perfil;
+- modifique documentos protegidos;
+- cree DEL-S2;
+- ejecute operaciones irreversibles.
+
+Durante una interrupción controlada, el backend deberá responder con un resultado temporal general y seguro.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Despliegue reproducible desde un commit específico.
+2. Repositorio limpio antes del despliegue.
+3. Dependencias bloqueadas y reproducibles.
+4. Ausencia de secretos en Git.
+5. Despliegue inicial en un proyecto separado de pruebas.
+6. Validación posterior de Authentication.
+7. Validación posterior de `auth_time`.
+8. Validación de la función invocable.
+9. Validación de transacciones.
+10. Validación de idempotencia.
+11. Validación de concurrencia.
+12. Validación de respuestas perdidas.
+13. Validación de errores parciales.
+14. Validación de restauración del perfil.
+15. Validación del punto de no retorno.
+16. Creación única del registro cancelado.
+17. Eliminación correcta de la solicitud activa.
+18. Ausencia de DEL-S2.
+19. Ausencia de operaciones irreversibles durante una cancelación válida.
+20. Ausencia de datos sensibles en respuestas y registros.
+21. Métricas y alertas funcionando.
+22. Costos iniciales dentro de lo estimado.
+23. Límites máximos de instancias aplicados.
+24. Compatibilidad con la aplicación privada.
+25. Respuesta temporal segura durante una interrupción.
+26. Reversión hacia una revisión anterior.
+27. Reversión con una operación todavía no confirmada.
+28. Reversión con restauración pendiente.
+29. Reversión después de una cancelación completada.
+30. Reversión después de confirmar el punto de no retorno.
+31. Imposibilidad de reactivar una solicitud cancelada.
+32. Imposibilidad de ocultar nuevamente un perfil restaurado.
+33. Imposibilidad de extender `expiresAt`.
+34. Imposibilidad de modificar `cancelledAt`.
+35. Imposibilidad de crear registros duplicados.
+36. Imposibilidad de crear DEL-S2 durante la reversión.
+37. Conservación del contrato general de respuestas.
+38. Documentación de la causa y resultado de una reversión.
+39. Limpieza de los datos sintéticos después de las pruebas.
+40. Aprobación explícita antes de producción.
+
+Las pruebas deberán utilizar cuentas desechables y datos sintéticos.
+
+El procedimiento de reversión deberá ensayarse antes del primer despliegue de producción y después de cambios arquitectónicos importantes.
+
+#### Condiciones para producción
+
+El backend solo podrá desplegarse en producción cuando:
+
+- las 13 decisiones técnicas hayan sido revisadas;
+- las decisiones críticas hayan superado pruebas locales;
+- el backend funcione mediante Emulator Suite;
+- las reglas de Firestore estén validadas;
+- TypeScript termine con cero errores;
+- las pruebas automatizadas terminen sin fallos;
+- Git esté limpio;
+- la versión esté sincronizada con GitHub;
+- la región esté confirmada;
+- el runtime esté confirmado;
+- la generación de Functions esté confirmada;
+- los costos estén estimados;
+- las alertas presupuestarias estén configuradas;
+- los límites operativos estén definidos;
+- el procedimiento de reversión haya sido ensayado;
+- exista aprobación explícita para activar Blaze;
+- exista aprobación explícita para desplegar.
+
+La aprobación de producción deberá registrar:
+
+- commit autorizado;
+- fecha;
+- entorno;
+- componentes autorizados;
+- región;
+- runtime;
+- límites;
+- responsable de la aprobación;
+- procedimiento de reversión aplicable.
+
+No se considerará autorizado ningún componente que no figure expresamente en la aprobación.
+
+#### Decisión propuesta
+
+Adoptar un procedimiento de despliegue gradual que comience con Emulator Suite, continúe en un proyecto separado de pruebas y llegue a producción únicamente después de superar las validaciones y aprobaciones definidas.
+
+Asociar cada despliegue con un commit específico, una configuración conocida y un procedimiento de reversión ensayado.
+
+Mantener estable el contrato general entre la aplicación y el backend.
+
+Garantizar que una reversión respete el estado real almacenado y no reactive cancelaciones, no oculte perfiles restaurados, no extienda `expiresAt`, no cree duplicados y no genere DEL-S2.
+
+Mantener DEC-BE-013 en estado `requiere-prueba` hasta ensayar el despliegue y la reversión en un proyecto separado con cuentas desechables y datos sintéticos.
+
+Esta decisión no autoriza activar Blaze, desplegar Functions, modificar recursos de producción ni utilizar cuentas reales.
