@@ -59,7 +59,7 @@ Cada decisión utilizará uno de estos estados:
 | DEC-BE-007 | Expiración del registro cancelado | Política TTL | requiere-prueba |
 | DEC-BE-008 | Función programada complementaria | No necesaria inicialmente | diferida |
 | DEC-BE-009 | App Check | Capa complementaria futura | diferida |
-| DEC-BE-010 | Estrategia de idempotencia | Clave interna y operación protegida | pendiente |
+| DEC-BE-010 | Estrategia de idempotencia | Clave interna opaca y operación transaccional protegida | requiere-prueba |
 | DEC-BE-011 | Métricas y observabilidad | Registros técnicos mínimos | pendiente |
 | DEC-BE-012 | Costos y Blaze | No activar todavía | pendiente |
 | DEC-BE-013 | Despliegue y reversión | Procedimiento previo obligatorio | pendiente |
@@ -1775,3 +1775,436 @@ Exigir una integración gradual, pruebas en dispositivos físicos, tratamiento s
 Mantener DEC-BE-009 en estado `diferida`.
 
 Esta decisión no autoriza habilitar App Check, registrar proveedores definitivos, desplegar servicios, activar Blaze ni modificar recursos de producción.
+
+### DEC-BE-010: Estrategia de idempotencia
+
+**Pregunta:** ¿Cómo deberá impedir el backend que reintentos, respuestas perdidas y llamadas concurrentes produzcan resultados duplicados o incompatibles?
+
+**Recomendación preliminar:** clave interna opaca combinada con una operación transaccional protegida.
+
+**Estado:** requiere-prueba.
+
+#### Objetivos
+
+La estrategia de idempotencia deberá garantizar que una misma cancelación lógica produzca un único resultado coherente.
+
+Deberá impedir:
+
+- dos registros cancelados para la misma cancelación;
+- dos valores diferentes de `cancelledAt`;
+- dos valores diferentes de `expiresAt`;
+- restauraciones incompatibles del perfil;
+- recreación de una solicitud activa eliminada;
+- reactivación de una cancelación completada;
+- creación de DEL-S2;
+- ejecución de operaciones irreversibles;
+- confirmación simultánea de cancelación y punto de no retorno;
+- respuestas contradictorias ante reintentos.
+
+La seguridad no deberá depender de que la aplicación invoque el backend una sola vez.
+
+#### Situaciones que deberán tolerarse
+
+La operación deberá ser segura ante:
+
+1. Dos pulsaciones rápidas del botón de cancelación.
+2. Dos dispositivos autenticados con la misma cuenta.
+3. Dos llamadas concurrentes.
+4. Una respuesta perdida después de completar la cancelación.
+5. Un error de red durante el procesamiento.
+6. Una interrupción después de restaurar el perfil.
+7. Una interrupción después de crear el registro cancelado.
+8. Una interrupción después de eliminar la solicitud activa.
+9. Un reintento después de completar toda la operación.
+10. Una carrera contra el procesador de eliminación.
+11. Una ejecución repetida por infraestructura.
+12. Una recuperación después de un error parcial.
+
+Cada reintento deberá comprobar el estado real almacenado antes de repetir una operación.
+
+#### Clave interna de idempotencia
+
+El backend deberá generar una clave interna de idempotencia para la operación de cancelación.
+
+La clave deberá:
+
+- ser generada exclusivamente por el backend;
+- ser aleatoria u opaca;
+- no derivarse directamente del UID;
+- no derivarse del correo;
+- no contener datos personales;
+- no ser seleccionada por la aplicación;
+- no coincidir con `cancellationRecordId`;
+- no coincidir con un identificador DEL-S2;
+- no reutilizarse para otra cancelación;
+- no exponerse en respuestas;
+- no registrarse innecesariamente;
+- no conservarse indefinidamente.
+
+La estrategia exacta de generación y retención deberá validarse durante la implementación local.
+
+#### Operación transaccional protegida
+
+La cancelación y el avance del procesador de eliminación deberán competir mediante una transacción o mecanismo protegido equivalente.
+
+La operación protegida deberá volver a leer el estado real de:
+
+```text
+accountDeletionRequests/{uid}
+```
+
+Dentro de la operación protegida, el backend deberá comprobar simultáneamente:
+
+- que la solicitud activa exista;
+- que `userId` coincida con el `uid` autenticado;
+- que el estado continúe siendo cancelable;
+- que `pointOfNoReturnAt` permanezca ausente;
+- que la cancelación no haya sido confirmada previamente;
+- que el procesador de eliminación no haya ganado previamente la carrera;
+- que `previousProfileVisibility` sea válido;
+- que la clave interna corresponda a la operación autorizada.
+
+Solo una transición podrá ser confirmada primero:
+
+```text
+cancelación confirmada
+```
+
+o:
+
+```text
+punto de no retorno confirmado
+```
+
+No podrá existir un resultado donde ambas transiciones queden confirmadas.
+
+#### Si la cancelación gana
+
+Cuando la cancelación confirme primero:
+
+- no se establecerá `pointOfNoReturnAt`;
+- no se establecerá `pointOfNoReturnOperation`;
+- no comenzará ninguna operación irreversible;
+- se restaurará el perfil;
+- se retirarán las marcas de eliminación;
+- se creará como máximo un registro cancelado mínimo;
+- se eliminará la solicitud activa;
+- se eliminarán los datos temporales de restauración;
+- no se creará DEL-S2;
+- los reintentos devolverán un resultado idempotente general.
+
+El procesador de eliminación deberá reconocer la cancelación confirmada y finalizar sin comenzar operaciones irreversibles.
+
+#### Si el procesador de eliminación gana
+
+Cuando el punto de no retorno confirme primero:
+
+- la cancelación será rechazada;
+- el perfil no será restaurado;
+- la solicitud permanecerá en `processing`;
+- no se creará un registro cancelado;
+- no se eliminará la solicitud activa como cancelada;
+- no se retirarán las marcas de eliminación;
+- la eliminación continuará mediante operaciones idempotentes;
+- la respuesta general será `point-of-no-return-reached`.
+
+Un reintento de cancelación no podrá revertir esta transición.
+
+#### Precondiciones y estado real
+
+Los datos aportados por la aplicación no deberán decidir el resultado de la carrera.
+
+El backend deberá utilizar:
+
+- el contexto autenticado;
+- el `uid` autenticado;
+- el `auth_time` verificado;
+- el estado real de Firestore;
+- transacciones;
+- precondiciones;
+- la hora confiable del servidor;
+- campos protegidos establecidos exclusivamente por el backend.
+
+La aplicación no podrá proporcionar:
+
+- el estado administrativo;
+- `pointOfNoReturnAt`;
+- `pointOfNoReturnOperation`;
+- `previousProfileVisibility` durante la cancelación;
+- la clave interna de idempotencia;
+- `cancellationRecordId`;
+- `cancelledAt`;
+- `expiresAt`;
+- una indicación de qué operación ganó la carrera;
+- una indicación de que la cancelación ya fue completada.
+
+Si una precondición deja de cumplirse durante la operación, la transacción deberá abortarse y volver a comprobar el estado real antes de decidir si corresponde reintentar o devolver un resultado general seguro.
+
+#### Relación con cancellationRecordId
+
+La clave interna de idempotencia y `cancellationRecordId` tendrán responsabilidades diferentes.
+
+La clave interna de idempotencia:
+
+- coordinará el procesamiento autorizado;
+- permitirá reconocer la misma cancelación lógica;
+- no será visible para la aplicación;
+- no sustituirá el identificador del registro cancelado;
+- no se conservará indefinidamente.
+
+`cancellationRecordId`:
+
+- identificará el registro cancelado mínimo;
+- será generado exclusivamente por el backend;
+- será aleatorio y opaco;
+- no contendrá UID ni correo;
+- no se reutilizará;
+- no funcionará como credencial;
+- no se expondrá a la aplicación.
+
+La aplicación no podrá proporcionar, seleccionar o correlacionar ninguno de los dos identificadores.
+
+#### Creación única del registro cancelado
+
+Una cancelación válida deberá producir como máximo un registro en:
+
+```text
+cancelledDeletionRequests/{cancellationRecordId}
+```
+
+La creación deberá coordinarse con:
+
+- la restauración del perfil;
+- la retirada de `deletionRequested`;
+- la retirada de `deletionRequestedAt`;
+- la eliminación de la solicitud activa;
+- la limpieza de `previousProfileVisibility`;
+- la eliminación de cualquier otro dato temporal de restauración.
+
+Si el registro ya existe para la misma cancelación lógica, un reintento no deberá crear otro.
+
+Si el registro no existe porque la operación todavía no alcanzó esa fase, el backend deberá continuar únicamente desde el último punto seguro comprobable.
+
+#### Fases de recuperación segura
+
+La operación deberá reconocer el último estado seguro comprobable antes de continuar un reintento.
+
+Las fases conceptuales serán:
+```text
+not-started
+restoration-in-progress
+profile-restored
+cancelled-record-created
+active-request-removed
+temporary-restoration-data-removed
+completed
+```
+
+Estas fases serán internas y no podrán ser seleccionadas ni modificadas por la aplicación móvil.
+
+Durante un reintento, el backend deberá comprobar:
+
+- si la solicitud activa todavía existe;
+- si el perfil ya fue restaurado;
+- si `deletionRequested` ya fue retirado;
+- si `deletionRequestedAt` ya fue retirado;
+- si el registro cancelado ya existe;
+- si la solicitud activa ya fue eliminada;
+- si `previousProfileVisibility` ya fue limpiado;
+- si la operación ya terminó.
+
+La comprobación del estado real deberá impedir repetir una operación de forma incompatible.
+#### Recuperación después de interrupciones
+
+Si la operación se interrumpe antes de confirmar la cancelación, podrá reiniciarse desde las validaciones iniciales.
+
+Si la cancelación ya fue confirmada, el procesador de eliminación no podrá ganar posteriormente la carrera ni alcanzar el punto de no retorno.
+
+Después de confirmar la cancelación, un reintento deberá completar únicamente las operaciones pendientes de restauración y limpieza.
+
+El backend no deberá:
+
+- invertir nuevamente una visibilidad ya restaurada;
+- ocultar un perfil restaurado;
+- crear otro registro cancelado;
+- recrear una solicitud activa eliminada;
+- volver a establecer marcas de eliminación;
+- extender `expiresAt`;
+- exigir nuevamente datos temporales ya eliminados;
+- crear DEL-S2;
+- iniciar operaciones irreversibles.
+
+#### Respuesta idempotente
+
+Cuando la cancelación ya haya sido completada, una llamada repetida deberá devolver:
+
+```text
+cancelled
+```
+
+La respuesta será general y no deberá revelar:
+
+- si el registro cancelado todavía existe;
+- `cancellationRecordId`;
+- la clave interna de idempotencia;
+- `cancelledAt`;
+- `expiresAt`;
+- fases internas;
+- rutas de documentos;
+- UID;
+- correo;
+- contenido;
+- detalles administrativos.
+
+Si la cancelación fue confirmada, pero todavía existen operaciones idempotentes pendientes, el backend podrá devolver:
+
+```text
+restoration-pending
+```
+
+La aplicación deberá tratar `restoration-pending` como un estado no destructivo y permitir una recuperación controlada.
+
+La aplicación no deberá inferir que la eliminación fue completada por la ausencia de lectura directa sobre la solicitud protegida.
+
+#### Retención de la clave interna
+
+La clave interna de idempotencia deberá conservarse únicamente durante el tiempo necesario para coordinar la operación y sus reintentos seguros.
+
+La clave no deberá:
+
+- conservarse indefinidamente;
+- copiarse al registro cancelado mínimo;
+- exponerse a la aplicación;
+- incluirse en mensajes localizados;
+- incluirse en comunicaciones por correo;
+- utilizarse como identificador DEL-S2;
+- reutilizarse para una solicitud nueva;
+- permitir reconstruir el UID o el correo;
+- utilizarse para seguimiento publicitario;
+- permanecer después de que deje de ser necesaria para la recuperación técnica.
+
+Antes de implementar deberá definirse:
+
+- dónde se conservará temporalmente;
+- qué operación autorizará su creación;
+- qué proceso verificará su coincidencia;
+- cuándo se considerará innecesaria;
+- cómo se eliminará;
+- cómo se evitará que un reintento extienda su retención;
+- cómo se comprobará una cancelación completada después de limpiarla.
+
+La eliminación de la clave no deberá eliminar anticipadamente el registro cancelado ni modificar `expiresAt`.
+
+#### Seguridad y privacidad
+
+La estrategia de idempotencia deberá aplicar minimización de datos.
+
+No deberá almacenar dentro de la clave ni de sus metadatos:
+
+- UID en texto legible;
+- correo;
+- nombre;
+- contenido del perfil;
+- contraseñas;
+- credenciales federadas;
+- tokens;
+- contenido de mensajes;
+- contenido de conversaciones;
+- contenido de reportes;
+- listas de bloqueos;
+- datos de otras cuentas;
+- identificadores DEL-S2;
+- valores que permitan correlación innecesaria.
+
+Los registros técnicos podrán utilizar categorías generales como:
+
+- operación iniciada;
+- reintento detectado;
+- operación ya completada;
+- conflicto transaccional;
+- recuperación pendiente;
+- punto de no retorno alcanzado;
+- error temporal.
+
+Las categorías técnicas no deberán incluir secretos, datos personales innecesarios ni detalles que permitan eludir los controles de concurrencia.
+
+La clave interna deberá permanecer inaccesible para la aplicación móvil y protegida contra lectura o modificación directa.
+
+#### Pruebas requeridas
+
+Antes de cambiar esta decisión a `aprobada` deberán comprobarse:
+
+1. Cancelación válida ejecutada una sola vez.
+2. Dos pulsaciones rápidas del botón de cancelación.
+3. Dos llamadas concurrentes desde el mismo dispositivo.
+4. Dos llamadas concurrentes desde dispositivos distintos.
+5. Carrera entre cancelación y establecimiento de `pointOfNoReturnAt`.
+6. Victoria única de la cancelación cuando confirma primero.
+7. Victoria única del procesador de eliminación cuando confirma primero.
+8. Imposibilidad de confirmar simultáneamente ambas transiciones.
+9. Creación de un único registro cancelado.
+10. Generación de un único `cancellationRecordId`.
+11. Ausencia de registros cancelados duplicados.
+12. Restauración única de un perfil originalmente visible.
+13. Conservación correcta de un perfil originalmente oculto.
+14. Compatibilidad con un perfil histórico.
+15. Retirada idempotente de `deletionRequested`.
+16. Retirada idempotente de `deletionRequestedAt`.
+17. Interrupción antes de confirmar la cancelación.
+18. Interrupción después de restaurar el perfil.
+19. Interrupción después de crear el registro cancelado.
+20. Interrupción después de eliminar la solicitud activa.
+21. Interrupción después de limpiar los datos temporales.
+22. Respuesta perdida después de completar la cancelación.
+23. Reintento después de completar toda la operación.
+24. Respuesta idempotente `cancelled`.
+25. Respuesta `restoration-pending` durante una recuperación incompleta.
+26. Imposibilidad de recrear la solicitud activa.
+27. Imposibilidad de extender `expiresAt`.
+28. Imposibilidad de modificar `cancelledAt`.
+29. Imposibilidad de reutilizar la clave interna en otra cancelación.
+30. Separación entre la clave interna y `cancellationRecordId`.
+31. Ausencia de UID, correo y datos personales dentro de la clave.
+32. Ausencia de la clave en respuestas destinadas a la aplicación.
+33. Eliminación segura de la clave cuando deje de ser necesaria.
+34. Ausencia de DEL-S2.
+35. Ausencia de operaciones irreversibles.
+36. Ausencia de conversaciones, mensajes o reportes afectados.
+37. Ausencia de modificaciones sobre otras cuentas.
+38. Funcionamiento correcto con concurrencia de segunda generación.
+39. Recuperación después de un conflicto transaccional.
+40. Pruebas completas mediante Emulator Suite.
+
+Las pruebas deberán utilizar datos sintéticos y cuentas desechables.
+
+Las pruebas de concurrencia deberán ejecutarse repetidamente para aumentar la probabilidad de detectar carreras y resultados no deterministas.
+
+#### Decisión propuesta
+
+Adoptar una estrategia de idempotencia basada en:
+
+- una clave interna opaca generada exclusivamente por el backend;
+- una operación transaccional protegida;
+- precondiciones basadas en el estado real de Firestore;
+- creación única del registro cancelado mínimo;
+- reconocimiento de fases seguras de recuperación;
+- respuestas generales e idempotentes;
+- limpieza de la clave cuando deje de ser necesaria.
+
+La estrategia deberá garantizar que solamente una transición pueda ganar:
+
+```text
+cancelación confirmada
+```
+
+o:
+
+```text
+punto de no retorno confirmado
+```
+
+La clave interna no sustituirá `cancellationRecordId`, no se expondrá a la aplicación, no contendrá datos personales y no se conservará indefinidamente.
+
+Mantener DEC-BE-010 en estado `requiere-prueba` hasta validar transacciones, concurrencia, respuestas perdidas, errores parciales, recuperación, limpieza de la clave y ausencia de duplicados mediante Emulator Suite.
+
+Esta decisión no autoriza crear Functions, instalar dependencias administrativas, activar Blaze, desplegar servicios ni ejecutar cancelaciones con cuentas reales.
