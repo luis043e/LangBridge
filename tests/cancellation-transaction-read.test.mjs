@@ -139,7 +139,7 @@ async function createOperation(
 
   const operation = {
     operationKey:
-      'operation-key-value-with-at-least-32-characters',
+      opaqueLookupKey,
     cancellationRecordId:
       storedCancellationRecordId,
     requestCreatedAt:

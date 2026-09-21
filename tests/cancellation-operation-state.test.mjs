@@ -11,7 +11,7 @@ import {
 } from '../functions/lib/cancellation-operation-state.js';
 
 const operationKey =
-  'operation-key-value-with-at-least-32-characters';
+  'a'.repeat(64);
 
 const cancellationRecordId =
   'cancellation-record-value-1234567890';
@@ -499,5 +499,26 @@ test(
         false
       );
     }
+  }
+);
+test(
+  'the initial coordinator rejects a non-hexadecimal operation key',
+  () => {
+    assert.throws(
+      () => {
+        createInitialCancellationOperationState(
+          'g'.repeat(64),
+          requestCreatedAt,
+          operationStartedAt,
+          cancellationRecordId
+        );
+      },
+      {
+        name:
+          'TypeError',
+        message:
+          'operationKey must be a 64-character lowercase hexadecimal lookup key.',
+      }
+    );
   }
 );

@@ -1,3 +1,7 @@
+import {
+  CANCELLATION_OPERATION_LOOKUP_KEY_PATTERN,
+} from "./cancellation-operation-key.js";
+
 export const CANCELLATION_OPERATION_PHASES = [
   "not-started",
   "restoration-in-progress",
@@ -62,15 +66,46 @@ function requireOpaqueValue(
   }
 }
 
+function requireOperationKey(
+  value: string
+): void {
+  if (
+    typeof value !== "string" ||
+    value.length < 32
+  ) {
+    throw new TypeError(
+      "operationKey must contain at least 32 characters."
+    );
+  }
+
+  if (
+    value.includes("/") ||
+    value.includes("\\")
+  ) {
+    throw new TypeError(
+      "operationKey cannot contain path separators."
+    );
+  }
+
+  if (
+    !CANCELLATION_OPERATION_LOOKUP_KEY_PATTERN.test(
+      value
+    )
+  ) {
+    throw new TypeError(
+      "operationKey must be a 64-character lowercase hexadecimal lookup key."
+    );
+  }
+}
+
 export function createInitialCancellationOperationState(
   operationKey: string,
   requestCreatedAt: Date,
   operationStartedAt: Date,
   cancellationRecordId: string
 ): InitialCancellationOperationState {
-  requireOpaqueValue(
-    operationKey,
-    "operationKey"
+    requireOperationKey(
+    operationKey
   );
 
   requireOpaqueValue(

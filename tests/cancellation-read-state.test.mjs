@@ -11,7 +11,7 @@ const authenticatedUid =
   'user-one';
 
 const operationKey =
-  'operation-key-value-with-at-least-32-characters';
+  'a'.repeat(64);
 
 const cancellationRecordId =
   'cancellation-record-value-1234567890';
