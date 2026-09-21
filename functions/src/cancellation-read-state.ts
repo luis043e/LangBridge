@@ -1,4 +1,12 @@
 import {
+  CANCELLATION_OPERATION_LOOKUP_KEY_PATTERN,
+} from "./cancellation-operation-key.js";
+
+import {
+  CANCELLATION_RECORD_ID_PATTERN,
+} from "./cancellation-record-id.js";
+
+import {
   evaluateDeletionRequest,
 } from "./deletion-request-state.js";
 
@@ -91,14 +99,25 @@ function readStoredDate(
   }
 }
 
-function isOpaqueIdentifier(
+function isValidOperationKey(
   value: unknown
 ): value is string {
   return (
     typeof value === "string" &&
-    value.length >= 32 &&
-    !value.includes("/") &&
-    !value.includes("\\")
+    CANCELLATION_OPERATION_LOOKUP_KEY_PATTERN.test(
+      value
+    )
+  );
+}
+
+function isValidCancellationRecordId(
+  value: unknown
+): value is string {
+  return (
+    typeof value === "string" &&
+    CANCELLATION_RECORD_ID_PATTERN.test(
+      value
+    )
   );
 }
 
@@ -263,12 +282,12 @@ export function evaluateCancellationReadState(
 
     if (
       phase === "not-started" ||
-      !isOpaqueIdentifier(
-        operationData.operationKey
-      ) ||
-      !isOpaqueIdentifier(
-        operationData.cancellationRecordId
-      ) ||
+      !isValidOperationKey(
+  operationData.operationKey
+) ||
+!isValidCancellationRecordId(
+  operationData.cancellationRecordId
+) ||
       operationData.operationKey ===
         operationData.cancellationRecordId ||
       !hasValidOperationDates(

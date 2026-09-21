@@ -14,7 +14,7 @@ const operationKey =
   'a'.repeat(64);
 
 const cancellationRecordId =
-  'cancellation-record-value-1234567890';
+  'b'.repeat(32);
 
 function createActiveRequest(
   overrides = {}
@@ -556,7 +556,53 @@ test(
     );
   }
 );
+test(
+  'a coordinator with a non-hexadecimal operation key is inconsistent',
+  () => {
+    assert.deepEqual(
+      evaluateCancellationReadState(
+        authenticatedUid,
+        true,
+        true,
+        createActiveRequest(),
+        true,
+        createOperation({
+          operationKey:
+            'g'.repeat(64),
+        }),
+        false
+      ),
+      {
+        status:
+          'inconsistent-state',
+      }
+    );
+  }
+);
 
+test(
+  'a coordinator with a malformed cancellation record id is inconsistent',
+  () => {
+    assert.deepEqual(
+      evaluateCancellationReadState(
+        authenticatedUid,
+        true,
+        true,
+        createActiveRequest(),
+        true,
+        createOperation({
+          cancellationRecordId:
+            'invalid.record.identifier.value',
+        }),
+        false
+      ),
+      {
+        status:
+          'inconsistent-state',
+      }
+    );
+  }
+);
 test(
   'equal coordinator identifiers are inconsistent',
   () => {

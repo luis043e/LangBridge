@@ -2585,7 +2585,7 @@ test(
           phase:
             'not-started',
           cancellationRecordId:
-            'cancellation-record-value-1234567890',
+            'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
           cancelledAt:
             serverTimestamp(),
           expiresAt:
@@ -2620,7 +2620,7 @@ test(
             phase:
               'completed',
             cancellationRecordId:
-              'cancellation-record-value-1234567890',
+              'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
             cancelledAt:
               serverTimestamp(),
             expiresAt:
@@ -2674,7 +2674,7 @@ test(
             phase:
               'not-started',
             cancellationRecordId:
-              'cancellation-record-value-1234567890',
+              'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
             cancelledAt:
               serverTimestamp(),
             expiresAt:
@@ -2732,7 +2732,7 @@ test(
             phase:
               'completed',
             cancellationRecordId:
-              'cancellation-record-value-1234567890',
+              'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
             cancelledAt:
               serverTimestamp(),
             expiresAt:

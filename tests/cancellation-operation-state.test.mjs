@@ -14,7 +14,7 @@ const operationKey =
   'a'.repeat(64);
 
 const cancellationRecordId =
-  'cancellation-record-value-1234567890';
+  'b'.repeat(32);
 
 const requestCreatedAt =
   new Date(
