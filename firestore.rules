@@ -427,6 +427,9 @@ allow update, delete: if false;
 
   allow read, update, delete: if false;
 }
+    match /accountDeletionCancellationOperations/{operationId} {
+      allow read, write: if false;
+    }
     match /{document=**} {
       allow read, write: if false;
     }

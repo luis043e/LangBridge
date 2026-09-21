@@ -2559,3 +2559,207 @@ test(
     );
   }
 );
+test(
+  'an authenticated user cannot create a cancellation operation coordinator',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'accountDeletionCancellationOperations',
+          'opaque-operation-lookup-key'
+        ),
+        {
+          operationKey:
+            'operation-key-value-with-at-least-32-characters',
+          requestCreatedAt:
+            serverTimestamp(),
+          phase:
+            'not-started',
+          cancellationRecordId:
+            'cancellation-record-value-1234567890',
+          cancelledAt:
+            serverTimestamp(),
+          expiresAt:
+            serverTimestamp(),
+          operationExpiresAt:
+            serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'an authenticated user cannot read a cancellation operation coordinator',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionCancellationOperations',
+            'opaque-operation-lookup-key'
+          ),
+          {
+            operationKey:
+              'operation-key-value-with-at-least-32-characters',
+            requestCreatedAt:
+              serverTimestamp(),
+            phase:
+              'completed',
+            cancellationRecordId:
+              'cancellation-record-value-1234567890',
+            cancelledAt:
+              serverTimestamp(),
+            expiresAt:
+              serverTimestamp(),
+            operationExpiresAt:
+              serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDoc(
+        doc(
+          firestore,
+          'accountDeletionCancellationOperations',
+          'opaque-operation-lookup-key'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'an authenticated user cannot update a cancellation operation coordinator',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionCancellationOperations',
+            'opaque-operation-lookup-key'
+          ),
+          {
+            operationKey:
+              'operation-key-value-with-at-least-32-characters',
+            requestCreatedAt:
+              serverTimestamp(),
+            phase:
+              'not-started',
+            cancellationRecordId:
+              'cancellation-record-value-1234567890',
+            cancelledAt:
+              serverTimestamp(),
+            expiresAt:
+              serverTimestamp(),
+            operationExpiresAt:
+              serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'accountDeletionCancellationOperations',
+          'opaque-operation-lookup-key'
+        ),
+        {
+          phase:
+            'completed',
+        }
+      )
+    );
+  }
+);
+
+test(
+  'an authenticated user cannot delete a cancellation operation coordinator',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'accountDeletionCancellationOperations',
+            'opaque-operation-lookup-key'
+          ),
+          {
+            operationKey:
+              'operation-key-value-with-at-least-32-characters',
+            requestCreatedAt:
+              serverTimestamp(),
+            phase:
+              'completed',
+            cancellationRecordId:
+              'cancellation-record-value-1234567890',
+            cancelledAt:
+              serverTimestamp(),
+            expiresAt:
+              serverTimestamp(),
+            operationExpiresAt:
+              serverTimestamp(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      deleteDoc(
+        doc(
+          firestore,
+          'accountDeletionCancellationOperations',
+          'opaque-operation-lookup-key'
+        )
+      )
+    );
+  }
+);
