@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import {
-    test,
+  test,
 } from 'node:test';
 
 import {
-    CANCELLATION_OPERATION_PHASES,
-    advanceCancellationOperationPhase,
-    createCancellationOperationState,
-    isCancellationOperationPhase,
+  CANCELLATION_OPERATION_PHASES,
+  advanceCancellationOperationPhase,
+  createInitialCancellationOperationState,
+  isCancellationOperationPhase,
 } from '../functions/lib/cancellation-operation-state.js';
 
 const operationKey =
@@ -21,23 +21,17 @@ const requestCreatedAt =
     '2026-09-20T14:00:00.000Z'
   );
 
-const cancelledAt =
+const operationStartedAt =
   new Date(
     '2026-09-20T15:00:00.000Z'
   );
 
-const expiresAt =
-  new Date(
-    '2026-10-20T15:00:00.000Z'
-  );
-
 function createState() {
-  return createCancellationOperationState(
+  return createInitialCancellationOperationState(
     operationKey,
     requestCreatedAt,
-    cancellationRecordId,
-    cancelledAt,
-    expiresAt
+    operationStartedAt,
+    cancellationRecordId
   );
 }
 
@@ -60,20 +54,17 @@ test(
 );
 
 test(
-  'a new cancellation operation starts at not-started',
+  'a persisted cancellation operation begins with restoration in progress',
   () => {
-    const state =
-      createState();
-
     assert.equal(
-      state.phase,
-      'not-started'
+      createState().phase,
+      'restoration-in-progress'
     );
   }
 );
 
 test(
-  'the coordinator preserves separate opaque identifiers',
+  'the initial coordinator preserves separate opaque identifiers',
   () => {
     const state =
       createState();
@@ -96,7 +87,7 @@ test(
 );
 
 test(
-  'the coordinator preserves the request creation timestamp',
+  'the initial coordinator preserves request and operation timestamps',
   () => {
     const state =
       createState();
@@ -105,34 +96,16 @@ test(
       state.requestCreatedAt.toISOString(),
       '2026-09-20T14:00:00.000Z'
     );
-  }
-);
-
-test(
-  'the coordinator preserves cancellation timestamps',
-  () => {
-    const state =
-      createState();
 
     assert.equal(
-      state.cancelledAt.toISOString(),
+      state.operationStartedAt.toISOString(),
       '2026-09-20T15:00:00.000Z'
     );
-
-    assert.equal(
-      state.expiresAt.toISOString(),
-      '2026-10-20T15:00:00.000Z'
-    );
-
-    assert.equal(
-      state.operationExpiresAt.toISOString(),
-      '2026-10-20T15:00:00.000Z'
-    );
   }
 );
 
 test(
-  'the coordinator uses independent date objects',
+  'the initial coordinator uses independent date objects',
   () => {
     const state =
       createState();
@@ -143,76 +116,86 @@ test(
     );
 
     assert.notEqual(
-      state.cancelledAt,
-      cancelledAt
-    );
-
-    assert.notEqual(
-      state.expiresAt,
-      expiresAt
-    );
-
-    assert.notEqual(
-      state.operationExpiresAt,
-      state.cancelledAt
+      state.operationStartedAt,
+      operationStartedAt
     );
   }
 );
 
 test(
-  'the coordinator does not mutate supplied dates',
+  'the initial coordinator does not mutate supplied dates',
   () => {
-    const originalRequestCreatedAt =
+    const suppliedRequestCreatedAt =
       new Date(
         requestCreatedAt.getTime()
       );
 
-    const originalCancelledAt =
+    const suppliedOperationStartedAt =
       new Date(
-        cancelledAt.getTime()
+        operationStartedAt.getTime()
       );
 
-    const originalExpiresAt =
-      new Date(
-        expiresAt.getTime()
-      );
-
-    createCancellationOperationState(
+    createInitialCancellationOperationState(
       operationKey,
-      originalRequestCreatedAt,
-      cancellationRecordId,
-      originalCancelledAt,
-      originalExpiresAt
+      suppliedRequestCreatedAt,
+      suppliedOperationStartedAt,
+      cancellationRecordId
     );
 
     assert.equal(
-      originalRequestCreatedAt.toISOString(),
+      suppliedRequestCreatedAt.toISOString(),
       requestCreatedAt.toISOString()
     );
 
     assert.equal(
-      originalCancelledAt.toISOString(),
-      cancelledAt.toISOString()
-    );
-
-    assert.equal(
-      originalExpiresAt.toISOString(),
-      expiresAt.toISOString()
+      suppliedOperationStartedAt.toISOString(),
+      operationStartedAt.toISOString()
     );
   }
 );
 
 test(
-  'the coordinator rejects equal internal identifiers',
+  'the initial coordinator does not contain completion timestamps',
+  () => {
+    const state =
+      createState();
+
+    assert.equal(
+      Object.hasOwn(
+        state,
+        'cancelledAt'
+      ),
+      false
+    );
+
+    assert.equal(
+      Object.hasOwn(
+        state,
+        'expiresAt'
+      ),
+      false
+    );
+
+    assert.equal(
+      Object.hasOwn(
+        state,
+        'operationExpiresAt'
+      ),
+      false
+    );
+  }
+);
+
+test(
+  'the initial coordinator rejects equal internal identifiers',
   () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
           operationKey,
           requestCreatedAt,
-          operationKey,
-          cancelledAt,
-          expiresAt
+          operationStartedAt,
+          operationKey
         );
       },
       {
@@ -226,16 +209,15 @@ test(
 );
 
 test(
-  'the coordinator rejects a short operation key',
+  'the initial coordinator rejects short opaque identifiers',
   () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
           'short-operation-key',
           requestCreatedAt,
-          cancellationRecordId,
-          cancelledAt,
-          expiresAt
+          operationStartedAt,
+          cancellationRecordId
         );
       },
       {
@@ -245,20 +227,14 @@ test(
           'operationKey must contain at least 32 characters.',
       }
     );
-  }
-);
 
-test(
-  'the coordinator rejects a short cancellation record id',
-  () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
           operationKey,
           requestCreatedAt,
-          'short-record-id',
-          cancelledAt,
-          expiresAt
+          operationStartedAt,
+          'short-record-id'
         );
       },
       {
@@ -272,18 +248,56 @@ test(
 );
 
 test(
-  'the coordinator rejects an invalid request creation date',
+  'the initial coordinator rejects path separators in opaque identifiers',
   () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
+          `${operationKey}/forged`,
+          requestCreatedAt,
+          operationStartedAt,
+          cancellationRecordId
+        );
+      },
+      {
+        name:
+          'TypeError',
+        message:
+          'operationKey cannot contain path separators.',
+      }
+    );
+
+    assert.throws(
+      () => {
+        createInitialCancellationOperationState(
+          operationKey,
+          requestCreatedAt,
+          operationStartedAt,
+          `${cancellationRecordId}\\forged`
+        );
+      },
+      {
+        name:
+          'TypeError',
+        message:
+          'cancellationRecordId cannot contain path separators.',
+      }
+    );
+  }
+);
+
+test(
+  'the initial coordinator rejects invalid dates',
+  () => {
+    assert.throws(
+      () => {
+        createInitialCancellationOperationState(
           operationKey,
           new Date(
             Number.NaN
           ),
-          cancellationRecordId,
-          cancelledAt,
-          expiresAt
+          operationStartedAt,
+          cancellationRecordId
         );
       },
       {
@@ -293,79 +307,66 @@ test(
           'requestCreatedAt must be a valid Date.',
       }
     );
-  }
-);
 
-test(
-  'the coordinator rejects an invalid cancellation date',
-  () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
           operationKey,
           requestCreatedAt,
-          cancellationRecordId,
           new Date(
             Number.NaN
           ),
-          expiresAt
+          cancellationRecordId
         );
       },
       {
         name:
           'TypeError',
         message:
-          'cancelledAt must be a valid Date.',
-      }
-    );
-  }
-);
-test(
-  'the coordinator rejects an invalid expiration date',
-  () => {
-    assert.throws(
-      () => {
-        createCancellationOperationState(
-          operationKey,
-          requestCreatedAt,
-          cancellationRecordId,
-          cancelledAt,
-          new Date(
-            Number.NaN
-          )
-        );
-      },
-      {
-        name:
-          'TypeError',
-        message:
-          'expiresAt must be a valid Date.',
+          'operationStartedAt must be a valid Date.',
       }
     );
   }
 );
 
 test(
-  'the coordinator rejects an expiration different from 30 calendar days',
+  'operation start cannot precede request creation',
   () => {
     assert.throws(
       () => {
-        createCancellationOperationState(
+        createInitialCancellationOperationState(
           operationKey,
           requestCreatedAt,
-          cancellationRecordId,
-          cancelledAt,
           new Date(
-            '2026-10-21T15:00:00.000Z'
-          )
+            '2026-09-20T13:59:59.999Z'
+          ),
+          cancellationRecordId
         );
       },
       {
         name:
           'TypeError',
         message:
-          'expiresAt must be exactly 30 calendar days after cancelledAt.',
+          'operationStartedAt cannot be earlier than requestCreatedAt.',
       }
+    );
+  }
+);
+
+test(
+  'operation start may equal request creation',
+  () => {
+    const state =
+      createInitialCancellationOperationState(
+        operationKey,
+        requestCreatedAt,
+        requestCreatedAt,
+        cancellationRecordId
+      );
+
+    assert.equal(
+      state.operationStartedAt.toISOString(),
+      requestCreatedAt.toISOString()
     );
   }
 );
@@ -411,10 +412,10 @@ test(
   () => {
     assert.equal(
       advanceCancellationOperationPhase(
-        'not-started',
-        'restoration-in-progress'
+        'restoration-in-progress',
+        'profile-restored'
       ),
-      'restoration-in-progress'
+      'profile-restored'
     );
   }
 );
@@ -438,8 +439,8 @@ test(
     assert.throws(
       () => {
         advanceCancellationOperationPhase(
-          'not-started',
-          'profile-restored'
+          'restoration-in-progress',
+          'cancelled-record-created'
         );
       },
       {
@@ -473,49 +474,30 @@ test(
 );
 
 test(
-  'the coordinator contains no directly identifying fields',
+  'the initial coordinator contains no directly identifying fields',
   () => {
     const state =
       createState();
 
-    const keys =
-      Object.keys(
-        state
+    const forbiddenFields = [
+      'uid',
+      'userId',
+      'userEmail',
+      'previousProfileVisibility',
+      'deletionReceipt',
+    ];
+
+    for (
+      const field of
+      forbiddenFields
+    ) {
+      assert.equal(
+        Object.hasOwn(
+          state,
+          field
+        ),
+        false
       );
-
-    assert.equal(
-      keys.includes(
-        'uid'
-      ),
-      false
-    );
-
-    assert.equal(
-      keys.includes(
-        'userId'
-      ),
-      false
-    );
-
-    assert.equal(
-      keys.includes(
-        'userEmail'
-      ),
-      false
-    );
-
-    assert.equal(
-      keys.includes(
-        'previousProfileVisibility'
-      ),
-      false
-    );
-
-    assert.equal(
-      keys.includes(
-        'deletionReceipt'
-      ),
-      false
-    );
+    }
   }
 );

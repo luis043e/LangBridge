@@ -1,9 +1,10 @@
 import {
-    evaluateDeletionRequest,
+  evaluateDeletionRequest,
 } from "./deletion-request-state.js";
 
 import {
-    isCancellationOperationPhase,
+  isCancellationOperationPhase,
+  type CancellationOperationPhase,
 } from "./cancellation-operation-state.js";
 
 export type CancellationReadState =
@@ -32,6 +33,199 @@ function isRecord(
   );
 }
 
+function hasOwn(
+  value: Record<string, unknown>,
+  field: string
+): boolean {
+  return Object.prototype.hasOwnProperty.call(
+    value,
+    field
+  );
+}
+
+function readStoredDate(
+  value: unknown
+): Date | undefined {
+  if (value instanceof Date) {
+    if (
+      Number.isNaN(
+        value.getTime()
+      )
+    ) {
+      return undefined;
+    }
+
+    return new Date(
+      value.getTime()
+    );
+  }
+
+  if (
+    !isRecord(value) ||
+    typeof value.toDate !==
+      "function"
+  ) {
+    return undefined;
+  }
+
+  try {
+    const converted =
+      value.toDate.call(
+        value
+      );
+
+    if (
+      !(converted instanceof Date) ||
+      Number.isNaN(
+        converted.getTime()
+      )
+    ) {
+      return undefined;
+    }
+
+    return new Date(
+      converted.getTime()
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+function isOpaqueIdentifier(
+  value: unknown
+): value is string {
+  return (
+    typeof value === "string" &&
+    value.length >= 32 &&
+    !value.includes("/") &&
+    !value.includes("\\")
+  );
+}
+
+function calculateExpectedExpiry(
+  cancelledAt: Date
+): Date {
+  const expectedExpiry =
+    new Date(
+      cancelledAt.getTime()
+    );
+
+  expectedExpiry.setUTCDate(
+    expectedExpiry.getUTCDate() +
+      30
+  );
+
+  return expectedExpiry;
+}
+
+function phaseRequiresCancelledRecord(
+  phase: CancellationOperationPhase
+): boolean {
+  return (
+    phase ===
+      "cancelled-record-created" ||
+    phase ===
+      "active-request-removed" ||
+    phase ===
+      "temporary-restoration-data-removed" ||
+    phase ===
+      "completed"
+  );
+}
+
+function hasValidOperationDates(
+  operationData: Record<string, unknown>,
+  phase: CancellationOperationPhase
+): boolean {
+  const requestCreatedAt =
+    readStoredDate(
+      operationData.requestCreatedAt
+    );
+
+  const operationStartedAt =
+    readStoredDate(
+      operationData.operationStartedAt
+    );
+
+  if (
+    requestCreatedAt === undefined ||
+    operationStartedAt === undefined ||
+    operationStartedAt.getTime() <
+      requestCreatedAt.getTime()
+  ) {
+    return false;
+  }
+
+  const requiresCancelledRecord =
+    phaseRequiresCancelledRecord(
+      phase
+    );
+
+  if (!requiresCancelledRecord) {
+    return (
+      !hasOwn(
+        operationData,
+        "cancelledAt"
+      ) &&
+      !hasOwn(
+        operationData,
+        "expiresAt"
+      ) &&
+      !hasOwn(
+        operationData,
+        "operationExpiresAt"
+      )
+    );
+  }
+
+  const cancelledAt =
+    readStoredDate(
+      operationData.cancelledAt
+    );
+
+  const expiresAt =
+    readStoredDate(
+      operationData.expiresAt
+    );
+
+  if (
+    cancelledAt === undefined ||
+    expiresAt === undefined
+  ) {
+    return false;
+  }
+
+  const expectedExpiry =
+    calculateExpectedExpiry(
+      cancelledAt
+    );
+
+  if (
+    expiresAt.getTime() !==
+    expectedExpiry.getTime()
+  ) {
+    return false;
+  }
+
+  if (phase !== "completed") {
+    return !hasOwn(
+      operationData,
+      "operationExpiresAt"
+    );
+  }
+
+  const operationExpiresAt =
+    readStoredDate(
+      operationData.operationExpiresAt
+    );
+
+  return (
+    operationExpiresAt !== undefined &&
+    operationExpiresAt.getTime() ===
+      expiresAt.getTime()
+  );
+}
+
 export function evaluateCancellationReadState(
   authenticatedUid: string,
   profileExists: boolean,
@@ -52,7 +246,9 @@ export function evaluateCancellationReadState(
 
   if (operationExists) {
     if (
-      !isRecord(operationData) ||
+      !isRecord(
+        operationData
+      ) ||
       !isCancellationOperationPhase(
         operationData.phase
       )
@@ -62,15 +258,23 @@ export function evaluateCancellationReadState(
       };
     }
 
+    const phase =
+      operationData.phase;
+
     if (
-      typeof operationData.operationKey !==
-        "string" ||
-      operationData.operationKey.length < 32 ||
-      typeof operationData.cancellationRecordId !==
-        "string" ||
-      operationData.cancellationRecordId.length < 32 ||
-      operationData.operationKey ===
+      phase === "not-started" ||
+      !isOpaqueIdentifier(
+        operationData.operationKey
+      ) ||
+      !isOpaqueIdentifier(
         operationData.cancellationRecordId
+      ) ||
+      operationData.operationKey ===
+        operationData.cancellationRecordId ||
+      !hasValidOperationDates(
+        operationData,
+        phase
+      )
     ) {
       return {
         status: "inconsistent-state",
@@ -78,7 +282,7 @@ export function evaluateCancellationReadState(
     }
 
     if (
-      operationData.phase ===
+      phase ===
       "completed"
     ) {
       if (!cancelledRecordExists) {
@@ -89,6 +293,17 @@ export function evaluateCancellationReadState(
 
       return {
         status: "cancelled",
+      };
+    }
+
+    if (
+      phaseRequiresCancelledRecord(
+        phase
+      ) &&
+      !cancelledRecordExists
+    ) {
+      return {
+        status: "inconsistent-state",
       };
     }
 

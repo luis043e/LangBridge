@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import {
-    test,
+  test,
 } from 'node:test';
 
 import {
-    evaluateCancellationReadState,
+  evaluateCancellationReadState,
 } from '../functions/lib/cancellation-read-state.js';
 
 const authenticatedUid =
@@ -33,11 +33,60 @@ function createActiveRequest(
 function createOperation(
   overrides = {}
 ) {
-  return {
+  const phase =
+    overrides.phase ??
+    'restoration-in-progress';
+
+  const requestCreatedAt =
+    new Date(
+      '2026-09-20T14:00:00.000Z'
+    );
+
+  const operationStartedAt =
+    new Date(
+      '2026-09-20T15:00:00.000Z'
+    );
+
+  const operation = {
     operationKey,
     cancellationRecordId,
-    phase:
-      'not-started',
+    requestCreatedAt,
+    operationStartedAt,
+    phase,
+  };
+
+  const phasesWithCancelledRecord = [
+    'cancelled-record-created',
+    'active-request-removed',
+    'temporary-restoration-data-removed',
+    'completed',
+  ];
+
+  if (
+    phasesWithCancelledRecord.includes(
+      phase
+    )
+  ) {
+    operation.cancelledAt =
+      new Date(
+        '2026-09-20T16:00:00.000Z'
+      );
+
+    operation.expiresAt =
+      new Date(
+        '2026-10-20T16:00:00.000Z'
+      );
+  }
+
+  if (phase === 'completed') {
+    operation.operationExpiresAt =
+      new Date(
+        '2026-10-20T16:00:00.000Z'
+      );
+  }
+
+  return {
+    ...operation,
     ...overrides,
   };
 }
@@ -232,15 +281,11 @@ test(
 );
 
 test(
-  'all valid non-completed phases require restoration recovery',
+  'early valid non-completed phases require restoration recovery',
   () => {
     const pendingPhases = [
-      'not-started',
       'restoration-in-progress',
       'profile-restored',
-      'cancelled-record-created',
-      'active-request-removed',
-      'temporary-restoration-data-removed',
     ];
 
     for (
@@ -265,6 +310,88 @@ test(
         }
       );
     }
+  }
+);
+
+test(
+  'later valid non-completed phases require the cancelled record',
+  () => {
+    const pendingPhases = [
+      'cancelled-record-created',
+      'active-request-removed',
+      'temporary-restoration-data-removed',
+    ];
+
+    for (
+      const phase of
+      pendingPhases
+    ) {
+      assert.deepEqual(
+        evaluateCancellationReadState(
+          authenticatedUid,
+          true,
+          true,
+          createActiveRequest(),
+          true,
+          createOperation({
+            phase,
+          }),
+          true
+        ),
+        {
+          status:
+            'restoration-pending',
+        }
+      );
+    }
+  }
+);
+
+test(
+  'a later recovery phase without its cancelled record is inconsistent',
+  () => {
+    assert.deepEqual(
+      evaluateCancellationReadState(
+        authenticatedUid,
+        true,
+        true,
+        createActiveRequest(),
+        true,
+        createOperation({
+          phase:
+            'cancelled-record-created',
+        }),
+        false
+      ),
+      {
+        status:
+          'inconsistent-state',
+      }
+    );
+  }
+);
+
+test(
+  'a persisted not-started coordinator is inconsistent',
+  () => {
+    assert.deepEqual(
+      evaluateCancellationReadState(
+        authenticatedUid,
+        true,
+        true,
+        createActiveRequest(),
+        true,
+        createOperation({
+          phase:
+            'not-started',
+        }),
+        false
+      ),
+      {
+        status:
+          'inconsistent-state',
+      }
+    );
   }
 );
 

@@ -133,13 +133,56 @@ async function createActiveRequest(
 async function createOperation(
   overrides = {}
 ) {
-  await operationReference().set({
+  const phase =
+    overrides.phase ??
+    'restoration-in-progress';
+
+  const operation = {
     operationKey:
       'operation-key-value-with-at-least-32-characters',
     cancellationRecordId:
       storedCancellationRecordId,
-    phase:
-      'not-started',
+    requestCreatedAt:
+      new Date(
+        '2026-09-20T14:00:00.000Z'
+      ),
+    operationStartedAt:
+      new Date(
+        '2026-09-20T15:00:00.000Z'
+      ),
+    phase,
+  };
+
+  if (
+    [
+      'cancelled-record-created',
+      'active-request-removed',
+      'temporary-restoration-data-removed',
+      'completed',
+    ].includes(
+      phase
+    )
+  ) {
+    operation.cancelledAt =
+      new Date(
+        '2026-09-20T16:00:00.000Z'
+      );
+
+    operation.expiresAt =
+      new Date(
+        '2026-10-20T16:00:00.000Z'
+      );
+  }
+
+  if (phase === 'completed') {
+    operation.operationExpiresAt =
+      new Date(
+        '2026-10-20T16:00:00.000Z'
+      );
+  }
+
+  await operationReference().set({
+    ...operation,
     ...overrides,
   });
 }

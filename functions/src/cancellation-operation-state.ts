@@ -11,17 +11,13 @@ export const CANCELLATION_OPERATION_PHASES = [
 export type CancellationOperationPhase =
   typeof CANCELLATION_OPERATION_PHASES[number];
 
-export type CancellationOperationState = {
+export type InitialCancellationOperationState = {
   operationKey: string;
   requestCreatedAt: Date;
-  phase: CancellationOperationPhase;
+  operationStartedAt: Date;
+  phase: "restoration-in-progress";
   cancellationRecordId: string;
-  cancelledAt: Date;
-  expiresAt: Date;
-  operationExpiresAt: Date;
 };
-
-const OPERATION_RETENTION_DAYS = 30;
 
 function requireValidDate(
   value: Date,
@@ -55,15 +51,23 @@ function requireOpaqueValue(
       `${name} must contain at least 32 characters.`
     );
   }
+
+  if (
+    value.includes("/") ||
+    value.includes("\\")
+  ) {
+    throw new TypeError(
+      `${name} cannot contain path separators.`
+    );
+  }
 }
 
-export function createCancellationOperationState(
+export function createInitialCancellationOperationState(
   operationKey: string,
   requestCreatedAt: Date,
-  cancellationRecordId: string,
-  cancelledAt: Date,
-  expiresAt: Date
-): CancellationOperationState {
+  operationStartedAt: Date,
+  cancellationRecordId: string
+): InitialCancellationOperationState {
   requireOpaqueValue(
     operationKey,
     "operationKey"
@@ -89,34 +93,18 @@ export function createCancellationOperationState(
       "requestCreatedAt"
     );
 
-  const normalizedCancelledAt =
+  const normalizedOperationStartedAt =
     requireValidDate(
-      cancelledAt,
-      "cancelledAt"
+      operationStartedAt,
+      "operationStartedAt"
     );
-
-  const normalizedExpiresAt =
-    requireValidDate(
-      expiresAt,
-      "expiresAt"
-    );
-
-  const operationExpiresAt =
-    new Date(
-      normalizedCancelledAt.getTime()
-    );
-
-  operationExpiresAt.setUTCDate(
-    operationExpiresAt.getUTCDate() +
-      OPERATION_RETENTION_DAYS
-  );
 
   if (
-    normalizedExpiresAt.getTime() !==
-    operationExpiresAt.getTime()
+    normalizedOperationStartedAt.getTime() <
+    normalizedRequestCreatedAt.getTime()
   ) {
     throw new TypeError(
-      "expiresAt must be exactly 30 calendar days after cancelledAt."
+      "operationStartedAt cannot be earlier than requestCreatedAt."
     );
   }
 
@@ -124,14 +112,11 @@ export function createCancellationOperationState(
     operationKey,
     requestCreatedAt:
       normalizedRequestCreatedAt,
+    operationStartedAt:
+      normalizedOperationStartedAt,
     phase:
-      "not-started",
+      "restoration-in-progress",
     cancellationRecordId,
-    cancelledAt:
-      normalizedCancelledAt,
-    expiresAt:
-      normalizedExpiresAt,
-    operationExpiresAt,
   };
 }
 
