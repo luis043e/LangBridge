@@ -4,8 +4,11 @@ import type {
 } from "firebase-admin/firestore";
 
 import {
-  evaluateCancellationReadState,
-  type CancellationReadState,
+  evaluateCoordinatedCancellationReadState,
+} from "./cancellation-coordinated-read-state.js";
+
+import type {
+  CancellationReadState,
 } from "./cancellation-read-state.js";
 
 export const CANCELLATION_COLLECTIONS = {
@@ -202,17 +205,25 @@ export async function readCancellationStateInTransaction(
         resolvedCancellationRecordId ===
         undefined
       ) {
-        return evaluateCancellationReadState(
-          uid,
-          profileSnapshot.exists,
-          activeRequestSnapshot.exists,
-          activeRequestSnapshot.exists
-            ? activeRequestSnapshot.data()
-            : undefined,
-          operationSnapshot.exists,
-          operationData,
-          false
-        );
+        return evaluateCoordinatedCancellationReadState({
+  authenticatedUid:
+    uid,
+  expectedOperationKey:
+    opaqueLookupKey,
+  profileExists:
+    profileSnapshot.exists,
+  activeRequestExists:
+    activeRequestSnapshot.exists,
+  activeRequestData:
+    activeRequestSnapshot.exists
+      ? activeRequestSnapshot.data()
+      : undefined,
+  operationExists:
+    operationSnapshot.exists,
+  operationData,
+  cancelledRecordExists:
+    false,
+});
       }
 
       if (
@@ -238,17 +249,25 @@ export async function readCancellationStateInTransaction(
           resolvedReferences.cancelledRequest
         );
 
-      return evaluateCancellationReadState(
-        uid,
-        profileSnapshot.exists,
-        activeRequestSnapshot.exists,
-        activeRequestSnapshot.exists
-          ? activeRequestSnapshot.data()
-          : undefined,
-        operationSnapshot.exists,
-        operationData,
-        cancelledRecordSnapshot.exists
-      );
+      return evaluateCoordinatedCancellationReadState({
+  authenticatedUid:
+    uid,
+  expectedOperationKey:
+    opaqueLookupKey,
+  profileExists:
+    profileSnapshot.exists,
+  activeRequestExists:
+    activeRequestSnapshot.exists,
+  activeRequestData:
+    activeRequestSnapshot.exists
+      ? activeRequestSnapshot.data()
+      : undefined,
+  operationExists:
+    operationSnapshot.exists,
+  operationData,
+  cancelledRecordExists:
+    cancelledRecordSnapshot.exists,
+});
     }
   );
 }

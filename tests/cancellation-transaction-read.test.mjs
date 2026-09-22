@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+﻿import assert from 'node:assert/strict';
 import {
   createRequire,
 } from 'node:module';
@@ -299,14 +299,18 @@ test(
     );
 
     await createActiveRequest(
-      uid,
-      {
-        status:
-          'processing',
-        pointOfNoReturnOperation:
-          'delete-authentication',
-      }
-    );
+  uid,
+  {
+    status:
+      'processing',
+    pointOfNoReturnAt:
+      new Date(
+        '2026-09-20T15:00:00.000Z'
+      ),
+    pointOfNoReturnOperation:
+      'delete-authentication',
+  }
+);
 
     assert.deepEqual(
       await readState(
@@ -331,8 +335,16 @@ test(
     );
 
     await createActiveRequest(
-      uid
-    );
+  uid,
+  {
+    cancellationConfirmedAt:
+      new Date(
+        '2026-09-20T15:00:00.000Z'
+      ),
+    cancellationOperationKey:
+      opaqueLookupKey,
+  }
+);
 
     await createOperation({
       phase:
