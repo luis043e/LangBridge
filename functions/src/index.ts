@@ -13,7 +13,16 @@ import {
   evaluateRecentAuthentication,
 } from "./recent-authentication.js";
 
+import {
+  runCancellationCallableWorkflow,
+} from "./cancellation-callable-runner.js";
+
 import { setGlobalOptions } from "firebase-functions/v2";
+
+import {
+  defineSecret,
+} from "firebase-functions/params";
+
 import {
   HttpsError,
   onCall,
@@ -25,6 +34,11 @@ if (getApps().length === 0) {
 
 const firestore =
   getFirestore();
+
+export const cancellationOperationSecret =
+  defineSecret(
+    "CANCELLATION_OPERATION_SECRET"
+  );
 
 setGlobalOptions({
   region: "us-central1",
@@ -75,6 +89,79 @@ function requireRecentAuthentication(
       reason: result.reason,
     }
   );
+}
+
+async function executeCancelAccountDeletion(
+  uid: string
+): Promise<{
+  status:
+    | "completed"
+    | "not-cancellable";
+}> {
+  try {
+    const result =
+      await runCancellationCallableWorkflow(
+        firestore,
+        uid,
+        cancellationOperationSecret.value(),
+        new Date()
+      );
+
+    switch (
+      result.status
+    ) {
+      case "completed":
+        return {
+          status:
+            "completed",
+        };
+
+      case "not-cancellable":
+        return {
+          status:
+            "not-cancellable",
+        };
+
+      case "profile-not-found":
+        throw new HttpsError(
+          "failed-precondition",
+          "The account profile is unavailable."
+        );
+
+      case "temporarily-unavailable":
+        throw new HttpsError(
+          "unavailable",
+          "The cancellation could not be completed at this time."
+        );
+
+      case "inconsistent-state":
+        throw new HttpsError(
+          "internal",
+          "The cancellation could not be completed."
+        );
+    }
+  } catch (error: unknown) {
+    if (
+      error instanceof HttpsError
+    ) {
+      throw error;
+    }
+
+    console.error(
+      "cancelAccountDeletion failed.",
+      {
+        errorName:
+          error instanceof Error
+            ? error.name
+            : "UnknownError",
+      }
+    );
+
+    throw new HttpsError(
+      "internal",
+      "The cancellation could not be completed."
+    );
+  }
 }
 
 function validateCallableRequest(
@@ -161,3 +248,24 @@ export const cancellationRequestStateProbe = onCall(
     };
   }
 );
+export const cancelAccountDeletion =
+  onCall(
+    {
+      timeoutSeconds:
+        60,
+      secrets: [
+        cancellationOperationSecret,
+      ],
+    },
+    async (request) => {
+      const {
+        uid,
+      } = validateCallableRequest(
+        request
+      );
+
+      return executeCancelAccountDeletion(
+        uid
+      );
+    }
+  );
