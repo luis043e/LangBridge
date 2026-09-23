@@ -1,15 +1,27 @@
 import {
-    httpsCallable,
+  httpsCallable,
 } from 'firebase/functions';
 
 import {
-    functions,
+  functions,
 } from '../firebaseConfig';
 
 export type CancelAccountDeletionPublicResult = {
   status:
     | 'completed'
     | 'not-cancellable';
+};
+
+export type AccountDeletionRequestPublicState =
+  | 'request-not-found'
+  | 'cancellable'
+  | 'not-cancellable'
+  | 'point-of-no-return-reached'
+  | 'inconsistent-state';
+
+export type ReadAccountDeletionRequestStateResult = {
+  status:
+    AccountDeletionRequestPublicState;
 };
 
 const cancelAccountDeletionCallable =
@@ -19,6 +31,15 @@ const cancelAccountDeletionCallable =
   >(
     functions,
     'cancelAccountDeletion'
+  );
+
+const readAccountDeletionRequestStateCallable =
+  httpsCallable<
+    Record<string, never>,
+    ReadAccountDeletionRequestStateResult
+  >(
+    functions,
+    'cancellationRequestStateProbe'
   );
 
 export async function cancelAccountDeletionRequest():
@@ -46,4 +67,34 @@ export async function cancelAccountDeletionRequest():
     status:
       result.status,
   };
+}
+
+export async function readAccountDeletionRequestState():
+  Promise<ReadAccountDeletionRequestStateResult> {
+  const response =
+    await readAccountDeletionRequestStateCallable(
+      {}
+    );
+
+  const result =
+    response.data;
+
+  switch (
+    result.status
+  ) {
+    case 'request-not-found':
+    case 'cancellable':
+    case 'not-cancellable':
+    case 'point-of-no-return-reached':
+    case 'inconsistent-state':
+      return {
+        status:
+          result.status,
+      };
+
+    default:
+      throw new Error(
+        'Unexpected cancellation request state.'
+      );
+  }
 }
