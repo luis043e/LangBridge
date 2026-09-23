@@ -6,6 +6,9 @@ import { initializeApp } from 'firebase/app';
 import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
 
 import { getFirestore } from 'firebase/firestore';
+import {
+  getFunctions,
+} from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBacUnaW0v34KK29-elmPGMvqLECeFydJc',
@@ -24,6 +27,15 @@ const auth = initializeAuth(app, {
 });
 
 const db = getFirestore(app);
-
-export { app, auth, db };
+const functions =
+  getFunctions(
+    app,
+    'us-central1'
+  );
+export {
+  app,
+  auth,
+  db,
+  functions
+};
 
