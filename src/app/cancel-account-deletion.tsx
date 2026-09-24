@@ -285,7 +285,18 @@ export default function CancelAccountDeletionScreen() {
           >
             {cardMessage}
           </Text>
-
+          {requestState ===
+            'cancellable' &&
+            providerState ===
+              'checking' && (
+            <ActivityIndicator
+              color="#22D3EE"
+              size="small"
+              style={
+                styles.providerIndicator
+              }
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -401,6 +412,10 @@ const styles =
     activityIndicator: {
       marginBottom:
         16,
+    },
+    providerIndicator: {
+      marginTop:
+        18,
     },
 
     cardTitle: {
