@@ -1,10 +1,15 @@
-import {
+﻿import {
   useRouter,
 } from 'expo-router';
 import {
   StatusBar,
 } from 'expo-status-bar';
 import {
+  useEffect,
+  useState,
+} from 'react';
+import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,11 +23,18 @@ import {
 import {
   useLanguage,
 } from '../contexts/language-context';
-
 import {
+  readAccountDeletionRequestState,
+  type AccountDeletionRequestPublicState,
+} from '../services/account-deletion-functions';
+import {
+  accountDeletionCancellationNavigationText,
   accountDeletionCancellationScreenText,
 } from '../translations/account-deletion-cancellation';
-
+type CancellationScreenRequestState =
+  | 'checking'
+  | 'unavailable'
+  | AccountDeletionRequestPublicState;
 export default function CancelAccountDeletionScreen() {
   const router =
     useRouter();
@@ -31,10 +43,106 @@ export default function CancelAccountDeletionScreen() {
     language,
   } =
     useLanguage();
-      const text =
+  const text =
     accountDeletionCancellationScreenText[
       language
     ];
+
+  const navigationText =
+    accountDeletionCancellationNavigationText[
+      language
+    ];
+
+  const [
+
+    requestState,
+    setRequestState,
+  ] =
+    useState<CancellationScreenRequestState>(
+      'checking'
+    );
+
+  useEffect(() => {
+    let isMounted =
+      true;
+
+    const loadRequestState =
+      async () => {
+        try {
+          const result =
+            await readAccountDeletionRequestState();
+
+          if (isMounted) {
+            setRequestState(
+              result.status
+            );
+          }
+        } catch {
+          if (isMounted) {
+            setRequestState(
+              'unavailable'
+            );
+          }
+        }
+      };
+
+    loadRequestState();
+
+    return () => {
+      isMounted =
+        false;
+    };
+  }, []);
+
+  let cardTitle =
+    text.requestDetectedTitle;
+
+  let cardMessage =
+    text.requestDetectedMessage;
+
+  if (
+    requestState ===
+    'checking'
+  ) {
+    cardTitle =
+      text.checkingTitle;
+    cardMessage =
+      text.checkingMessage;
+  } else if (
+    requestState ===
+    'point-of-no-return-reached'
+  ) {
+    cardTitle =
+      navigationText.pointOfNoReturnTitle;
+    cardMessage =
+      navigationText.pointOfNoReturnMessage;
+  } else if (
+    requestState ===
+      'request-not-found' ||
+    requestState ===
+      'not-cancellable'
+  ) {
+    cardTitle =
+      text.notCancellableTitle;
+    cardMessage =
+      text.notCancellableMessage;
+  } else if (
+    requestState ===
+    'inconsistent-state'
+  ) {
+    cardTitle =
+      text.internalErrorTitle;
+    cardMessage =
+      text.internalErrorMessage;
+  } else if (
+    requestState ===
+    'unavailable'
+  ) {
+    cardTitle =
+      text.temporarilyUnavailableTitle;
+    cardMessage =
+      text.temporarilyUnavailableMessage;
+  }
 
   return (
     <SafeAreaView
@@ -84,7 +192,7 @@ export default function CancelAccountDeletionScreen() {
               styles.icon
             }
           >
-            ↩️
+            {'<'}
           </Text>
 
           <Text
@@ -109,12 +217,22 @@ export default function CancelAccountDeletionScreen() {
             styles.card
           }
         >
+          {requestState ===
+            'checking' && (
+            <ActivityIndicator
+              color="#22D3EE"
+              size="large"
+              style={
+                styles.activityIndicator
+              }
+            />
+          )}
           <Text
             style={
               styles.cardTitle
             }
           >
-            {text.requestDetectedTitle}
+            {cardTitle}
           </Text>
 
           <Text
@@ -122,7 +240,7 @@ export default function CancelAccountDeletionScreen() {
               styles.cardText
             }
           >
-            {text.requestDetectedMessage}
+            {cardMessage}
           </Text>
 
         </View>
@@ -236,6 +354,10 @@ const styles =
         18,
       padding:
         18,
+    },
+    activityIndicator: {
+      marginBottom:
+        16,
     },
 
     cardTitle: {
