@@ -1,23 +1,27 @@
 import {
-    useRouter,
+  useRouter,
 } from 'expo-router';
 import {
-    StatusBar,
+  StatusBar,
 } from 'expo-status-bar';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
-    SafeAreaView,
+  SafeAreaView,
 } from 'react-native-safe-area-context';
 
 import {
-    useLanguage,
+  useLanguage,
 } from '../contexts/language-context';
+
+import {
+  accountDeletionCancellationScreenText,
+} from '../translations/account-deletion-cancellation';
 
 export default function CancelAccountDeletionScreen() {
   const router =
@@ -27,6 +31,10 @@ export default function CancelAccountDeletionScreen() {
     language,
   } =
     useLanguage();
+      const text =
+    accountDeletionCancellationScreenText[
+      language
+    ];
 
   return (
     <SafeAreaView
@@ -62,7 +70,7 @@ export default function CancelAccountDeletionScreen() {
               styles.backButtonText
             }
           >
-            ‹ Back
+            {'<'} {text.back}
           </Text>
         </TouchableOpacity>
 
@@ -84,7 +92,7 @@ export default function CancelAccountDeletionScreen() {
               styles.title
             }
           >
-            Cancel deletion request
+            {text.title}
           </Text>
 
           <Text
@@ -92,7 +100,7 @@ export default function CancelAccountDeletionScreen() {
               styles.subtitle
             }
           >
-            Review and securely cancel your pending account deletion request.
+            {text.subtitle}
           </Text>
         </View>
 
@@ -106,7 +114,7 @@ export default function CancelAccountDeletionScreen() {
               styles.cardTitle
             }
           >
-            Request detected
+            {text.requestDetectedTitle}
           </Text>
 
           <Text
@@ -114,16 +122,9 @@ export default function CancelAccountDeletionScreen() {
               styles.cardText
             }
           >
-            The cancellation controls will be connected in the next validated step.
+            {text.requestDetectedMessage}
           </Text>
 
-          <Text
-            style={
-              styles.languageNote
-            }
-          >
-            Language: {language}
-          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -255,14 +256,5 @@ const styles =
         21,
       marginTop:
         9,
-    },
-
-    languageNote: {
-      color:
-        '#94A3B8',
-      fontSize:
-        12,
-      marginTop:
-        16,
     },
   });
