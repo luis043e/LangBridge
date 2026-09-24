@@ -58,3 +58,45 @@ export async function reauthenticateWithPassword(
     credential
   );
 }
+export type AccountDeletionReauthenticationProvider =
+  | 'password'
+  | 'google'
+  | 'unsupported';
+
+export function getAccountDeletionReauthenticationProvider():
+  AccountDeletionReauthenticationProvider {
+  const currentUser =
+    auth.currentUser;
+
+  if (!currentUser) {
+    throw new Error(
+      'AUTHENTICATED_USER_REQUIRED'
+    );
+  }
+
+  const providerIds =
+    new Set(
+      currentUser.providerData.map(
+        provider =>
+          provider.providerId
+      )
+    );
+
+  if (
+    providerIds.has(
+      EmailAuthProvider.PROVIDER_ID
+    )
+  ) {
+    return 'password';
+  }
+
+  if (
+    providerIds.has(
+      'google.com'
+    )
+  ) {
+    return 'google';
+  }
+
+  return 'unsupported';
+}
