@@ -100,7 +100,85 @@ export type AccountDeletionCancellationScreenText = {
   returnToPrivacy:
     string;
 };
-
+const accountDeletionCancellationScreenTextEn:
+  AccountDeletionCancellationScreenText = {
+  back:
+    'Back',
+  title:
+    'Cancel deletion request',
+  subtitle:
+    'Securely cancel your pending account deletion request and restore your profile settings.',
+  checkingTitle:
+    'Checking your request',
+  checkingMessage:
+    'Wait while LangBridge verifies that your deletion request can still be cancelled.',
+  requestDetectedTitle:
+    'Deletion request detected',
+  requestDetectedMessage:
+    'Confirm your identity before cancelling the request. Your previous profile settings will be restored.',
+  passwordLabel:
+    'Password',
+  passwordPlaceholder:
+    'Enter your password',
+  passwordRequiredTitle:
+    'Password required',
+  passwordRequiredMessage:
+    'Enter your password to verify your identity.',
+  passwordAction:
+    'Verify and continue',
+  googleAction:
+    'Continue with Google',
+  unsupportedProviderTitle:
+    'Sign-in method not supported',
+  unsupportedProviderMessage:
+    'Your current sign-in method cannot be used to verify this cancellation securely.',
+  confirmationTitle:
+    'Cancel the deletion request?',
+  confirmationMessage:
+    'Your account will remain active and your previous profile settings will be restored. You can submit a new deletion request later.',
+  confirmationCancel:
+    'Keep request',
+  confirmationContinue:
+    'Cancel deletion',
+  cancellingAction:
+    'Cancelling request...',
+  completedTitle:
+    'Deletion request cancelled',
+  completedMessage:
+    'Your account will remain active and your previous profile settings have been restored.',
+  notCancellableTitle:
+    'Request cannot be cancelled',
+  notCancellableMessage:
+    'This deletion request is no longer eligible for cancellation.',
+  unauthenticatedTitle:
+    'Sign in again',
+  unauthenticatedMessage:
+    'Your session is no longer available. Sign in again before continuing.',
+  invalidCredentialTitle:
+    'Identity could not be verified',
+  invalidCredentialMessage:
+    'The credential you entered is not valid. Check it and try again.',
+  recentAuthenticationTitle:
+    'Verify your identity again',
+  recentAuthenticationMessage:
+    'A recent sign-in is required before the deletion request can be cancelled.',
+  temporarilyUnavailableTitle:
+    'Service temporarily unavailable',
+  temporarilyUnavailableMessage:
+    'The request could not be completed right now. Check your connection and try again.',
+  internalErrorTitle:
+    'Request could not be completed',
+  internalErrorMessage:
+    'The request could not be processed safely. Try again later.',
+  unknownErrorTitle:
+    'Something went wrong',
+  unknownErrorMessage:
+    'An unexpected problem occurred. Try again without closing LangBridge.',
+  retry:
+    'Try again',
+  returnToPrivacy:
+    'Return to privacy and security',
+};
 export const accountDeletionCancellationNavigationText =
   {
     en: {
