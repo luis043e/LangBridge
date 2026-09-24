@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+﻿import { useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -199,6 +199,75 @@ const handleChangePassword = async () => {
 );
   }
 };
+
+  const handleAccountDeletionPress = async () => {
+    if (isCheckingDeletionState) {
+      return;
+    }
+
+    try {
+      setIsCheckingDeletionState(true);
+
+      const result =
+        await readAccountDeletionRequestState();
+
+      switch (result.status) {
+        case 'request-not-found':
+          router.push({
+            pathname: '/delete-account',
+            params: {
+              lang: language,
+            },
+          });
+          return;
+
+        case 'cancellable':
+          router.push({
+            pathname: '/cancel-account-deletion',
+            params: {
+              lang: language,
+            },
+          } as unknown as Href);
+          return;
+
+        case 'point-of-no-return-reached':
+          Alert.alert(
+            cancellationText.pointOfNoReturnTitle,
+            cancellationText.pointOfNoReturnMessage
+          );
+          return;
+
+        case 'not-cancellable':
+          Alert.alert(
+            cancellationText.notCancellableTitle,
+            cancellationText.notCancellableMessage
+          );
+          return;
+
+        case 'inconsistent-state':
+          Alert.alert(
+            cancellationText.stateErrorTitle,
+            cancellationText.stateErrorMessage
+          );
+          return;
+      }
+    } catch (error) {
+      console.error(
+        'Error checking account deletion request:',
+        error instanceof Error
+          ? error.name
+          : 'UnknownError'
+      );
+
+      Alert.alert(
+        cancellationText.requestUnavailableTitle,
+        cancellationText.requestUnavailableMessage
+      );
+    } finally {
+      setIsCheckingDeletionState(false);
+    }
+  };
+
   return (
     <SafeAreaView
       style={styles.safeArea}
@@ -381,15 +450,9 @@ const handleChangePassword = async () => {
           <View style={styles.dangerCard}>
             <TouchableOpacity
   style={styles.settingRow}
-  onPress={() =>
-    router.push({
-      pathname: '/delete-account',
-      params: {
-        lang: language,
-      },
-    })
-  }
+  onPress={handleAccountDeletionPress}
   activeOpacity={0.85}
+  disabled={isCheckingDeletionState}
 >
               <View style={styles.dangerIcon}>
                 <Text style={styles.settingIconText}>
@@ -399,7 +462,7 @@ const handleChangePassword = async () => {
 
               <View style={styles.settingInformation}>
                 <Text style={styles.dangerTitle}>
-  {text.privacySecurityScreen.deleteAccount}
+  {isCheckingDeletionState ? cancellationText.checkingRequest : text.privacySecurityScreen.deleteAccount}
 </Text>
 
 <Text style={styles.settingDescription}>
