@@ -4,6 +4,7 @@
 } from '@react-native-google-signin/google-signin';
 import {
   GoogleAuthProvider,
+  reauthenticateWithCredential,
   signInWithCredential,
   signOut,
 } from 'firebase/auth';
@@ -131,4 +132,70 @@ throw new Error(
     user: firebaseUser,
     isNewUser,
   };
+}
+export async function reauthenticateWithGoogle(
+  language: AppLanguage
+): Promise<boolean> {
+  const webClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+  const text = translations[language];
+  const currentUser = auth.currentUser;
+
+  if (!webClientId) {
+    throw new Error(
+      text.googleAuth.missingWebClientId
+    );
+  }
+
+  if (!currentUser) {
+    throw new Error(
+      'AUTHENTICATED_USER_REQUIRED'
+    );
+  }
+
+  const usesGoogleProvider =
+    currentUser.providerData.some(
+      provider =>
+        provider.providerId ===
+        GoogleAuthProvider.PROVIDER_ID
+    );
+
+  if (!usesGoogleProvider) {
+    throw new Error(
+      'GOOGLE_PROVIDER_REQUIRED'
+    );
+  }
+
+  await GoogleSignin.hasPlayServices({
+    showPlayServicesUpdateDialog: true,
+  });
+
+  await GoogleSignin.signOut();
+
+  const googleResponse =
+    await GoogleSignin.signIn();
+
+  if (!isSuccessResponse(googleResponse)) {
+    return false;
+  }
+
+  const idToken =
+    googleResponse.data.idToken;
+
+  if (!idToken) {
+    throw new Error(
+      text.googleAuth.invalidIdToken
+    );
+  }
+
+  const googleCredential =
+    GoogleAuthProvider.credential(idToken);
+
+  await reauthenticateWithCredential(
+    currentUser,
+    googleCredential
+  );
+
+  return true;
 }
