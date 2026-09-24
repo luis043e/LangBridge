@@ -17,6 +17,14 @@ import { useLanguage } from '../contexts/language-context';
 import { auth, db } from '../firebaseConfig';
 import { translations } from '../translations';
 
+import {
+  readAccountDeletionRequestState,
+} from '../services/account-deletion-functions';
+
+import {
+  accountDeletionCancellationNavigationText,
+} from '../translations/account-deletion-cancellation';
+
 export default function PrivacySecurityScreen() {
   const router = useRouter();
 
@@ -24,8 +32,18 @@ const { language } = useLanguage();
 
 const text = translations[language];
 
+const cancellationText =
+  accountDeletionCancellationNavigationText[
+    language
+  ];
+
 const [isProfileVisible, setIsProfileVisible] =
   useState(true);
+
+const [
+  isCheckingDeletionState,
+  setIsCheckingDeletionState,
+] = useState(false);
   useEffect(() => {
   let isMounted = true;
 
