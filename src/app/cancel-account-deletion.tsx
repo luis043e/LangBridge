@@ -28,6 +28,10 @@ import {
   type AccountDeletionRequestPublicState,
 } from '../services/account-deletion-functions';
 import {
+  getAccountDeletionReauthenticationProvider,
+  type AccountDeletionReauthenticationProvider,
+} from '../services/account-deletion-reauthentication';
+import {
   accountDeletionCancellationNavigationText,
   accountDeletionCancellationScreenText,
 } from '../translations/account-deletion-cancellation';
@@ -35,6 +39,11 @@ type CancellationScreenRequestState =
   | 'checking'
   | 'unavailable'
   | AccountDeletionRequestPublicState;
+type CancellationScreenProviderState =
+  | 'idle'
+  | 'checking'
+  | 'unavailable'
+  | AccountDeletionReauthenticationProvider;
 export default function CancelAccountDeletionScreen() {
   const router =
     useRouter();
@@ -54,12 +63,18 @@ export default function CancelAccountDeletionScreen() {
     ];
 
   const [
-
     requestState,
     setRequestState,
   ] =
     useState<CancellationScreenRequestState>(
       'checking'
+    );
+  const [
+    providerState,
+    setProviderState,
+  ] =
+    useState<CancellationScreenProviderState>(
+      'idle'
     );
 
   useEffect(() => {
@@ -93,6 +108,34 @@ export default function CancelAccountDeletionScreen() {
         false;
     };
   }, []);
+  useEffect(() => {
+    if (
+      requestState !==
+      'cancellable'
+    ) {
+      setProviderState(
+        'idle'
+      );
+      return;
+    }
+
+    setProviderState(
+      'checking'
+    );
+
+    try {
+      const provider =
+        getAccountDeletionReauthenticationProvider();
+
+      setProviderState(
+        provider
+      );
+    } catch {
+      setProviderState(
+        'unavailable'
+      );
+    }
+  }, [requestState]);
 
   let cardTitle =
     text.requestDetectedTitle;
