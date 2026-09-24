@@ -179,6 +179,86 @@ const accountDeletionCancellationScreenTextEn:
   returnToPrivacy:
     'Return to privacy and security',
 };
+const accountDeletionCancellationScreenTextEs:
+  AccountDeletionCancellationScreenText = {
+  back:
+    'Regresar',
+  title:
+    'Cancelar solicitud de eliminación',
+  subtitle:
+    'Cancela de forma segura tu solicitud pendiente de eliminación de cuenta y restaura la configuración de tu perfil.',
+  checkingTitle:
+    'Comprobando tu solicitud',
+  checkingMessage:
+    'Espera mientras LangBridge verifica que tu solicitud de eliminación todavía pueda cancelarse.',
+  requestDetectedTitle:
+    'Solicitud de eliminación detectada',
+  requestDetectedMessage:
+    'Confirma tu identidad antes de cancelar la solicitud. Se restaurará la configuración anterior de tu perfil.',
+  passwordLabel:
+    'Contraseña',
+  passwordPlaceholder:
+    'Escribe tu contraseña',
+  passwordRequiredTitle:
+    'Contraseña requerida',
+  passwordRequiredMessage:
+    'Escribe tu contraseña para verificar tu identidad.',
+  passwordAction:
+    'Verificar y continuar',
+  googleAction:
+    'Continuar con Google',
+  unsupportedProviderTitle:
+    'Método de inicio de sesión no admitido',
+  unsupportedProviderMessage:
+    'Tu método actual de inicio de sesión no puede utilizarse para verificar esta cancelación de forma segura.',
+  confirmationTitle:
+    '¿Cancelar la solicitud de eliminación?',
+  confirmationMessage:
+    'Tu cuenta permanecerá activa y se restaurará la configuración anterior de tu perfil. Podrás enviar una nueva solicitud de eliminación más adelante.',
+  confirmationCancel:
+    'Conservar solicitud',
+  confirmationContinue:
+    'Cancelar eliminación',
+  cancellingAction:
+    'Cancelando solicitud...',
+  completedTitle:
+    'Solicitud de eliminación cancelada',
+  completedMessage:
+    'Tu cuenta permanecerá activa y se restauró la configuración anterior de tu perfil.',
+  notCancellableTitle:
+    'La solicitud no se puede cancelar',
+  notCancellableMessage:
+    'Esta solicitud de eliminación ya no cumple las condiciones para cancelarse.',
+  unauthenticatedTitle:
+    'Inicia sesión nuevamente',
+  unauthenticatedMessage:
+    'Tu sesión ya no está disponible. Inicia sesión nuevamente antes de continuar.',
+  invalidCredentialTitle:
+    'No se pudo verificar tu identidad',
+  invalidCredentialMessage:
+    'La credencial introducida no es válida. Compruébala e inténtalo nuevamente.',
+  recentAuthenticationTitle:
+    'Verifica nuevamente tu identidad',
+  recentAuthenticationMessage:
+    'Se requiere un inicio de sesión reciente antes de cancelar la solicitud de eliminación.',
+  temporarilyUnavailableTitle:
+    'Servicio temporalmente no disponible',
+  temporarilyUnavailableMessage:
+    'La solicitud no pudo completarse ahora. Comprueba tu conexión e inténtalo nuevamente.',
+  internalErrorTitle:
+    'No se pudo completar la solicitud',
+  internalErrorMessage:
+    'La solicitud no pudo procesarse de forma segura. Inténtalo más tarde.',
+  unknownErrorTitle:
+    'Ocurrió un problema',
+  unknownErrorMessage:
+    'Ocurrió un problema inesperado. Inténtalo nuevamente sin cerrar LangBridge.',
+  retry:
+    'Intentar nuevamente',
+  returnToPrivacy:
+    'Volver a privacidad y seguridad',
+};
+
 export const accountDeletionCancellationNavigationText =
   {
     en: {
