@@ -258,6 +258,43 @@ const accountDeletionCancellationScreenTextEs:
   returnToPrivacy:
     'Volver a privacidad y seguridad',
 };
+export const accountDeletionCancellationScreenText = {
+  en:
+    accountDeletionCancellationScreenTextEn,
+  es:
+    accountDeletionCancellationScreenTextEs,
+  fr:
+    accountDeletionCancellationScreenTextEn,
+  pt:
+    accountDeletionCancellationScreenTextEn,
+  de:
+    accountDeletionCancellationScreenTextEn,
+  it:
+    accountDeletionCancellationScreenTextEn,
+  ja:
+    accountDeletionCancellationScreenTextEn,
+  ko:
+    accountDeletionCancellationScreenTextEn,
+  zh:
+    accountDeletionCancellationScreenTextEn,
+  ar:
+    accountDeletionCancellationScreenTextEn,
+  ru:
+    accountDeletionCancellationScreenTextEn,
+  tr:
+    accountDeletionCancellationScreenTextEn,
+  hi:
+    accountDeletionCancellationScreenTextEn,
+  bn:
+    accountDeletionCancellationScreenTextEn,
+  nl:
+    accountDeletionCancellationScreenTextEn,
+  pl:
+    accountDeletionCancellationScreenTextEn,
+} satisfies Record<
+  AppLanguage,
+  AccountDeletionCancellationScreenText
+>;
 
 export const accountDeletionCancellationNavigationText =
   {
