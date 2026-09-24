@@ -1,5 +1,5 @@
 import type {
-    AppLanguage,
+  AppLanguage,
 } from '../translations';
 
 export type AccountDeletionCancellationNavigationText = {
@@ -20,6 +20,84 @@ export type AccountDeletionCancellationNavigationText = {
   stateErrorTitle:
     string;
   stateErrorMessage:
+    string;
+};
+export type AccountDeletionCancellationScreenText = {
+  back:
+    string;
+  title:
+    string;
+  subtitle:
+    string;
+  checkingTitle:
+    string;
+  checkingMessage:
+    string;
+  requestDetectedTitle:
+    string;
+  requestDetectedMessage:
+    string;
+  passwordLabel:
+    string;
+  passwordPlaceholder:
+    string;
+  passwordRequiredTitle:
+    string;
+  passwordRequiredMessage:
+    string;
+  passwordAction:
+    string;
+  googleAction:
+    string;
+  unsupportedProviderTitle:
+    string;
+  unsupportedProviderMessage:
+    string;
+  confirmationTitle:
+    string;
+  confirmationMessage:
+    string;
+  confirmationCancel:
+    string;
+  confirmationContinue:
+    string;
+  cancellingAction:
+    string;
+  completedTitle:
+    string;
+  completedMessage:
+    string;
+  notCancellableTitle:
+    string;
+  notCancellableMessage:
+    string;
+  unauthenticatedTitle:
+    string;
+  unauthenticatedMessage:
+    string;
+  invalidCredentialTitle:
+    string;
+  invalidCredentialMessage:
+    string;
+  recentAuthenticationTitle:
+    string;
+  recentAuthenticationMessage:
+    string;
+  temporarilyUnavailableTitle:
+    string;
+  temporarilyUnavailableMessage:
+    string;
+  internalErrorTitle:
+    string;
+  internalErrorMessage:
+    string;
+  unknownErrorTitle:
+    string;
+  unknownErrorMessage:
+    string;
+  retry:
+    string;
+  returnToPrivacy:
     string;
 };
 
