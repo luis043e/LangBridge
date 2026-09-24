@@ -297,6 +297,36 @@ export default function CancelAccountDeletionScreen() {
               }
             />
           )}
+          {requestState ===
+            'cancellable' &&
+            providerState ===
+              'unsupported' && (
+            <View
+              style={
+                styles.notice
+              }
+            >
+              <Text
+                style={
+                  styles.noticeTitle
+                }
+              >
+                {
+                  text.unsupportedProviderTitle
+                }
+              </Text>
+
+              <Text
+                style={
+                  styles.noticeMessage
+                }
+              >
+                {
+                  text.unsupportedProviderMessage
+                }
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -408,6 +438,40 @@ const styles =
         18,
       padding:
         18,
+    },
+    notice: {
+      backgroundColor:
+        '#091330',
+      borderColor:
+        '#475569',
+      borderWidth:
+        1,
+      borderRadius:
+        12,
+      marginTop:
+        18,
+      padding:
+        14,
+    },
+
+    noticeTitle: {
+      color:
+        '#FFFFFF',
+      fontSize:
+        15,
+      fontWeight:
+        '800',
+    },
+
+    noticeMessage: {
+      color:
+        '#CBD5E1',
+      fontSize:
+        14,
+      lineHeight:
+        20,
+      marginTop:
+        7,
     },
     activityIndicator: {
       marginBottom:
