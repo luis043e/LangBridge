@@ -377,6 +377,19 @@ export default function CancelAccountDeletionScreen() {
               />
             </View>
           )}
+          {requestState ===
+            'cancellable' &&
+            providerState ===
+              'google' && (
+            <TouchableOpacity
+              style={styles.primaryButton}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.primaryButtonText}>
+                {text.googleAction}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -564,6 +577,34 @@ const styles =
         14,
       paddingVertical:
         13,
+    },
+
+    primaryButton: {
+      backgroundColor:
+        '#0891B2',
+      borderRadius:
+        12,
+      alignItems:
+        'center',
+      justifyContent:
+        'center',
+      marginTop:
+        18,
+      paddingHorizontal:
+        18,
+      paddingVertical:
+        14,
+    },
+
+    primaryButtonText: {
+      color:
+        '#FFFFFF',
+      fontSize:
+        15,
+      fontWeight:
+        '800',
+      textAlign:
+        'center',
     },
     cardTitle: {
       color:
