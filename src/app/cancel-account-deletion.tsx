@@ -375,6 +375,14 @@ export default function CancelAccountDeletionScreen() {
                 autoCorrect={false}
                 style={styles.passwordInput}
               />
+              <TouchableOpacity
+                style={styles.primaryButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {text.passwordAction}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
           {requestState ===
