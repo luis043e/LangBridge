@@ -13,6 +13,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -76,6 +77,8 @@ export default function CancelAccountDeletionScreen() {
     useState<CancellationScreenProviderState>(
       'idle'
     );
+  const [password, setPassword] =
+    useState('');
 
   useEffect(() => {
     let isMounted =
@@ -353,6 +356,27 @@ export default function CancelAccountDeletionScreen() {
               </Text>
             </View>
           )}
+          {requestState ===
+            'cancellable' &&
+            providerState ===
+              'password' && (
+            <View style={styles.passwordSection}>
+              <Text style={styles.inputLabel}>
+                {text.passwordLabel}
+              </Text>
+
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder={text.passwordPlaceholder}
+                placeholderTextColor="#718096"
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={styles.passwordInput}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -507,7 +531,40 @@ const styles =
       marginTop:
         18,
     },
+    passwordSection: {
+      marginTop:
+        20,
+    },
 
+    inputLabel: {
+      color:
+        '#E2E8F0',
+      fontSize:
+        14,
+      fontWeight:
+        '700',
+      marginBottom:
+        8,
+    },
+
+    passwordInput: {
+      backgroundColor:
+        '#091330',
+      borderColor:
+        '#334C7D',
+      borderWidth:
+        1.5,
+      borderRadius:
+        12,
+      color:
+        '#FFFFFF',
+      fontSize:
+        16,
+      paddingHorizontal:
+        14,
+      paddingVertical:
+        13,
+    },
     cardTitle: {
       color:
         '#FFFFFF',
