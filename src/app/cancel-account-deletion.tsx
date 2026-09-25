@@ -327,6 +327,32 @@ export default function CancelAccountDeletionScreen() {
               </Text>
             </View>
           )}
+          {requestState ===
+            'cancellable' &&
+            providerState ===
+              'unavailable' && (
+            <View
+              style={
+                styles.notice
+              }
+            >
+              <Text
+                style={
+                  styles.noticeTitle
+                }
+              >
+                {text.unauthenticatedTitle}
+              </Text>
+
+              <Text
+                style={
+                  styles.noticeMessage
+                }
+              >
+                {text.unauthenticatedMessage}
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
