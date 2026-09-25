@@ -10,6 +10,7 @@ import {
 } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,11 +26,15 @@ import {
   useLanguage,
 } from '../contexts/language-context';
 import {
+  classifyAccountDeletionError,
+} from '../services/account-deletion-error';
+import {
   readAccountDeletionRequestState,
   type AccountDeletionRequestPublicState,
 } from '../services/account-deletion-functions';
 import {
   getAccountDeletionReauthenticationProvider,
+  reauthenticateWithPassword,
   type AccountDeletionReauthenticationProvider,
 } from '../services/account-deletion-reauthentication';
 import {
@@ -79,6 +84,12 @@ export default function CancelAccountDeletionScreen() {
     );
   const [password, setPassword] =
     useState('');
+
+  const [
+    isReauthenticating,
+    setIsReauthenticating,
+  ] =
+    useState(false);
 
   useEffect(() => {
     let isMounted =
@@ -139,6 +150,84 @@ export default function CancelAccountDeletionScreen() {
       );
     }
   }, [requestState]);
+
+  const handlePasswordReauthentication =
+    async () => {
+      if (!password) {
+        Alert.alert(
+          text.passwordRequiredTitle,
+          text.passwordRequiredMessage
+        );
+        return;
+      }
+
+      try {
+        setIsReauthenticating(
+          true
+        );
+
+        await reauthenticateWithPassword(
+          password
+        );
+
+        Alert.alert(
+          text.confirmationTitle,
+          text.confirmationMessage
+        );
+      } catch (error) {
+        const category =
+          classifyAccountDeletionError(
+            error
+          );
+
+        if (
+          category ===
+          'invalid-credential'
+        ) {
+          Alert.alert(
+            text.invalidCredentialTitle,
+            text.invalidCredentialMessage
+          );
+        } else if (
+          category ===
+          'unauthenticated'
+        ) {
+          Alert.alert(
+            text.unauthenticatedTitle,
+            text.unauthenticatedMessage
+          );
+        } else if (
+          category ===
+          'temporarily-unavailable'
+        ) {
+          Alert.alert(
+            text.temporarilyUnavailableTitle,
+            text.temporarilyUnavailableMessage
+          );
+        } else if (
+          category ===
+          'recent-authentication-required'
+        ) {
+          Alert.alert(
+            text.recentAuthenticationTitle,
+            text.recentAuthenticationMessage
+          );
+        } else {
+          Alert.alert(
+            text.internalErrorTitle,
+            text.internalErrorMessage
+          );
+        }
+      } finally {
+        setPassword(
+          ''
+        );
+
+        setIsReauthenticating(
+          false
+        );
+      }
+    };
 
   let cardTitle =
     text.requestDetectedTitle;
@@ -374,10 +463,19 @@ export default function CancelAccountDeletionScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 style={styles.passwordInput}
+                editable={
+                  !isReauthenticating
+                }
               />
               <TouchableOpacity
                 style={styles.primaryButton}
                 activeOpacity={0.8}
+                onPress={
+                  handlePasswordReauthentication
+                }
+                disabled={
+                  isReauthenticating
+                }
               >
                 <Text style={styles.primaryButtonText}>
                   {text.passwordAction}
