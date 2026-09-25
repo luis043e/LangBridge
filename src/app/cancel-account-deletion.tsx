@@ -26,6 +26,9 @@ import {
   useLanguage,
 } from '../contexts/language-context';
 import {
+  reauthenticateWithGoogle,
+} from '../googleAuth';
+import {
   classifyAccountDeletionError,
 } from '../services/account-deletion-error';
 import {
@@ -223,6 +226,69 @@ export default function CancelAccountDeletionScreen() {
           ''
         );
 
+        setIsReauthenticating(
+          false
+        );
+      }
+    };
+
+  const handleGoogleReauthentication =
+      async () => {
+      try {
+        setIsReauthenticating(
+          true
+        );
+
+        const wasReauthenticated =
+          await reauthenticateWithGoogle(
+            language
+          );
+
+        if (!wasReauthenticated) {
+          return;
+        }
+
+        Alert.alert(
+          text.confirmationTitle,
+          text.confirmationMessage
+        );
+      } catch (error) {
+        const category =
+          classifyAccountDeletionError(
+            error
+          );
+
+        if (
+          category ===
+          'unauthenticated'
+        ) {
+          Alert.alert(
+            text.unauthenticatedTitle,
+            text.unauthenticatedMessage
+          );
+        } else if (
+          category ===
+          'temporarily-unavailable'
+        ) {
+          Alert.alert(
+            text.temporarilyUnavailableTitle,
+            text.temporarilyUnavailableMessage
+          );
+        } else if (
+          category ===
+          'recent-authentication-required'
+        ) {
+          Alert.alert(
+            text.recentAuthenticationTitle,
+            text.recentAuthenticationMessage
+          );
+        } else {
+          Alert.alert(
+            text.internalErrorTitle,
+            text.internalErrorMessage
+          );
+        }
+      } finally {
         setIsReauthenticating(
           false
         );
@@ -490,6 +556,12 @@ export default function CancelAccountDeletionScreen() {
             <TouchableOpacity
               style={styles.primaryButton}
               activeOpacity={0.8}
+              onPress={
+                handleGoogleReauthentication
+              }
+              disabled={
+                isReauthenticating
+              }
             >
               <Text style={styles.primaryButtonText}>
                 {text.googleAction}
