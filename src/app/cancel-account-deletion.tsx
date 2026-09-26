@@ -233,7 +233,7 @@ export default function CancelAccountDeletionScreen() {
     };
 
   const handleGoogleReauthentication =
-      async () => {
+    async () => {
       try {
         setIsReauthenticating(
           true
