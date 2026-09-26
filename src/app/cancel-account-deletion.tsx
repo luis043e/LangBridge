@@ -94,7 +94,7 @@ export default function CancelAccountDeletionScreen() {
     setIsReauthenticating,
   ] =
     useState(false);
-    const [
+  const [
     isCancelling,
     setIsCancelling,
   ] =
@@ -283,7 +283,7 @@ export default function CancelAccountDeletionScreen() {
           password
         );
 
-                showCancellationConfirmation();
+        showCancellationConfirmation();
       } catch (error) {
         const category =
           classifyAccountDeletionError(
@@ -355,7 +355,7 @@ export default function CancelAccountDeletionScreen() {
           return;
         }
 
-                showCancellationConfirmation();
+        showCancellationConfirmation();
       } catch (error) {
         const category =
           classifyAccountDeletionError(
@@ -634,7 +634,8 @@ export default function CancelAccountDeletionScreen() {
                 autoCorrect={false}
                 style={styles.passwordInput}
                 editable={
-                  !isReauthenticating
+                  !isReauthenticating &&
+                  !isCancelling
                 }
               />
               <TouchableOpacity
@@ -644,11 +645,16 @@ export default function CancelAccountDeletionScreen() {
                   handlePasswordReauthentication
                 }
                 disabled={
-                  isReauthenticating
+                  isReauthenticating ||
+                  isCancelling
                 }
               >
                 <Text style={styles.primaryButtonText}>
-                  {text.passwordAction}
+                  {
+                    isCancelling
+                      ? text.cancellingAction
+                      : text.passwordAction
+                  }
                 </Text>
               </TouchableOpacity>
             </View>
@@ -664,11 +670,16 @@ export default function CancelAccountDeletionScreen() {
                 handleGoogleReauthentication
               }
               disabled={
-                isReauthenticating
+                isReauthenticating ||
+                isCancelling
               }
             >
               <Text style={styles.primaryButtonText}>
-                {text.googleAction}
+                {
+                  isCancelling
+                    ? text.cancellingAction
+                    : text.googleAction
+                }
               </Text>
             </TouchableOpacity>
           )}
