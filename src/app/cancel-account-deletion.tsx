@@ -32,6 +32,7 @@ import {
   classifyAccountDeletionError,
 } from '../services/account-deletion-error';
 import {
+  cancelAccountDeletionRequest,
   readAccountDeletionRequestState,
   type AccountDeletionRequestPublicState,
 } from '../services/account-deletion-functions';
@@ -93,7 +94,11 @@ export default function CancelAccountDeletionScreen() {
     setIsReauthenticating,
   ] =
     useState(false);
-
+    const [
+    isCancelling,
+    setIsCancelling,
+  ] =
+    useState(false);
   useEffect(() => {
     let isMounted =
       true;
@@ -153,7 +158,88 @@ export default function CancelAccountDeletionScreen() {
       );
     }
   }, [requestState]);
+    const executeCancellation =
+    async () => {
+      try {
+        setIsCancelling(
+          true
+        );
 
+        const result =
+          await cancelAccountDeletionRequest();
+
+        if (
+          result.status ===
+          'not-cancellable'
+        ) {
+          Alert.alert(
+            text.notCancellableTitle,
+            text.notCancellableMessage
+          );
+          return;
+        }
+
+        Alert.alert(
+          text.completedTitle,
+          text.completedMessage,
+          [
+            {
+              text:
+                text.returnToPrivacy,
+              onPress: () =>
+                router.replace({
+                  pathname:
+                    '/privacy-security',
+                  params: {
+                    lang:
+                      language,
+                  },
+                }),
+            },
+          ]
+        );
+      } catch (error) {
+        const category =
+          classifyAccountDeletionError(
+            error
+          );
+
+        if (
+          category ===
+          'unauthenticated'
+        ) {
+          Alert.alert(
+            text.unauthenticatedTitle,
+            text.unauthenticatedMessage
+          );
+        } else if (
+          category ===
+          'recent-authentication-required'
+        ) {
+          Alert.alert(
+            text.recentAuthenticationTitle,
+            text.recentAuthenticationMessage
+          );
+        } else if (
+          category ===
+          'temporarily-unavailable'
+        ) {
+          Alert.alert(
+            text.temporarilyUnavailableTitle,
+            text.temporarilyUnavailableMessage
+          );
+        } else {
+          Alert.alert(
+            text.internalErrorTitle,
+            text.internalErrorMessage
+          );
+        }
+      } finally {
+        setIsCancelling(
+          false
+        );
+      }
+    };
   const handlePasswordReauthentication =
     async () => {
       if (!password) {
