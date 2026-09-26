@@ -158,7 +158,7 @@ export default function CancelAccountDeletionScreen() {
       );
     }
   }, [requestState]);
-    const executeCancellation =
+  const executeCancellation =
     async () => {
       try {
         setIsCancelling(
@@ -240,6 +240,30 @@ export default function CancelAccountDeletionScreen() {
         );
       }
     };
+  const showCancellationConfirmation =
+    () => {
+      Alert.alert(
+        text.confirmationTitle,
+        text.confirmationMessage,
+        [
+          {
+            text:
+              text.confirmationCancel,
+            style:
+              'cancel',
+          },
+          {
+            text:
+              text.confirmationContinue,
+            style:
+              'destructive',
+            onPress: () => {
+              void executeCancellation();
+            },
+          },
+        ]
+      );
+    };
   const handlePasswordReauthentication =
     async () => {
       if (!password) {
@@ -259,10 +283,7 @@ export default function CancelAccountDeletionScreen() {
           password
         );
 
-        Alert.alert(
-          text.confirmationTitle,
-          text.confirmationMessage
-        );
+                showCancellationConfirmation();
       } catch (error) {
         const category =
           classifyAccountDeletionError(
@@ -334,10 +355,7 @@ export default function CancelAccountDeletionScreen() {
           return;
         }
 
-        Alert.alert(
-          text.confirmationTitle,
-          text.confirmationMessage
-        );
+                showCancellationConfirmation();
       } catch (error) {
         const category =
           classifyAccountDeletionError(
