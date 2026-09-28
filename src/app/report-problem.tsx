@@ -106,38 +106,63 @@ const text = translations[language];
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+        try {
+      setIsSubmitting(
+        true
+      );
 
-      await addDoc(collection(db, 'reports'), {
-        reporterId: currentUser.uid,
-        reporterEmail: currentUser.email || '',
-        category: selectedCategory,
-        description: cleanDescription,
-        status: 'pending',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await addDoc(
+        collection(
+          db,
+          'reports'
+        ),
+        {
+          reporterId:
+            currentUser.uid,
+          reporterEmail:
+            currentUser.email || '',
+          category:
+            selectedCategory,
+          description:
+            cleanDescription,
+          status:
+            'pending',
+          createdAt:
+            serverTimestamp(),
+          updatedAt:
+            serverTimestamp(),
+        }
+      );
+
+      setSelectedCategory(
+        null
+      );
+
+      setDescription(
+        ''
+      );
 
       Alert.alert(
-  text.reportProblemScreen.reportSubmittedTitle,
-  text.reportProblemScreen.reportSubmittedMessage,
+        text.reportProblemScreen.reportSubmittedTitle,
+        text.reportProblemScreen.reportSubmittedMessage,
         [
           {
-            text: 'OK',
-            onPress: () => router.back(),
+            text:
+              'OK',
+            onPress: () =>
+              router.back(),
           },
         ]
       );
-    } catch (error) {
-      console.error('Error submitting report:', error);
-
+    } catch {
       Alert.alert(
-  text.reportProblemScreen.submitErrorTitle,
-  text.reportProblemScreen.connectionError
-);
+        text.reportProblemScreen.submitErrorTitle,
+        text.reportProblemScreen.connectionError
+      );
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(
+        false
+      );
     }
   };
   return (
