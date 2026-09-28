@@ -1,37 +1,103 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later,
+// measurementId is optional.
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initializeApp } from 'firebase/app';
+import {
+  initializeApp,
+} from 'firebase/app';
 
 // @ts-ignore
-import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
+import { connectAuthEmulator, getReactNativePersistence, initializeAuth } from 'firebase/auth';
 
-import { getFirestore } from 'firebase/firestore';
 import {
+  connectFirestoreEmulator,
+  getFirestore,
+} from 'firebase/firestore';
+
+import {
+  connectFunctionsEmulator,
   getFunctions,
 } from 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBacUnaW0v34KK29-elmPGMvqLECeFydJc',
-  authDomain: 'langbridge-d048f.firebaseapp.com',
-  projectId: 'langbridge-d048f',
-  storageBucket: 'langbridge-d048f.firebasestorage.app',
-  messagingSenderId: '390796304873',
-  appId: '1:390796304873:web:7ea64809b91b4d3eaaab78',
-  measurementId: 'G-JPSRTVDSJR',
+  apiKey:
+    'AIzaSyBacUnaW0v34KK29-elmPGMvqLECeFydJc',
+  authDomain:
+    'langbridge-d048f.firebaseapp.com',
+  projectId:
+    'langbridge-d048f',
+  storageBucket:
+    'langbridge-d048f.firebasestorage.app',
+  messagingSenderId:
+    '390796304873',
+  appId:
+    '1:390796304873:web:7ea64809b91b4d3eaaab78',
+  measurementId:
+    'G-JPSRTVDSJR',
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+  initializeApp(
+    firebaseConfig
+  );
 
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+const auth =
+  initializeAuth(
+    app,
+    {
+      persistence:
+        getReactNativePersistence(
+          AsyncStorage
+        ),
+    }
+  );
 
-const db = getFirestore(app);
+const db =
+  getFirestore(
+    app
+  );
+
 const functions =
   getFunctions(
     app,
     'us-central1'
   );
+
+const useFirebaseEmulators =
+  __DEV__ &&
+  process.env
+    .EXPO_PUBLIC_USE_FIREBASE_EMULATORS ===
+    'true';
+
+const firebaseEmulatorHost =
+  process.env
+    .EXPO_PUBLIC_FIREBASE_EMULATOR_HOST;
+
+if (
+  useFirebaseEmulators &&
+  firebaseEmulatorHost
+) {
+  connectAuthEmulator(
+    auth,
+    `http://${firebaseEmulatorHost}:9099`,
+    {
+      disableWarnings:
+        true,
+    }
+  );
+
+  connectFirestoreEmulator(
+    db,
+    firebaseEmulatorHost,
+    8080
+  );
+
+  connectFunctionsEmulator(
+    functions,
+    firebaseEmulatorHost,
+    5001
+  );
+}
+
 export {
   app,
   auth,
