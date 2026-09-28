@@ -45,76 +45,104 @@ const text = translations[language];
   Alert.alert(title, message);
 };
 
-  const handleLogin = async () => {
-    const cleanEmail = email.trim().toLowerCase();
+    const handleLogin =
+    async () => {
+      const cleanEmail =
+        email
+          .trim()
+          .toLowerCase();
 
-    if (!cleanEmail || !password) {
-      showAlert(
-  text.loginScreen.incompleteFieldsTitle,
-  text.loginScreen.incompleteFieldsMessage
-);
-      return;
-    }
+      if (
+        !cleanEmail ||
+        !password
+      ) {
+        showAlert(
+          text.loginScreen.incompleteFieldsTitle,
+          text.loginScreen.incompleteFieldsMessage
+        );
+        return;
+      }
 
-    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
-      showAlert(
-  text.loginScreen.invalidEmailTitle,
-  text.loginScreen.invalidEmailMessage
-);
-      return;
-    }
+      if (
+        !cleanEmail.includes('@') ||
+        !cleanEmail.includes('.')
+      ) {
+        showAlert(
+          text.loginScreen.invalidEmailTitle,
+          text.loginScreen.invalidEmailMessage
+        );
+        return;
+      }
 
-    try {
-      setIsLoading(true);
+      try {
+        setIsLoading(
+          true
+        );
 
-      await signInWithEmailAndPassword(auth, cleanEmail, password);
-      router.replace({
-  pathname: '/home',
-  params: { lang: language },
-});
+        await signInWithEmailAndPassword(
+          auth,
+          cleanEmail,
+          password
+        );
 
-    } catch (error: any) {
-      console.error(
-  'FIREBASE LOGIN ERROR:',
-  error?.code,
-  error?.message
-);
-      let errorMessage =
-  text.loginScreen.genericLoginError;
+        router.replace({
+          pathname:
+            '/home',
+          params: {
+            lang:
+              language,
+          },
+        });
+      } catch (error: any) {
+        let errorMessage =
+          text.loginScreen.genericLoginError;
 
-if (
-  error?.code === 'auth/invalid-credential' ||
-  error?.code === 'auth/wrong-password' ||
-  error?.code === 'auth/user-not-found'
-) {
-  errorMessage =
-    text.loginScreen.invalidCredentials;
-} else if (error?.code === 'auth/invalid-email') {
-  errorMessage =
-    text.loginScreen.invalidEmailMessage;
-} else if (
-  error?.code === 'auth/too-many-requests'
-) {
-  errorMessage =
-    text.loginScreen.tooManyLoginAttempts;
-} else if (error?.code === 'auth/user-disabled') {
-  errorMessage =
-    text.loginScreen.userDisabled;
-} else if (
-  error?.code === 'auth/network-request-failed'
-) {
-  errorMessage =
-    text.loginScreen.networkError;
-}
+        if (
+          error?.code ===
+            'auth/invalid-credential' ||
+          error?.code ===
+            'auth/wrong-password' ||
+          error?.code ===
+            'auth/user-not-found'
+        ) {
+          errorMessage =
+            text.loginScreen.invalidCredentials;
+        } else if (
+          error?.code ===
+          'auth/invalid-email'
+        ) {
+          errorMessage =
+            text.loginScreen.invalidEmailMessage;
+        } else if (
+          error?.code ===
+          'auth/too-many-requests'
+        ) {
+          errorMessage =
+            text.loginScreen.tooManyLoginAttempts;
+        } else if (
+          error?.code ===
+          'auth/user-disabled'
+        ) {
+          errorMessage =
+            text.loginScreen.userDisabled;
+        } else if (
+          error?.code ===
+          'auth/network-request-failed'
+        ) {
+          errorMessage =
+            text.loginScreen.networkError;
+        }
 
-showAlert(
-  text.loginScreen.loginErrorTitle,
-  errorMessage
-);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        showAlert(
+          text.loginScreen.loginErrorTitle,
+          errorMessage
+        );
+      } finally {
+        setIsLoading(
+          false
+        );
+      }
+    };
 
   const handleForgotPassword = async () => {
     const cleanEmail = email.trim().toLowerCase();
