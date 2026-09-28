@@ -173,7 +173,8 @@ function validateCallableRequest(
       };
     };
     data: unknown;
-  }
+  },
+  requireRecentAuth = true
 ): {
   uid: string;
 } {
@@ -191,9 +192,11 @@ function validateCallableRequest(
     );
   }
 
-  requireRecentAuthentication(
-    request.auth.token.auth_time
-  );
+  if (requireRecentAuth) {
+    requireRecentAuthentication(
+      request.auth.token.auth_time
+    );
+  }
 
   return {
     uid: request.auth.uid,
@@ -223,7 +226,8 @@ export const cancellationRequestStateProbe = onCall(
     const {
       uid,
     } = validateCallableRequest(
-      request
+      request,
+      false
     );
 
     const snapshot =
