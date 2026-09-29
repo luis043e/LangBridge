@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   setDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
@@ -528,7 +529,25 @@ const reverseRequestData =
               currentUser.uid
             );
 
-            await setDoc(
+            const privateBlockReference = doc(
+              db,
+              'userBlocks',
+              currentUser.uid,
+              'blockedUsers',
+              partnerId
+            );
+
+            const blockBatch = writeBatch(db);
+
+            blockBatch.set(
+              privateBlockReference,
+              {
+                blockedId: partnerId,
+                createdAt: serverTimestamp(),
+              }
+            );
+
+            blockBatch.set(
               currentUserReference,
               {
                 blockedUserIds: arrayUnion(partnerId),
@@ -537,6 +556,8 @@ const reverseRequestData =
                 merge: true,
               }
             );
+
+            await blockBatch.commit();
 
             Alert.alert(
   text.partnerProfileScreen.userBlockedTitle,
@@ -551,16 +572,11 @@ const reverseRequestData =
     },
   ]
 );
-          } catch (error) {
-            console.error(
-              'Error blocking user:',
-              error
-            );
-
+          } catch {
             Alert.alert(
-  text.partnerProfileScreen.blockErrorTitle,
-  text.partnerProfileScreen.connectionError
-);
+              text.partnerProfileScreen.blockErrorTitle,
+              text.partnerProfileScreen.connectionError
+            );
           }
         },
       },
