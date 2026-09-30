@@ -1,8 +1,13 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import type {
+  DocumentData,
+  QueryDocumentSnapshot,
+} from 'firebase/firestore';
 import {
   collection,
-  getDocs,
+  doc,
+  onSnapshot,
   query,
   where,
 } from 'firebase/firestore';
@@ -25,6 +30,7 @@ type Connection = {
   id: string;
   partnerId: string;
   partnerName: string;
+  unreadCount: number;
 };
 
 export default function ConnectionsScreen() {
@@ -33,7 +39,7 @@ export default function ConnectionsScreen() {
 const { language } = useLanguage();
 
 const text = translations[language];
-    
+
   const [connections, setConnections] =
   useState<Connection[]>([]);
 
@@ -43,42 +49,70 @@ const [isLoading, setIsLoading] =
 const [loadError, setLoadError] =
   useState<string | null>(null);
   useEffect(() => {
-  const loadConnections = async () => {
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
+      setConnections([]);
       setLoadError(
-  text.connectionsScreen.loginRequired
-);
-
+        text.connectionsScreen.loginRequired
+      );
       setIsLoading(false);
       return;
     }
 
-    try {
-      setIsLoading(true);
-      setLoadError(null);
+    setIsLoading(true);
+    setLoadError(null);
 
-      const sentRequestsQuery = query(
-        collection(db, 'connectionRequests'),
-        where('senderId', '==', currentUser.uid)
+    let sentRequestDocuments:
+      QueryDocumentSnapshot<DocumentData>[] = [];
+
+    let receivedRequestDocuments:
+      QueryDocumentSnapshot<DocumentData>[] = [];
+
+    let sentSnapshotReceived = false;
+    let receivedSnapshotReceived = false;
+
+    let conversationUnsubscribers:
+      Array<() => void> = [];
+
+    const clearConversationListeners = () => {
+      conversationUnsubscribers.forEach(
+        (unsubscribe) => {
+          unsubscribe();
+        }
       );
 
-      const receivedRequestsQuery = query(
-        collection(db, 'connectionRequests'),
-        where('recipientId', '==', currentUser.uid)
-      );
+      conversationUnsubscribers = [];
+    };
 
-      const [
-        sentRequestsSnapshot,
-        receivedRequestsSnapshot,
-      ] = await Promise.all([
-        getDocs(sentRequestsQuery),
-        getDocs(receivedRequestsQuery),
-      ]);
+    const updateUnreadCount = (
+      connectionId: string,
+      unreadCount: number
+    ) => {
+      setConnections((currentConnections) =>
+        currentConnections.map((connection) =>
+          connection.id === connectionId
+            ? {
+                ...connection,
+                unreadCount,
+              }
+            : connection
+        )
+      );
+    };
+
+    const synchronizeConnections = () => {
+      if (
+        !sentSnapshotReceived ||
+        !receivedSnapshotReceived
+      ) {
+        return;
+      }
+
+      clearConversationListeners();
 
       const acceptedConnections: Connection[] = [
-        ...sentRequestsSnapshot.docs
+        ...sentRequestDocuments
           .filter((requestDocument) => {
             return (
               requestDocument.data().status ===
@@ -86,18 +120,22 @@ const [loadError, setLoadError] =
             );
           })
           .map((requestDocument) => {
-            const data = requestDocument.data();
+            const data =
+              requestDocument.data();
 
             return {
               id: requestDocument.id,
-              partnerId: data.recipientId || '',
+              partnerId:
+                data.recipientId || '',
               partnerName:
                 data.recipientName ||
-text.connectionsScreen.defaultUserName
+                text.connectionsScreen
+                  .defaultUserName,
+              unreadCount: 0,
             };
           }),
 
-        ...receivedRequestsSnapshot.docs
+        ...receivedRequestDocuments
           .filter((requestDocument) => {
             return (
               requestDocument.data().status ===
@@ -105,21 +143,29 @@ text.connectionsScreen.defaultUserName
             );
           })
           .map((requestDocument) => {
-            const data = requestDocument.data();
+            const data =
+              requestDocument.data();
 
             return {
-  id: requestDocument.id,
-  partnerId: data.senderId || '',
-  partnerName:
-    data.senderName ||
-    text.connectionsScreen.defaultUserName,
-};
+              id: requestDocument.id,
+              partnerId:
+                data.senderId || '',
+              partnerName:
+                data.senderName ||
+                text.connectionsScreen
+                  .defaultUserName,
+              unreadCount: 0,
+            };
           }),
       ];
 
       const uniqueConnections =
         acceptedConnections.filter(
-          (connection, index, allConnections) => {
+          (
+            connection,
+            index,
+            allConnections
+          ) => {
             return (
               allConnections.findIndex(
                 (item) =>
@@ -131,22 +177,163 @@ text.connectionsScreen.defaultUserName
         );
 
       setConnections(uniqueConnections);
-    } catch (error) {
-      console.error(
-        'Error loading accepted connections:',
-        error
+      setLoadError(null);
+      setIsLoading(false);
+
+      uniqueConnections.forEach((connection) => {
+        let messageUnsubscribe:
+          (() => void) | null = null;
+
+        const conversationReference = doc(
+          db,
+          'conversations',
+          connection.id
+        );
+
+        const conversationUnsubscribe =
+          onSnapshot(
+            conversationReference,
+            (conversationSnapshot) => {
+              if (messageUnsubscribe) {
+                messageUnsubscribe();
+                messageUnsubscribe = null;
+              }
+
+              if (!conversationSnapshot.exists()) {
+                updateUnreadCount(
+                  connection.id,
+                  0
+                );
+                return;
+              }
+
+              const unreadMessagesQuery = query(
+                collection(
+                  db,
+                  'conversations',
+                  connection.id,
+                  'messages'
+                ),
+                where(
+                  'readAt',
+                  '==',
+                  null
+                )
+              );
+
+              messageUnsubscribe = onSnapshot(
+                unreadMessagesQuery,
+                (messagesSnapshot) => {
+                  const unreadCount =
+                    messagesSnapshot.docs.filter(
+                      (messageDocument) => {
+                        return (
+                          messageDocument.data()
+                            .senderId !==
+                          currentUser.uid
+                        );
+                      }
+                    ).length;
+
+                  updateUnreadCount(
+                    connection.id,
+                    unreadCount
+                  );
+                },
+                () => {
+                  updateUnreadCount(
+                    connection.id,
+                    0
+                  );
+                }
+              );
+            },
+            () => {
+              updateUnreadCount(
+                connection.id,
+                0
+              );
+            }
+          );
+
+        conversationUnsubscribers.push(() => {
+          conversationUnsubscribe();
+
+          if (messageUnsubscribe) {
+            messageUnsubscribe();
+          }
+        });
+      });
+    };
+
+    const sentRequestsQuery = query(
+      collection(
+        db,
+        'connectionRequests'
+      ),
+      where(
+        'senderId',
+        '==',
+        currentUser.uid
+      )
+    );
+
+    const receivedRequestsQuery = query(
+      collection(
+        db,
+        'connectionRequests'
+      ),
+      where(
+        'recipientId',
+        '==',
+        currentUser.uid
+      )
+    );
+
+    const sentRequestsUnsubscribe =
+      onSnapshot(
+        sentRequestsQuery,
+        (sentRequestsSnapshot) => {
+          sentRequestDocuments =
+            sentRequestsSnapshot.docs;
+
+          sentSnapshotReceived = true;
+          synchronizeConnections();
+        },
+        () => {
+          setConnections([]);
+          setLoadError(
+            text.connectionsScreen.loadError
+          );
+          setIsLoading(false);
+        }
       );
 
-      setLoadError(
-  text.connectionsScreen.loadError
-);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const receivedRequestsUnsubscribe =
+      onSnapshot(
+        receivedRequestsQuery,
+        (receivedRequestsSnapshot) => {
+          receivedRequestDocuments =
+            receivedRequestsSnapshot.docs;
 
-  loadConnections();
-}, [language]);
+          receivedSnapshotReceived = true;
+          synchronizeConnections();
+        },
+        () => {
+          setConnections([]);
+          setLoadError(
+            text.connectionsScreen.loadError
+          );
+          setIsLoading(false);
+        }
+      );
+
+    return () => {
+      sentRequestsUnsubscribe();
+      receivedRequestsUnsubscribe();
+      clearConversationListeners();
+    };
+  }, [language]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -201,21 +388,25 @@ text.connectionsScreen.defaultUserName
           ) : (
             connections.map((connection) => (
               <TouchableOpacity
-  key={connection.id}
-  style={styles.connectionCard}
-  onPress={() =>
-    router.push({
-      pathname: '/chat',
-      params: {
-        lang: language,
-        connectionId: connection.id,
-        partnerId: connection.partnerId,
-        partnerName: connection.partnerName,
-      },
-    })
-  }
-  activeOpacity={0.85}
->
+                key={connection.id}
+                style={[
+                  styles.connectionCard,
+                  connection.unreadCount > 0 &&
+                    styles.unreadConnectionCard,
+              ]}
+              onPress={() =>
+                router.push({
+                  pathname: '/chat',
+                  params: {
+                    lang: language,
+                    connectionId: connection.id,
+                    partnerId: connection.partnerId,
+                    partnerName: connection.partnerName,
+                  },
+                })
+              }
+              activeOpacity={0.85}
+            >
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>
                     {connection.partnerName
@@ -239,7 +430,23 @@ text.connectionsScreen.defaultUserName
                   </Text>
                 </View>
 
-                <Text style={styles.arrow}>›</Text>
+                <View style={styles.connectionMeta}>
+                  {connection.unreadCount > 0 ? (
+                    <View style={styles.unreadBadge}>
+                      <Text
+                        style={styles.unreadBadgeText}
+                      >
+                        {connection.unreadCount > 99
+                          ? '99+'
+                          : connection.unreadCount}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  <Text style={styles.arrow}>
+                    ›
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))
           )}
@@ -339,6 +546,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
+  unreadConnectionCard: {
+    borderColor: '#22D3EE',
+    backgroundColor: '#132342',
+  },
+
   avatar: {
     width: 56,
     height: 56,
@@ -359,6 +571,29 @@ const styles = StyleSheet.create({
 
   connectionInformation: {
     flex: 1,
+  },
+
+  connectionMeta: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+  },
+
+  unreadBadge: {
+    minWidth: 25,
+    height: 25,
+    borderRadius: 13,
+    backgroundColor: '#22D3EE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 7,
+    marginBottom: 4,
+  },
+
+  unreadBadgeText: {
+    color: '#050B24',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 
   connectionName: {
