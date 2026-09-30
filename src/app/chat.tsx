@@ -72,8 +72,13 @@ const [chatError, setChatError] =
   useState<Message[]>([]);
 
   const messagesScrollRef =
-  useRef<ScrollView>(null);
-useEffect(() => {
+    useRef<ScrollView>(null);
+
+  const pendingReadMessageIdsRef =
+    useRef<Set<string>>(
+      new Set()
+    );
+  useEffect(() => {
   const prepareConversation = async () => {
     const currentUser = auth.currentUser;
     const partnerId = params.partnerId;
@@ -133,11 +138,15 @@ useEffect(() => {
 ]);
   const initials = partnerName
   useEffect(() => {
-  const currentUser = auth.currentUser;
+    const currentUser = auth.currentUser;
 
-  if (!currentUser || !connectionId) {
-    return;
-  }
+    if (
+      !currentUser ||
+      !connectionId ||
+      isPreparingChat
+    ) {
+      return;
+    }
 
   const messagesQuery = query(
     collection(
@@ -180,48 +189,74 @@ return {
 };
           }
         );
-const unreadReceivedMessages =
-  messagesSnapshot.docs.filter((messageDocument) => {
-    const data = messageDocument.data();
+      const unreadReceivedMessages =
+        messagesSnapshot.docs.filter(
+          (messageDocument) => {
+            const data =
+              messageDocument.data();
 
-    return (
-      data.senderId !== currentUser.uid &&
-      !data.readAt
-    );
-  });
+            if (data.readAt) {
+              pendingReadMessageIdsRef.current.delete(
+                messageDocument.id
+              );
 
-if (unreadReceivedMessages.length > 0) {
-  const readBatch = writeBatch(db);
+              return false;
+            }
 
-  unreadReceivedMessages.forEach((messageDocument) => {
-    readBatch.update(messageDocument.ref, {
-      readAt: serverTimestamp(),
-    });
-  });
+            return (
+              data.senderId !== currentUser.uid &&
+              !pendingReadMessageIdsRef.current.has(
+                messageDocument.id
+              )
+            );
+          }
+        );
 
-  void readBatch.commit().catch((error) => {
-    console.error(
-      'Error marking messages as read:',
-      error
-    );
-  });
-}
+      if (unreadReceivedMessages.length > 0) {
+        const readBatch = writeBatch(db);
+
+        unreadReceivedMessages.forEach(
+          (messageDocument) => {
+            pendingReadMessageIdsRef.current.add(
+              messageDocument.id
+            );
+
+            readBatch.update(
+              messageDocument.ref,
+              {
+                readAt: serverTimestamp(),
+              }
+            );
+          }
+        );
+
+        void readBatch.commit().catch(() => {
+          unreadReceivedMessages.forEach(
+            (messageDocument) => {
+              pendingReadMessageIdsRef.current.delete(
+                messageDocument.id
+              );
+            }
+          );
+        });
+      }
       setMessages(loadedMessages);
+      setChatError(null);
     },
-    (error) => {
-      console.error(
-        'Error loading chat messages:',
-        error
-      );
-
+    () => {
+      setMessages([]);
       setChatError(
-  text.chatScreen.messagesLoadError
-);
+        text.chatScreen.messagesLoadError
+      );
     }
   );
 
   return unsubscribe;
-}, [connectionId, language]);
+}, [
+  connectionId,
+  isPreparingChat,
+  language,
+]);
   const handleSendMessage = async () => {
   const cleanMessage = messageText.trim();
   const currentUser = auth.currentUser;
