@@ -175,11 +175,13 @@ useEffect(() => {
 
                   updateTotal();
                 },
-                (error) => {
-                  console.error(
-                    'Error loading unread messages:',
-                    error
+                () => {
+                  unreadCounts.set(
+                    conversationDocument.id,
+                    0
                   );
+
+                  updateTotal();
                 }
               );
 
