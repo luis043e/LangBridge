@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import {
   collection,
   doc,
-  getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   updateDoc,
@@ -54,34 +54,32 @@ const text = translations[language];
   useState<string | null>(null);
 
   useEffect(() => {
-    const loadRequests = async () => {
-      const currentUser = auth.currentUser;
+    const currentUser = auth.currentUser;
 
-      if (!currentUser) {
-        setLoadError(
-  text.requestsScreen.loginRequired
-);
+    if (!currentUser) {
+      setLoadError(
+        text.requestsScreen.loginRequired
+      );
+      setRequests([]);
+      setIsLoading(false);
+      return;
+    }
 
-        setIsLoading(false);
-        return;
-      }
+    setIsLoading(true);
+    setLoadError(null);
 
-      try {
-        setIsLoading(true);
-        setLoadError(null);
+    const requestsQuery = query(
+      collection(db, 'connectionRequests'),
+      where(
+        'recipientId',
+        '==',
+        currentUser.uid
+      )
+    );
 
-        const requestsQuery = query(
-          collection(db, 'connectionRequests'),
-          where(
-            'recipientId',
-            '==',
-            currentUser.uid
-          )
-        );
-
-        const requestSnapshot =
-          await getDocs(requestsQuery);
-
+    const unsubscribe = onSnapshot(
+      requestsQuery,
+      (requestSnapshot) => {
         const receivedRequests:
           ConnectionRequest[] =
           requestSnapshot.docs
@@ -96,8 +94,8 @@ const text = translations[language];
                 recipientId:
                   data.recipientId || '',
                 senderName:
-  data.senderName ||
-  text.requestsScreen.defaultUserName,
+                  data.senderName ||
+                  text.requestsScreen.defaultUserName,
                 recipientName:
                   data.recipientName || '',
                 status:
@@ -109,21 +107,21 @@ const text = translations[language];
             });
 
         setRequests(receivedRequests);
-      } catch (error) {
-        console.error(
-          'Error loading connection requests:',
-          error
-        );
-
+        setLoadError(null);
+        setIsLoading(false);
+      },
+      () => {
+        setRequests([]);
         setLoadError(
-  text.requestsScreen.loadError
-);
-      } finally {
+          text.requestsScreen.loadError
+        );
         setIsLoading(false);
       }
-    };
+    );
 
-    loadRequests();
+    return () => {
+      unsubscribe();
+    };
   }, [language]);
 const handleRequestResponse = async (
   requestId: string,
