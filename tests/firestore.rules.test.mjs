@@ -3129,3 +3129,125 @@ test(
     );
   }
 );
+test(
+  'a user can renew the user own notification token without changing createdAt',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-one',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[old-installation-token]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+            updatedAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      updateDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[new-installation-token]',
+          platform: 'android',
+          enabled: true,
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a user cannot change createdAt when renewing a notification token',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-one',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[old-installation-token]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+            updatedAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      updateDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[new-installation-token]',
+          platform: 'android',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
