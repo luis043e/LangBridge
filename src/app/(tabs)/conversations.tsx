@@ -10,6 +10,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   where,
@@ -45,6 +46,7 @@ export default function ConversationsScreen() {
 
 const { language } = useLanguage();
 const text = translations[language];
+
 const [conversations, setConversations] =
   useState<ConversationItem[]>([]);
 
@@ -53,6 +55,11 @@ const [isLoading, setIsLoading] =
 
 const [loadError, setLoadError] =
   useState<string | null>(null);
+
+const conversationIds = conversations
+    .map((conversation) => conversation.id)
+    .sort()
+    .join('|');
   useEffect(() => {
   const loadConversations = async () => {
     const currentUser = auth.currentUser;
@@ -205,8 +212,164 @@ return {
     }
   };
 
-  loadConversations();
+    loadConversations();
 }, [language]);
+
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser || !conversationIds) {
+      return;
+    }
+
+    const messageUnsubscribers =
+      conversations.flatMap((conversation) => {
+        const messagesReference = collection(
+          db,
+          'conversations',
+          conversation.id,
+          'messages'
+        );
+
+        const latestMessageQuery = query(
+          messagesReference,
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+
+        const latestMessageUnsubscribe =
+          onSnapshot(
+            latestMessageQuery,
+            (latestMessageSnapshot) => {
+              const latestMessageDocument =
+                latestMessageSnapshot.docs[0];
+
+              const latestMessageData =
+                latestMessageDocument?.data();
+
+              const latestMessageDate =
+                latestMessageData?.createdAt
+                  ?.toDate?.();
+
+              const formattedTime =
+                latestMessageDate
+                  ? latestMessageDate
+                      .toLocaleTimeString(
+                        text.conversationsScreen
+                          .timeLocale,
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }
+                      )
+                  : '';
+
+              setConversations(
+                (currentConversations) =>
+                  currentConversations.map(
+                    (currentConversation) =>
+                      currentConversation.id ===
+                      conversation.id
+                        ? {
+                            ...currentConversation,
+                            lastMessage:
+                              latestMessageData?.text ||
+                              text
+                                .conversationsScreen
+                                .noMessagesYet,
+                            lastMessageTime:
+                              formattedTime,
+                          }
+                        : currentConversation
+                  )
+              );
+            },
+            () => {
+              setConversations(
+                (currentConversations) =>
+                  currentConversations.map(
+                    (currentConversation) =>
+                      currentConversation.id ===
+                      conversation.id
+                        ? {
+                            ...currentConversation,
+                            lastMessage:
+                              text
+                                .conversationsScreen
+                                .noMessagesYet,
+                            lastMessageTime: '',
+                          }
+                        : currentConversation
+                  )
+              );
+            }
+          );
+
+        const unreadMessagesQuery = query(
+          messagesReference,
+          where('readAt', '==', null)
+        );
+
+        const unreadMessagesUnsubscribe =
+          onSnapshot(
+            unreadMessagesQuery,
+            (unreadMessagesSnapshot) => {
+              const unreadCount =
+                unreadMessagesSnapshot.docs.filter(
+                  (messageDocument) =>
+                    messageDocument.data().senderId !==
+                    currentUser.uid
+                ).length;
+
+              setConversations(
+                (currentConversations) =>
+                  currentConversations.map(
+                    (currentConversation) =>
+                      currentConversation.id ===
+                      conversation.id
+                        ? {
+                            ...currentConversation,
+                            unreadCount,
+                          }
+                        : currentConversation
+                  )
+              );
+            },
+            () => {
+              setConversations(
+                (currentConversations) =>
+                  currentConversations.map(
+                    (currentConversation) =>
+                      currentConversation.id ===
+                      conversation.id
+                        ? {
+                            ...currentConversation,
+                            unreadCount: 0,
+                          }
+                        : currentConversation
+                  )
+              );
+            }
+          );
+
+        return [
+          latestMessageUnsubscribe,
+          unreadMessagesUnsubscribe,
+        ];
+      });
+
+    return () => {
+      messageUnsubscribers.forEach(
+        (unsubscribe) => {
+          unsubscribe();
+        }
+      );
+    };
+  }, [
+    conversationIds,
+    language,
+  ]);
+
   return (
     <SafeAreaView
   style={styles.safeArea}
