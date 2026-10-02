@@ -13,9 +13,11 @@ import {
 } from '@firebase/rules-unit-testing';
 
 import {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -2758,6 +2760,370 @@ test(
           firestore,
           'accountDeletionCancellationOperations',
           'opaque-operation-lookup-key'
+        )
+      )
+    );
+  }
+);
+test(
+  'a user can register a valid notification installation',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      setDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[test-installation-one]',
+          platform: 'android',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a user cannot register an installation for another user',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-two',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[test-installation-one]',
+          platform: 'android',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a notification token owner cannot read the stored token',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-one',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[test-installation-one]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'a notification token owner cannot list stored installations',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-one',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[test-installation-one]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDocs(
+        collection(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'a notification installation cannot contain unknown fields',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[test-installation-one]',
+          platform: 'android',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          exposedEmail:
+            'must-not-be-stored@example.com',
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a notification installation cannot use an invalid platform',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token:
+            'ExponentPushToken[test-installation-one]',
+          platform: 'windows',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a notification installation cannot use an empty token',
+  async () => {
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      setDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        ),
+        {
+          token: '',
+          platform: 'android',
+          enabled: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+      )
+    );
+  }
+);
+
+test(
+  'a user can delete the user own notification installation',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-one',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[test-installation-one]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertSucceeds(
+      deleteDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-one',
+          'installations',
+          'installation-one'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'a user cannot delete another user notification installation',
+  async () => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            'user-two',
+            'installations',
+            'installation-one'
+          ),
+          {
+            token:
+              'ExponentPushToken[test-installation-two]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        );
+      }
+    );
+
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      deleteDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-two',
+          'installations',
+          'installation-one'
         )
       )
     );
