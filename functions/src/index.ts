@@ -17,6 +17,11 @@ import {
   runCancellationCallableWorkflow,
 } from "./cancellation-callable-runner.js";
 
+import {
+  runRegisterNotificationInstallationCallable,
+  runRemoveNotificationInstallationCallable,
+} from "./notification-installation-callable.js";
+
 import { setGlobalOptions } from "firebase-functions/v2";
 
 import {
@@ -270,6 +275,47 @@ export const cancelAccountDeletion =
 
       return executeCancelAccountDeletion(
         uid
+      );
+    }
+  );
+export const registerNotificationInstallation =
+  onCall(
+    {
+      timeoutSeconds: 30,
+    },
+    async (request) => {
+      if (request.auth === undefined) {
+        throw new HttpsError(
+          "unauthenticated",
+          "Authentication is required."
+        );
+      }
+
+      return runRegisterNotificationInstallationCallable(
+        firestore,
+        request.auth.uid,
+        request.data
+      );
+    }
+  );
+
+export const removeNotificationInstallation =
+  onCall(
+    {
+      timeoutSeconds: 30,
+    },
+    async (request) => {
+      if (request.auth === undefined) {
+        throw new HttpsError(
+          "unauthenticated",
+          "Authentication is required."
+        );
+      }
+
+      return runRemoveNotificationInstallationCallable(
+        firestore,
+        request.auth.uid,
+        request.data
       );
     }
   );
