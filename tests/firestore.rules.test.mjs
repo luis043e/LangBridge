@@ -2765,8 +2765,43 @@ test(
     );
   }
 );
+const seedNotificationInstallation =
+  async (
+    userId,
+    installationId = 'installation-one'
+  ) => {
+    await testEnvironment.withSecurityRulesDisabled(
+      async (context) => {
+        const firestore =
+          context.firestore();
+
+        await setDoc(
+          doc(
+            firestore,
+            'userNotificationTokens',
+            userId,
+            'installations',
+            installationId
+          ),
+          {
+            token:
+              'ExponentPushToken[test-installation-token]',
+            platform: 'android',
+            enabled: true,
+            createdAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+            updatedAt: new Date(
+              '2026-01-01T00:00:00.000Z'
+            ),
+          }
+        );
+      }
+    );
+  };
+
 test(
-  'a user can register a valid notification installation',
+  'a client cannot register the user own notification installation',
   async () => {
     const authenticatedContext =
       testEnvironment.authenticatedContext(
@@ -2776,7 +2811,7 @@ test(
     const firestore =
       authenticatedContext.firestore();
 
-    await assertSucceeds(
+    await assertFails(
       setDoc(
         doc(
           firestore,
@@ -2799,7 +2834,7 @@ test(
 );
 
 test(
-  'a user cannot register an installation for another user',
+  'a client cannot register a notification installation for another user',
   async () => {
     const authenticatedContext =
       testEnvironment.authenticatedContext(
@@ -2820,7 +2855,7 @@ test(
         ),
         {
           token:
-            'ExponentPushToken[test-installation-one]',
+            'ExponentPushToken[test-installation-two]',
           platform: 'android',
           enabled: true,
           createdAt: serverTimestamp(),
@@ -2832,31 +2867,10 @@ test(
 );
 
 test(
-  'a notification token owner cannot read the stored token',
+  'a client cannot read the user own notification installation',
   async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
-
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-one',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[test-installation-one]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }
-        );
-      }
+    await seedNotificationInstallation(
+      'user-one'
     );
 
     const authenticatedContext =
@@ -2882,31 +2896,39 @@ test(
 );
 
 test(
-  'a notification token owner cannot list stored installations',
+  'a client cannot read another user notification installation',
   async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
+    await seedNotificationInstallation(
+      'user-two'
+    );
 
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-one',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[test-installation-one]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }
-        );
-      }
+    const authenticatedContext =
+      testEnvironment.authenticatedContext(
+        'user-one'
+      );
+
+    const firestore =
+      authenticatedContext.firestore();
+
+    await assertFails(
+      getDoc(
+        doc(
+          firestore,
+          'userNotificationTokens',
+          'user-two',
+          'installations',
+          'installation-one'
+        )
+      )
+    );
+  }
+);
+
+test(
+  'a client cannot list notification installations',
+  async () => {
+    await seedNotificationInstallation(
+      'user-one'
     );
 
     const authenticatedContext =
@@ -2931,8 +2953,12 @@ test(
 );
 
 test(
-  'a notification installation cannot contain unknown fields',
+  'a client cannot update the user own notification installation',
   async () => {
+    await seedNotificationInstallation(
+      'user-one'
+    );
+
     const authenticatedContext =
       testEnvironment.authenticatedContext(
         'user-one'
@@ -2942,7 +2968,7 @@ test(
       authenticatedContext.firestore();
 
     await assertFails(
-      setDoc(
+      updateDoc(
         doc(
           firestore,
           'userNotificationTokens',
@@ -2952,13 +2978,10 @@ test(
         ),
         {
           token:
-            'ExponentPushToken[test-installation-one]',
+            'ExponentPushToken[test-renewed-token]',
           platform: 'android',
           enabled: true,
-          createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          exposedEmail:
-            'must-not-be-stored@example.com',
         }
       )
     );
@@ -2966,8 +2989,12 @@ test(
 );
 
 test(
-  'a notification installation cannot use an invalid platform',
+  'a client cannot update another user notification installation',
   async () => {
+    await seedNotificationInstallation(
+      'user-two'
+    );
+
     const authenticatedContext =
       testEnvironment.authenticatedContext(
         'user-one'
@@ -2977,20 +3004,19 @@ test(
       authenticatedContext.firestore();
 
     await assertFails(
-      setDoc(
+      updateDoc(
         doc(
           firestore,
           'userNotificationTokens',
-          'user-one',
+          'user-two',
           'installations',
           'installation-one'
         ),
         {
           token:
-            'ExponentPushToken[test-installation-one]',
-          platform: 'windows',
+            'ExponentPushToken[test-renewed-token]',
+          platform: 'android',
           enabled: true,
-          createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         }
       )
@@ -2999,8 +3025,12 @@ test(
 );
 
 test(
-  'a notification installation cannot use an empty token',
+  'a client cannot delete the user own notification installation',
   async () => {
+    await seedNotificationInstallation(
+      'user-one'
+    );
+
     const authenticatedContext =
       testEnvironment.authenticatedContext(
         'user-one'
@@ -3010,63 +3040,6 @@ test(
       authenticatedContext.firestore();
 
     await assertFails(
-      setDoc(
-        doc(
-          firestore,
-          'userNotificationTokens',
-          'user-one',
-          'installations',
-          'installation-one'
-        ),
-        {
-          token: '',
-          platform: 'android',
-          enabled: true,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        }
-      )
-    );
-  }
-);
-
-test(
-  'a user can delete the user own notification installation',
-  async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
-
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-one',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[test-installation-one]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }
-        );
-      }
-    );
-
-    const authenticatedContext =
-      testEnvironment.authenticatedContext(
-        'user-one'
-      );
-
-    const firestore =
-      authenticatedContext.firestore();
-
-    await assertSucceeds(
       deleteDoc(
         doc(
           firestore,
@@ -3081,31 +3054,10 @@ test(
 );
 
 test(
-  'a user cannot delete another user notification installation',
+  'a client cannot delete another user notification installation',
   async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
-
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-two',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[test-installation-two]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }
-        );
-      }
+    await seedNotificationInstallation(
+      'user-two'
     );
 
     const authenticatedContext =
@@ -3125,128 +3077,6 @@ test(
           'installations',
           'installation-one'
         )
-      )
-    );
-  }
-);
-test(
-  'a user can renew the user own notification token without changing createdAt',
-  async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
-
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-one',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[old-installation-token]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(
-              '2026-01-01T00:00:00.000Z'
-            ),
-            updatedAt: new Date(
-              '2026-01-01T00:00:00.000Z'
-            ),
-          }
-        );
-      }
-    );
-
-    const authenticatedContext =
-      testEnvironment.authenticatedContext(
-        'user-one'
-      );
-
-    const firestore =
-      authenticatedContext.firestore();
-
-    await assertSucceeds(
-      updateDoc(
-        doc(
-          firestore,
-          'userNotificationTokens',
-          'user-one',
-          'installations',
-          'installation-one'
-        ),
-        {
-          token:
-            'ExponentPushToken[new-installation-token]',
-          platform: 'android',
-          enabled: true,
-          updatedAt: serverTimestamp(),
-        }
-      )
-    );
-  }
-);
-
-test(
-  'a user cannot change createdAt when renewing a notification token',
-  async () => {
-    await testEnvironment.withSecurityRulesDisabled(
-      async (context) => {
-        const firestore =
-          context.firestore();
-
-        await setDoc(
-          doc(
-            firestore,
-            'userNotificationTokens',
-            'user-one',
-            'installations',
-            'installation-one'
-          ),
-          {
-            token:
-              'ExponentPushToken[old-installation-token]',
-            platform: 'android',
-            enabled: true,
-            createdAt: new Date(
-              '2026-01-01T00:00:00.000Z'
-            ),
-            updatedAt: new Date(
-              '2026-01-01T00:00:00.000Z'
-            ),
-          }
-        );
-      }
-    );
-
-    const authenticatedContext =
-      testEnvironment.authenticatedContext(
-        'user-one'
-      );
-
-    const firestore =
-      authenticatedContext.firestore();
-
-    await assertFails(
-      updateDoc(
-        doc(
-          firestore,
-          'userNotificationTokens',
-          'user-one',
-          'installations',
-          'installation-one'
-        ),
-        {
-          token:
-            'ExponentPushToken[new-installation-token]',
-          platform: 'android',
-          enabled: true,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        }
       )
     );
   }

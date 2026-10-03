@@ -457,64 +457,7 @@ allow update, delete: if false;
       allow read, write: if false;
 
       match /installations/{installationId} {
-        allow read: if false;
-
-        allow create: if isAuthenticated()
-          && request.auth.uid == userId
-          && installationId.size() > 0
-          && installationId.size() <= 128
-          && request.resource.data.keys().hasOnly([
-            'token',
-            'platform',
-            'enabled',
-            'createdAt',
-            'updatedAt'
-          ])
-          && request.resource.data.token
-            is string
-          && request.resource.data.token.size() > 0
-          && request.resource.data.token.size() <= 512
-          && request.resource.data.platform
-            in [
-              'android',
-              'ios'
-            ]
-          && request.resource.data.enabled
-            == true
-          && request.resource.data.createdAt
-            == request.time
-          && request.resource.data.updatedAt
-            == request.time;
-
-        allow update: if isAuthenticated()
-          && request.auth.uid == userId
-          && installationId.size() > 0
-          && installationId.size() <= 128
-          && request.resource.data.keys().hasOnly([
-            'token',
-            'platform',
-            'enabled',
-            'createdAt',
-            'updatedAt'
-          ])
-          && request.resource.data.token
-            is string
-          && request.resource.data.token.size() > 0
-          && request.resource.data.token.size() <= 512
-          && request.resource.data.platform
-            in [
-              'android',
-              'ios'
-            ]
-          && request.resource.data.enabled
-            is bool
-          && request.resource.data.createdAt
-            == resource.data.createdAt
-          && request.resource.data.updatedAt
-            == request.time;
-
-        allow delete: if isAuthenticated()
-          && request.auth.uid == userId;
+        allow read, write: if false;
       }
     }
     match /reports/{reportId} {
