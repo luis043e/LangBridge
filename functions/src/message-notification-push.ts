@@ -100,9 +100,7 @@ function isPermanentlyInvalidTokenError(
 ): boolean {
   return (
     value ===
-      "DeviceNotRegistered" ||
-    value ===
-      "InvalidCredentials"
+      "DeviceNotRegistered"
   );
 }
 

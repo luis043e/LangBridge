@@ -240,7 +240,7 @@ test(
 );
 
 test(
-  'InvalidCredentials marks the installation token as invalid',
+  'InvalidCredentials preserves the installation for credential recovery',
   async () => {
     const result =
       await sendMessageNotificationPush(
@@ -270,7 +270,7 @@ test(
           installationId:
             'installation-1',
           status:
-            'invalid-token',
+            'temporarily-unavailable',
         },
       ]
     );
