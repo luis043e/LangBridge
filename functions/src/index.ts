@@ -29,9 +29,20 @@ import {
 } from "firebase-functions/params";
 
 import {
+  onDocumentCreated,
+} from "firebase-functions/v2/firestore";
+import {
   HttpsError,
   onCall,
 } from "firebase-functions/v2/https";
+
+import {
+  runMessageNotificationCreatedEvent,
+} from "./message-notification-runner.js";
+
+import {
+  type PushFetch,
+} from "./message-notification-push.js";
 
 if (getApps().length === 0) {
   initializeApp();
@@ -40,6 +51,28 @@ if (getApps().length === 0) {
 const firestore =
   getFirestore();
 
+const messageNotificationPushFetch:
+  PushFetch =
+    async (
+      url,
+      init
+    ) => {
+      const response =
+        await fetch(
+          url,
+          init
+        );
+
+      return {
+        ok:
+          response.ok,
+        status:
+          response.status,
+        json:
+          async () =>
+            response.json(),
+      };
+    };
 export const cancellationOperationSecret =
   defineSecret(
     "CANCELLATION_OPERATION_SECRET"
@@ -317,5 +350,92 @@ export const removeNotificationInstallation =
         request.auth.uid,
         request.data
       );
+    }
+  );
+
+export const notifyMessageCreated =
+  onDocumentCreated(
+    "conversations/{conversationId}/messages/{messageId}",
+    async (event) => {
+      const conversationId =
+        event.params
+          .conversationId;
+
+      const messageId =
+        event.params
+          .messageId;
+
+      const messageSnapshot =
+        event.data;
+
+      if (!messageSnapshot) {
+        console.warn(
+          "Message notification event has no document snapshot.",
+          {
+            conversationId,
+            messageId,
+          }
+        );
+
+        return;
+      }
+
+      try {
+        const result =
+          await runMessageNotificationCreatedEvent(
+            {
+              conversationId,
+              messageId,
+              messageData:
+                messageSnapshot.data(),
+            },
+            {
+              firestore,
+              pushFetch:
+                messageNotificationPushFetch,
+            }
+          );
+
+        if (
+          result.status ===
+          "invalid-event"
+        ) {
+          console.warn(
+            "Message notification event was rejected.",
+            {
+              conversationId,
+              messageId,
+              status:
+                result.status,
+            }
+          );
+
+          return;
+        }
+
+        console.info(
+          "Message notification event processed.",
+          {
+            conversationId:
+              result.conversationId,
+            messageId:
+              result.messageId,
+            workflowStatus:
+              result.workflowResult.status,
+          }
+        );
+      } catch (error) {
+        console.error(
+          "Message notification event failed.",
+          {
+            conversationId,
+            messageId,
+            errorName:
+              error instanceof Error
+                ? error.name
+                : "UnknownError",
+          }
+        );
+      }
     }
   );
