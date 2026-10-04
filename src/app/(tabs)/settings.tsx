@@ -18,6 +18,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../../contexts/language-context';
 import { auth } from '../../firebaseConfig';
+import {
+  removeNotificationInstallation,
+} from '../../services/notification-service';
 import { translations } from '../../translations';
 export default function SettingsScreen() {
   const router = useRouter();
@@ -64,25 +67,36 @@ useFocusEffect(
     .map((part) => part.charAt(0).toUpperCase())
     .join('');
 
-  const handleSignOut = () => {
+    const handleSignOut = () => {
     Alert.alert(
-  text.settingsScreen.signOutTitle,
-  text.settingsScreen.signOutConfirmation,
+      text.settingsScreen.signOutTitle,
+      text.settingsScreen.signOutConfirmation,
       [
         {
-  text: text.settingsScreen.cancel,
-  style: 'cancel',
-},
+          text: text.settingsScreen.cancel,
+          style: 'cancel',
+        },
         {
-  text: text.settingsScreen.signOut,
-  style: 'destructive',
-  onPress: async () => {
+          text: text.settingsScreen.signOut,
+          style: 'destructive',
+          onPress: async () => {
             try {
+              try {
+                await removeNotificationInstallation();
+              } catch (notificationError) {
+                console.error(
+                  'Notification installation removal failed.',
+                  notificationError
+                );
+              }
+
               await signOut(auth);
 
               router.replace({
                 pathname: '/welcome',
-                params: { lang: language },
+                params: {
+                  lang: language,
+                },
               });
             } catch (error) {
               console.error(
@@ -91,9 +105,9 @@ useFocusEffect(
               );
 
               Alert.alert(
-  text.settingsScreen.signOutErrorTitle,
-  text.settingsScreen.tryAgain
-);
+                text.settingsScreen.signOutErrorTitle,
+                text.settingsScreen.tryAgain
+              );
             }
           },
         },
