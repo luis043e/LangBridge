@@ -17,6 +17,7 @@ import {
 } from '../firebaseConfig';
 import {
   addNotificationResponseListener,
+  configureForegroundNotifications,
   getLastNotificationResponse,
   registerNotificationInstallation,
 } from '../services/notification-service';
@@ -81,6 +82,8 @@ export function NotificationSessionManager() {
   const {
     language,
   } = useLanguage();
+
+  configureForegroundNotifications();
 
   const registeredUserIdRef =
     useRef<string | null>(

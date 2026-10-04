@@ -299,7 +299,21 @@ export const removeNotificationInstallation =
       );
     }
   };
-
+export const configureForegroundNotifications =
+  () => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        priority:
+          Notifications
+            .AndroidNotificationPriority
+            .HIGH,
+      }),
+    });
+  };
 export const getLastNotificationResponse =
   async () => {
     return Notifications
