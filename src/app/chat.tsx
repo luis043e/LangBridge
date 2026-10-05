@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   getDoc,
+  limitToLast,
   onSnapshot,
   orderBy,
   query,
@@ -155,7 +156,8 @@ const [chatError, setChatError] =
       connectionId,
       'messages'
     ),
-    orderBy('createdAt', 'asc')
+    orderBy('createdAt', 'asc'),
+    limitToLast(50)
   );
 
   const unsubscribe = onSnapshot(
