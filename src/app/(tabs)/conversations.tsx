@@ -1,4 +1,4 @@
-import {
+﻿import {
   useLocalSearchParams,
   useRouter
 } from 'expo-router';
@@ -307,6 +307,11 @@ return {
 
         const unreadMessagesQuery = query(
           messagesReference,
+          where(
+            'senderId',
+            '==',
+            conversation.partnerId
+          ),
           where('readAt', '==', null)
         );
 
@@ -315,11 +320,7 @@ return {
             unreadMessagesQuery,
             (unreadMessagesSnapshot) => {
               const unreadCount =
-                unreadMessagesSnapshot.docs.filter(
-                  (messageDocument) =>
-                    messageDocument.data().senderId !==
-                    currentUser.uid
-                ).length;
+                unreadMessagesSnapshot.size;
 
               setConversations(
                 (currentConversations) =>
@@ -402,7 +403,7 @@ return {
 
           {isLoading ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>⏳</Text>
+    <Text style={styles.emptyIcon}>â³</Text>
 
     <Text style={styles.emptyTitle}>
       {text.conversationsScreen.loading}
@@ -410,7 +411,7 @@ return {
   </View>
 ) : loadError ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>⚠️</Text>
+    <Text style={styles.emptyIcon}>âš ï¸</Text>
 
     <Text style={styles.emptyTitle}>
      {text.conversationsScreen.loadErrorTitle}
@@ -422,7 +423,7 @@ return {
   </View>
 ) : conversations.length === 0 ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>💬</Text>
+    <Text style={styles.emptyIcon}>ðŸ’¬</Text>
 
     <Text style={styles.emptyTitle}>
       {text.conversationsScreen.emptyTitle}
@@ -503,7 +504,7 @@ return {
     </View>
   ) : null}
 
-  <Text style={styles.arrow}>›</Text>
+  <Text style={styles.arrow}>â€º</Text>
 </View>
     </TouchableOpacity>
   ))
