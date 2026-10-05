@@ -6,7 +6,6 @@ import { StatusBar } from 'expo-status-bar';
 import {
   collection,
   doc,
-  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -132,67 +131,21 @@ const conversationIds = conversations
           }
         }
 
-        const latestMessageQuery = query(
-  collection(
-    db,
-    'conversations',
-    conversationDocument.id,
-    'messages'
-  ),
-  orderBy('createdAt', 'desc'),
-  limit(1)
-);
-
-const latestMessageSnapshot =
-  await getDocs(latestMessageQuery);
-
-const latestMessageDocument =
-  latestMessageSnapshot.docs[0];
-
-const latestMessageData =
-  latestMessageDocument?.data();
-
-const unreadMessagesQuery = query(
-  collection(
-    db,
-    'conversations',
-    conversationDocument.id,
-    'messages'
-  ),
-  where('senderId', '==', partnerId),
-  where('readAt', '==', null)
-);
-
-const unreadMessagesSnapshot =
-  await getCountFromServer(unreadMessagesQuery);
-
-const unreadCount =
-  unreadMessagesSnapshot.data().count;
-
-const latestMessageDate =
-  latestMessageData?.createdAt?.toDate?.();
-
-const formattedTime = latestMessageDate
-  ? latestMessageDate.toLocaleTimeString(
-      text.conversationsScreen.timeLocale,
-      {
-        hour: '2-digit',
-        minute: '2-digit',
-      }
-    )
-  : '';
-
-return {
-  id: conversationDocument.id,
-  partnerId,
-  partnerName,
-  photoURL: partnerPhotoURL,
-  lastMessage:
-  latestMessageData?.text ||
-  text.conversationsScreen.noMessagesYet,
-  lastMessageTime: formattedTime,
-  unreadCount,
-};
+        return {
+          id:
+            conversationDocument.id,
+          partnerId,
+          partnerName,
+          photoURL:
+            partnerPhotoURL,
+          lastMessage:
+            text.conversationsScreen
+              .noMessagesYet,
+          lastMessageTime:
+            '',
+          unreadCount:
+            0,
+        };
       }
     )
   );
@@ -403,7 +356,7 @@ return {
 
           {isLoading ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>â³</Text>
+    <Text style={styles.emptyIcon}>⏳</Text>
 
     <Text style={styles.emptyTitle}>
       {text.conversationsScreen.loading}
@@ -411,7 +364,7 @@ return {
   </View>
 ) : loadError ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>âš ï¸</Text>
+    <Text style={styles.emptyIcon}>⚠️</Text>
 
     <Text style={styles.emptyTitle}>
      {text.conversationsScreen.loadErrorTitle}
@@ -423,7 +376,7 @@ return {
   </View>
 ) : conversations.length === 0 ? (
   <View style={styles.emptyCard}>
-    <Text style={styles.emptyIcon}>ðŸ’¬</Text>
+    <Text style={styles.emptyIcon}>💬</Text>
 
     <Text style={styles.emptyTitle}>
       {text.conversationsScreen.emptyTitle}
@@ -504,7 +457,7 @@ return {
     </View>
   ) : null}
 
-  <Text style={styles.arrow}>â€º</Text>
+  <Text style={styles.arrow}>›</Text>
 </View>
     </TouchableOpacity>
   ))
