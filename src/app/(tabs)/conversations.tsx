@@ -34,6 +34,7 @@ type ConversationItem = {
   photoURL: string;
   lastMessage: string;
   lastMessageTime: string;
+  lastMessageAt: number;
   unreadCount: number;
 };
 export default function ConversationsScreen() {
@@ -143,8 +144,9 @@ const conversationIds = conversations
               .noMessagesYet,
           lastMessageTime:
             '',
-          unreadCount:
+          lastMessageAt:
             0,
+          unreadCount: 0,
         };
       }
     )
@@ -217,24 +219,42 @@ const conversationIds = conversations
                       )
                   : '';
 
-              setConversations(
+                            setConversations(
                 (currentConversations) =>
-                  currentConversations.map(
-                    (currentConversation) =>
-                      currentConversation.id ===
-                      conversation.id
-                        ? {
-                            ...currentConversation,
-                            lastMessage:
-                              latestMessageData?.text ||
-                              text
-                                .conversationsScreen
-                                .noMessagesYet,
-                            lastMessageTime:
-                              formattedTime,
-                          }
-                        : currentConversation
-                  )
+                  currentConversations
+                    .map(
+                      (
+                        currentConversation
+                      ) =>
+                        currentConversation.id ===
+                        conversation.id
+                          ? {
+                              ...currentConversation,
+                              lastMessage:
+                                latestMessageData
+                                  ?.text ||
+                                text
+                                  .conversationsScreen
+                                  .noMessagesYet,
+                              lastMessageTime:
+                                formattedTime,
+                              lastMessageAt:
+                                latestMessageDate
+                                  ?.getTime() ??
+                                0,
+                            }
+                          : currentConversation
+                    )
+                    .sort(
+                      (
+                        firstConversation,
+                        secondConversation
+                      ) =>
+                        secondConversation
+                          .lastMessageAt -
+                        firstConversation
+                          .lastMessageAt
+                    )
               );
             },
             () => {
@@ -251,6 +271,7 @@ const conversationIds = conversations
                                 .conversationsScreen
                                 .noMessagesYet,
                             lastMessageTime: '',
+                            lastMessageAt: 0,
                           }
                         : currentConversation
                   )
