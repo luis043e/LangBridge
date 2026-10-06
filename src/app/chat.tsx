@@ -12,6 +12,8 @@ import {
   serverTimestamp,
   setDoc,
   writeBatch,
+  type DocumentData,
+  type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -70,10 +72,41 @@ const [chatError, setChatError] =
   const [isSending, setIsSending] = useState(false);
 
   const [messages, setMessages] =
-  useState<Message[]>([]);
+    useState<Message[]>([]);
+
+  const [olderMessages, setOlderMessages] =
+    useState<Message[]>([]);
+
+  const [
+    isLoadingOlderMessages,
+    setIsLoadingOlderMessages,
+  ] = useState(false);
+
+  const [
+    hasOlderMessages,
+    setHasOlderMessages,
+  ] = useState(false);
+
+  const [
+    olderMessagesError,
+    setOlderMessagesError,
+  ] = useState<string | null>(null);
 
   const messagesScrollRef =
     useRef<ScrollView>(null);
+  const oldestLoadedMessageRef =
+    useRef<
+      QueryDocumentSnapshot<DocumentData> | null
+    >(null);
+
+  const hasLoadedOlderMessagesRef =
+    useRef(false);
+
+  const shouldScrollToEndRef =
+    useRef(true);
+
+  const recentMessagesRef =
+    useRef<Message[]>([]);
 
   const pendingReadMessageIdsRef =
     useRef<Set<string>>(
@@ -148,7 +181,21 @@ const [chatError, setChatError] =
     ) {
       return;
     }
+    setOlderMessages([]);
+    setOlderMessagesError(null);
+    setHasOlderMessages(false);
+    setIsLoadingOlderMessages(false);
 
+    oldestLoadedMessageRef.current =
+      null;
+
+    hasLoadedOlderMessagesRef.current =
+      false;
+
+    shouldScrollToEndRef.current =
+      true;
+    recentMessagesRef.current =
+      [];
   const messagesQuery = query(
     collection(
       db,
@@ -163,6 +210,19 @@ const [chatError, setChatError] =
   const unsubscribe = onSnapshot(
     messagesQuery,
     (messagesSnapshot) => {
+      const oldestRecentMessage =
+        messagesSnapshot.docs[0];
+
+      if (
+        !hasLoadedOlderMessagesRef.current
+      ) {
+        oldestLoadedMessageRef.current =
+          oldestRecentMessage ?? null;
+
+        setHasOlderMessages(
+          messagesSnapshot.size === 50
+        );
+      }
       const loadedMessages: Message[] =
         messagesSnapshot.docs.map(
           (messageDocument) => {
@@ -186,7 +246,7 @@ return {
   text: data.text || '',
   isOwn:
     data.senderId === currentUser.uid,
-  readAt: data.readAt?.toDate?.() ?? null,  
+  readAt: data.readAt?.toDate?.() ?? null,
   time: formattedTime,
 };
           }
@@ -242,6 +302,54 @@ return {
           );
         });
       }
+            if (
+        hasLoadedOlderMessagesRef.current
+      ) {
+        const recentMessageIds =
+          new Set(
+            loadedMessages.map(
+              (message) => message.id
+            )
+          );
+
+        const messagesLeavingRecentWindow =
+          recentMessagesRef.current.filter(
+            (message) =>
+              !recentMessageIds.has(
+                message.id
+              )
+          );
+
+        if (
+          messagesLeavingRecentWindow.length > 0
+        ) {
+          setOlderMessages(
+            (currentOlderMessages) => {
+              const currentIds =
+                new Set(
+                  currentOlderMessages.map(
+                    (message) =>
+                      message.id
+                  )
+                );
+
+              return [
+                ...currentOlderMessages,
+                ...messagesLeavingRecentWindow.filter(
+                  (message) =>
+                    !currentIds.has(
+                      message.id
+                    )
+                ),
+              ];
+            }
+          );
+        }
+      }
+
+      recentMessagesRef.current =
+        loadedMessages;
+
       setMessages(loadedMessages);
       setChatError(null);
     },
@@ -259,6 +367,7 @@ return {
   isPreparingChat,
   language,
 ]);
+
   const handleSendMessage = async () => {
   const cleanMessage = messageText.trim();
   const currentUser = auth.currentUser;
@@ -270,7 +379,19 @@ return {
   ) {
     return;
   }
+    setOlderMessages([]);
+    setOlderMessagesError(null);
+    setHasOlderMessages(false);
+    setIsLoadingOlderMessages(false);
 
+    oldestLoadedMessageRef.current =
+      null;
+
+    hasLoadedOlderMessagesRef.current =
+      false;
+
+    shouldScrollToEndRef.current =
+      true;
   if (!currentUser || !connectionId) {
     setChatError(
   text.chatScreen.identificationError
