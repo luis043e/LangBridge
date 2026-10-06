@@ -208,6 +208,22 @@
       'Inviato',
     messagePlaceholder:
       'Scrivi un messaggio...',
+
+    loadOlderMessages:
+
+      "Carica i messaggi precedenti",
+
+    loadingOlderMessages:
+
+      "Caricamento dei messaggi precedenti...",
+
+    noOlderMessages:
+
+      "Nessun messaggio precedente",
+
+    olderMessagesLoadError:
+
+      "Impossibile caricare i messaggi precedenti.",
   },
 
   connectionsScreen: {

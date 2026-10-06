@@ -209,6 +209,22 @@ export const ptTranslations = {
       'Enviado',
     messagePlaceholder:
       'Escreva uma mensagem...',
+
+    loadOlderMessages:
+
+      "Carregar mensagens anteriores",
+
+    loadingOlderMessages:
+
+      "Carregando mensagens anteriores...",
+
+    noOlderMessages:
+
+      "Não há mensagens anteriores",
+
+    olderMessagesLoadError:
+
+      "Não foi possível carregar as mensagens anteriores.",
   },
 
   connectionsScreen: {

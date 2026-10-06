@@ -208,6 +208,22 @@ chatScreen: {
     'भेजा गया',
   messagePlaceholder:
     'अपना संदेश लिखें...',
+
+  loadOlderMessages:
+
+    "पुराने संदेश लोड करें",
+
+  loadingOlderMessages:
+
+    "पुराने संदेश लोड हो रहे हैं...",
+
+  noOlderMessages:
+
+    "कोई पुराना संदेश नहीं है",
+
+  olderMessagesLoadError:
+
+    "पुराने संदेश लोड नहीं किए जा सके।",
 },
 
 connectionsScreen: {

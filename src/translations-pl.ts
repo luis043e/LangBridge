@@ -208,6 +208,22 @@ chatScreen: {
     'Wysłano',
   messagePlaceholder:
     'Napisz wiadomość...',
+
+  loadOlderMessages:
+
+    "Wczytaj wcześniejsze wiadomości",
+
+  loadingOlderMessages:
+
+    "Wczytywanie wcześniejszych wiadomości...",
+
+  noOlderMessages:
+
+    "Brak wcześniejszych wiadomości",
+
+  olderMessagesLoadError:
+
+    "Nie udało się wczytać wcześniejszych wiadomości.",
 },
 
 connectionsScreen: {

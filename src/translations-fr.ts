@@ -198,6 +198,22 @@ welcome: {
       'Envoyé',
     messagePlaceholder:
       'Écrivez un message...',
+
+    loadOlderMessages:
+
+      "Charger les messages précédents",
+
+    loadingOlderMessages:
+
+      "Chargement des messages précédents...",
+
+    noOlderMessages:
+
+      "Aucun message précédent",
+
+    olderMessagesLoadError:
+
+      "Impossible de charger les messages précédents.",
   },
   connectionsScreen: {
     loginRequired:

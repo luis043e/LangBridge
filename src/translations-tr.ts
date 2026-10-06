@@ -208,6 +208,22 @@ chatScreen: {
     'Gönderildi',
   messagePlaceholder:
     'Mesajınızı yazın...',
+
+  loadOlderMessages:
+
+    "Önceki mesajları yükle",
+
+  loadingOlderMessages:
+
+    "Önceki mesajlar yükleniyor...",
+
+  noOlderMessages:
+
+    "Önceki mesaj yok",
+
+  olderMessagesLoadError:
+
+    "Önceki mesajlar yüklenemedi.",
 },
 
 connectionsScreen: {

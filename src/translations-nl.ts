@@ -208,6 +208,22 @@ chatScreen: {
     'Verzonden',
   messagePlaceholder:
     'Schrijf je bericht...',
+
+  loadOlderMessages:
+
+    "Eerdere berichten laden",
+
+  loadingOlderMessages:
+
+    "Eerdere berichten worden geladen...",
+
+  noOlderMessages:
+
+    "Geen eerdere berichten",
+
+  olderMessagesLoadError:
+
+    "Eerdere berichten konden niet worden geladen.",
 },
 
 connectionsScreen: {

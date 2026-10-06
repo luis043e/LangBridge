@@ -208,6 +208,22 @@
       'Отправлено',
     messagePlaceholder:
       'Введите сообщение...',
+
+    loadOlderMessages:
+
+      "Загрузить предыдущие сообщения",
+
+    loadingOlderMessages:
+
+      "Загрузка предыдущих сообщений...",
+
+    noOlderMessages:
+
+      "Предыдущих сообщений нет",
+
+    olderMessagesLoadError:
+
+      "Не удалось загрузить предыдущие сообщения.",
   },
 
   connectionsScreen: {

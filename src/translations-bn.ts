@@ -208,6 +208,22 @@ chatScreen: {
     'পাঠানো হয়েছে',
   messagePlaceholder:
     'আপনার বার্তা লিখুন...',
+
+  loadOlderMessages:
+
+    "আগের বার্তাগুলো লোড করুন",
+
+  loadingOlderMessages:
+
+    "আগের বার্তাগুলো লোড হচ্ছে...",
+
+  noOlderMessages:
+
+    "কোনো আগের বার্তা নেই",
+
+  olderMessagesLoadError:
+
+    "আগের বার্তাগুলো লোড করা যায়নি।",
 },
 
 connectionsScreen: {

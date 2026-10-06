@@ -208,6 +208,22 @@
       'تم الإرسال',
     messagePlaceholder:
       'اكتب رسالة...',
+
+    loadOlderMessages:
+
+      "تحميل الرسائل السابقة",
+
+    loadingOlderMessages:
+
+      "جارٍ تحميل الرسائل السابقة...",
+
+    noOlderMessages:
+
+      "لا توجد رسائل سابقة",
+
+    olderMessagesLoadError:
+
+      "تعذر تحميل الرسائل السابقة.",
   },
 
   connectionsScreen: {

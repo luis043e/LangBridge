@@ -302,6 +302,22 @@ chatScreen: {
   sent: 'Sent',
   messagePlaceholder:
     'Write a message...',
+
+  loadOlderMessages:
+
+    "Load earlier messages",
+
+  loadingOlderMessages:
+
+    "Loading earlier messages...",
+
+  noOlderMessages:
+
+    "No earlier messages",
+
+  olderMessagesLoadError:
+
+    "Earlier messages could not be loaded.",
 },
 connectionsScreen: {
   loginRequired:
@@ -1205,6 +1221,22 @@ chatScreen: {
   sent: 'Enviado',
   messagePlaceholder:
     'Escribe un mensaje...',
+
+  loadOlderMessages:
+
+    "Cargar mensajes anteriores",
+
+  loadingOlderMessages:
+
+    "Cargando mensajes anteriores...",
+
+  noOlderMessages:
+
+    "No hay mensajes anteriores",
+
+  olderMessagesLoadError:
+
+    "No se pudieron cargar los mensajes anteriores.",
 },
 connectionsScreen: {
   loginRequired:

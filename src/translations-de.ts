@@ -208,6 +208,22 @@
       'Gesendet',
     messagePlaceholder:
       'Nachricht schreiben...',
+
+    loadOlderMessages:
+
+      "Frühere Nachrichten laden",
+
+    loadingOlderMessages:
+
+      "Frühere Nachrichten werden geladen...",
+
+    noOlderMessages:
+
+      "Keine früheren Nachrichten",
+
+    olderMessagesLoadError:
+
+      "Frühere Nachrichten konnten nicht geladen werden.",
   },
 
   connectionsScreen: {

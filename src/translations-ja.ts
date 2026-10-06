@@ -208,6 +208,22 @@
       '送信済み',
     messagePlaceholder:
       'メッセージを入力...',
+
+    loadOlderMessages:
+
+      "以前のメッセージを読み込む",
+
+    loadingOlderMessages:
+
+      "以前のメッセージを読み込み中...",
+
+    noOlderMessages:
+
+      "以前のメッセージはありません",
+
+    olderMessagesLoadError:
+
+      "以前のメッセージを読み込めませんでした。",
   },
 
   connectionsScreen: {

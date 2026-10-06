@@ -208,6 +208,22 @@
       '已发送',
     messagePlaceholder:
       '输入消息...',
+
+    loadOlderMessages:
+
+      "加载更早的消息",
+
+    loadingOlderMessages:
+
+      "正在加载更早的消息...",
+
+    noOlderMessages:
+
+      "没有更早的消息",
+
+    olderMessagesLoadError:
+
+      "无法加载更早的消息。",
   },
 
   connectionsScreen: {

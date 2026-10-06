@@ -208,6 +208,22 @@
       '전송됨',
     messagePlaceholder:
       '메시지를 입력하세요...',
+
+    loadOlderMessages:
+
+      "이전 메시지 불러오기",
+
+    loadingOlderMessages:
+
+      "이전 메시지를 불러오는 중...",
+
+    noOlderMessages:
+
+      "이전 메시지가 없습니다",
+
+    olderMessagesLoadError:
+
+      "이전 메시지를 불러올 수 없습니다.",
   },
 
   connectionsScreen: {
