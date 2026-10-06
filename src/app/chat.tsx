@@ -367,7 +367,165 @@ return {
   isPreparingChat,
   language,
 ]);
+  const handleLoadOlderMessages =
+    async () => {
+      const currentUser =
+        auth.currentUser;
 
+      const oldestLoadedMessage =
+        oldestLoadedMessageRef.current;
+
+      if (
+        !currentUser ||
+        !connectionId ||
+        !oldestLoadedMessage ||
+        isLoadingOlderMessages ||
+        !hasOlderMessages
+      ) {
+        return;
+      }
+
+      try {
+        setIsLoadingOlderMessages(true);
+        setOlderMessagesError(null);
+
+        const {
+          endBefore,
+          getDocs,
+        } = await import(
+          'firebase/firestore'
+        );
+
+        const olderMessagesQuery =
+          query(
+            collection(
+              db,
+              'conversations',
+              connectionId,
+              'messages'
+            ),
+            orderBy(
+              'createdAt',
+              'asc'
+            ),
+            endBefore(
+              oldestLoadedMessage
+            ),
+            limitToLast(50)
+          );
+
+        const olderMessagesSnapshot =
+          await getDocs(
+            olderMessagesQuery
+          );
+
+        const loadedOlderMessages:
+          Message[] =
+          olderMessagesSnapshot.docs.map(
+            (messageDocument) => {
+              const data =
+                messageDocument.data();
+
+              const messageDate =
+                data.createdAt
+                  ?.toDate?.();
+
+              const formattedTime =
+                messageDate
+                  ? messageDate
+                      .toLocaleTimeString(
+                        text.chatScreen
+                          .timeLocale,
+                        {
+                          hour:
+                            '2-digit',
+                          minute:
+                            '2-digit',
+                        }
+                      )
+                  : '';
+
+              return {
+                id:
+                  messageDocument.id,
+                text:
+                  data.text || '',
+                isOwn:
+                  data.senderId ===
+                  currentUser.uid,
+                readAt:
+                  data.readAt
+                    ?.toDate?.() ??
+                  null,
+                time:
+                  formattedTime,
+              };
+            }
+          );
+
+        if (
+          olderMessagesSnapshot.empty
+        ) {
+          setHasOlderMessages(false);
+          return;
+        }
+
+        const oldestOlderMessage =
+          olderMessagesSnapshot.docs[0];
+
+        oldestLoadedMessageRef.current =
+          oldestOlderMessage ?? null;
+
+        hasLoadedOlderMessagesRef.current =
+          true;
+
+        shouldScrollToEndRef.current =
+          false;
+
+        setOlderMessages(
+          (currentOlderMessages) => {
+            const existingIds =
+              new Set([
+                ...currentOlderMessages,
+                ...messages,
+              ].map(
+                (message) =>
+                  message.id
+              ));
+
+            const uniqueOlderMessages =
+              loadedOlderMessages.filter(
+                (message) =>
+                  !existingIds.has(
+                    message.id
+                  )
+              );
+
+            return [
+              ...uniqueOlderMessages,
+              ...currentOlderMessages,
+            ];
+          }
+        );
+
+        setHasOlderMessages(
+          olderMessagesSnapshot.size ===
+            50
+        );
+      } catch (error) {
+        console.error(
+          'Error loading older chat messages:',
+          error
+        );
+
+        setOlderMessagesError(
+          text.chatScreen
+            .olderMessagesLoadError
+        );
+      } finally {
+        setIsLoadingOlderMessages(false);
+      }
+    };
   const handleSendMessage = async () => {
   const cleanMessage = messageText.trim();
   const currentUser = auth.currentUser;
@@ -379,19 +537,6 @@ return {
   ) {
     return;
   }
-    setOlderMessages([]);
-    setOlderMessagesError(null);
-    setHasOlderMessages(false);
-    setIsLoadingOlderMessages(false);
-
-    oldestLoadedMessageRef.current =
-      null;
-
-    hasLoadedOlderMessagesRef.current =
-      false;
-
-    shouldScrollToEndRef.current =
-      true;
   if (!currentUser || !connectionId) {
     setChatError(
   text.chatScreen.identificationError
@@ -432,7 +577,16 @@ return {
     setIsSending(false);
   }
 };
-
+  const displayedMessages = [
+    ...olderMessages,
+    ...messages,
+  ].filter(
+    (message, index, allMessages) =>
+      allMessages.findIndex(
+        (candidateMessage) =>
+          candidateMessage.id === message.id
+      ) === index
+  );
   return (
   <SafeAreaView style={styles.safeArea}>
     <KeyboardAvoidingView
@@ -492,13 +646,100 @@ return {
   contentContainerStyle={styles.messagesContent}
   showsVerticalScrollIndicator={false}
   keyboardShouldPersistTaps="handled"
-  onContentSizeChange={() =>
+    maintainVisibleContentPosition={{
+    minIndexForVisible: 0,
+  }}
+  onContentSizeChange={() => {
+    if (
+      !shouldScrollToEndRef.current
+    ) {
+      shouldScrollToEndRef.current =
+        true;
+
+      return;
+    }
+
     messagesScrollRef.current?.scrollToEnd({
       animated: true,
-    })
-  }
+    });
+  }}
 >
-          {messages.length === 0 ? (
+          {hasOlderMessages ? (
+            <TouchableOpacity
+              style={
+                styles.loadOlderMessagesButton
+              }
+              onPress={
+                handleLoadOlderMessages
+              }
+              activeOpacity={0.8}
+              disabled={
+                isLoadingOlderMessages
+              }
+            >
+              <Text
+                style={
+                  styles.loadOlderMessagesText
+                }
+              >
+                {isLoadingOlderMessages
+                  ? text.chatScreen
+                      .loadingOlderMessages
+                  : text.chatScreen
+                      .loadOlderMessages}
+              </Text>
+            </TouchableOpacity>
+          ) : olderMessages.length > 0 ? (
+            <Text
+              style={
+                styles.noOlderMessagesText
+              }
+            >
+              {
+                text.chatScreen
+                  .noOlderMessages
+              }
+            </Text>
+          ) : null}
+
+          {olderMessagesError ? (
+            <View
+              style={
+                styles.olderMessagesErrorBox
+              }
+            >
+              <Text
+                style={
+                  styles.olderMessagesErrorText
+                }
+              >
+                {olderMessagesError}
+              </Text>
+
+              {hasOlderMessages ? (
+                <TouchableOpacity
+                  onPress={
+                    handleLoadOlderMessages
+                  }
+                  disabled={
+                    isLoadingOlderMessages
+                  }
+                >
+                  <Text
+                    style={
+                      styles.olderMessagesRetryText
+                    }
+                  >
+                    {
+                      text.chatScreen
+                        .loadOlderMessages
+                    }
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          ) : null}
+          {displayedMessages.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>
                 💬
@@ -516,7 +757,7 @@ return {
               </Text>
             </View>
           ) : (
-            messages.map((message) => (
+            displayedMessages.map((message) => (
               <View
                 key={message.id}
                 style={[
@@ -683,7 +924,51 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 24,
   },
+    loadOlderMessagesButton: {
+    alignSelf: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 14,
+    marginBottom: 16,
+    backgroundColor: '#172554',
+    borderWidth: 1,
+    borderColor: '#334E82',
+  },
 
+  loadOlderMessagesText: {
+    color: '#67E8F9',
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+
+  noOlderMessagesText: {
+    color: '#7D8BA8',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+
+  olderMessagesErrorBox: {
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 12,
+  },
+
+  olderMessagesErrorText: {
+    color: '#FCA5A5',
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+  },
+
+  olderMessagesRetryText: {
+    color: '#67E8F9',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 8,
+    textAlign: 'center',
+  },
   emptyState: {
     flex: 1,
     minHeight: 320,
