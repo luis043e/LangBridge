@@ -133,7 +133,6 @@ const configureAndroidNotificationChannel =
             250,
           ],
           lightColor: '#22D3EE',
-          sound: 'default',
         }
       );
   };
